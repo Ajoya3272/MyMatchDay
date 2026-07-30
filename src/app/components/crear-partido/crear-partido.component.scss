@@ -16,7 +16,7 @@ ion-content.create-match-page {
 
 .create-match-page__eyebrow {
   margin: 0 0 8px;
-  color: #22c55e;
+  color: var(--matchday-green);
   font-size: 0.78rem;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -60,7 +60,7 @@ ion-content.create-match-page {
 }
 
 .create-match-page__steps span.completed {
-  color: #22c55e;
+  color: var(--matchday-green);
 }
 
 .create-match-page__progress-bar {
@@ -72,7 +72,7 @@ ion-content.create-match-page {
 
 .create-match-page__progress-bar.step-2,
 .create-match-page__progress-bar.step-3 {
-  --progress-background: #22c55e;
+  --progress-background: var(--matchday-green);
 }
 
 .create-match-card {
@@ -193,7 +193,7 @@ ion-content.create-match-page {
   --title-color: #111827;
   --wheel-highlight-background: #ecfdf3;
   --wheel-fade-background-rgb: 255, 255, 255;
-  --day-highlight-background: #22c55e;
+  --day-highlight-background: var(--matchday-green);
   --day-highlight-color: #ffffff;
 }
 
@@ -242,7 +242,7 @@ ion-content.create-match-page {
 }
 
 .field-input:focus {
-  border-color: #22c55e;
+  border-color: var(--matchday-green);
   box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.12);
 }
 
@@ -306,7 +306,7 @@ ion-content.create-match-page {
 
 .primary-action {
   flex: 1;
-  background: #22c55e;
+  background: var(--matchday-green);
   color: #0f172a;
   box-shadow: 0 10px 24px rgba(34, 197, 94, 0.22);
 }

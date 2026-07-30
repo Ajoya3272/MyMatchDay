@@ -1,12 +1,17 @@
 @import url("https://fonts.googleapis.com/css2?family=Futura+PT:wght@400;700&display=swap");
 
+:root {
+  --matchday-green: #22c55e;
+  --matchday-black: #111827;
+}
+
 html,
 body {
   margin: 0;
   padding: 0;
   font-family: "Inter", "Segoe UI", sans-serif;
   background: #f5f7fb;
-  color: #111827;
+  color: var(--matchday-black);
 }
 
 * {

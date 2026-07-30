@@ -10,14 +10,14 @@
     <span></span>
   </button>
 
-  <div class="app-header__brand">
-    <span class="app-header__logo">M</span>
-
-    <div class="app-header__brand-copy">
-      <p class="app-header__name">Matchday</p>
-      <p class="app-header__status">Your football app</p>
-    </div>
-  </div>
+  <button
+    class="app-header__brand"
+    type="button"
+    aria-label="Volver al inicio"
+    (click)="goHome()"
+  >
+    <strong class="app-header__title">MYMATCHDAY</strong>
+  </button>
 
   <div class="app-header__profile">
     <button
@@ -31,9 +31,7 @@
 
     <div class="app-header__profile-menu" *ngIf="isProfileOpen">
       <button type="button" class="app-header__profile-item">My profile</button>
-
       <button type="button" class="app-header__profile-item">Settings</button>
-
       <button type="button" class="app-header__profile-item">Log out</button>
     </div>
   </div>
