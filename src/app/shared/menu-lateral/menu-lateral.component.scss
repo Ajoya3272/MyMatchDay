@@ -1,0 +1,143 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+ion-content.menu-lateral {
+  --background: #f6f7fb;
+  --padding-top: 20px;
+  --padding-bottom: 24px;
+  --padding-start: 16px;
+  --padding-end: 16px;
+}
+
+.menu-lateral__top {
+  margin-bottom: 20px;
+}
+
+.menu-lateral__brand {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.menu-lateral__logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  background: #22c55e;
+  color: #0f172a;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+.menu-lateral__brand-copy {
+  min-width: 0;
+}
+
+.menu-lateral__eyebrow {
+  margin: 0 0 4px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6b7280;
+}
+
+.menu-lateral__title {
+  margin: 0;
+  font-size: 1.9rem;
+  line-height: 1;
+  font-weight: 800;
+  color: #111827;
+}
+
+.menu-lateral__subtitle {
+  margin: 8px 0 0;
+  font-size: 0.98rem;
+  line-height: 1.45;
+  color: #4b5563;
+}
+
+.menu-lateral__list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+}
+
+.menu-lateral__item {
+  --background: #ffffff;
+  --border-radius: 22px;
+  --padding-start: 14px;
+  --padding-end: 14px;
+  --inner-padding-end: 0;
+  --min-height: 78px;
+  --color: #111827;
+  margin-bottom: 12px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+.menu-lateral__item-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  background: #eef2f7;
+  display: grid;
+  place-items: center;
+  margin-right: 12px;
+  font-size: 1.1rem;
+}
+
+.menu-lateral__item ion-label h3 {
+  margin: 0 0 4px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.menu-lateral__item ion-label p {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.35;
+  color: #6b7280;
+}
+
+.menu-lateral__bottom {
+  margin-top: 24px;
+}
+
+.menu-lateral__mock-card {
+  padding: 20px;
+  border-radius: 24px;
+  background: #111827;
+  color: #ffffff;
+}
+
+.menu-lateral__mock-label {
+  margin: 0 0 8px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.menu-lateral__mock-title {
+  margin: 0 0 8px;
+  font-size: 1.35rem;
+  line-height: 1.05;
+  font-weight: 800;
+}
+
+.menu-lateral__mock-text {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.82);
+}

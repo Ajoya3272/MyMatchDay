@@ -1,0 +1,244 @@
+ion-content.home-page {
+  --background: #ffffff;
+}
+
+.home-page {
+  color: #111827;
+}
+
+.home-page__next-match {
+  padding: 92px 16px 0;
+}
+
+.home-page__quick-section,
+.home-page__stats,
+.home-page__activity {
+  padding: 20px 16px 0;
+}
+
+.home-page__activity {
+  padding-bottom: 32px;
+}
+
+.home-page__section-heading {
+  margin-bottom: 14px;
+}
+
+.home-page__section-heading h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #111827;
+}
+
+.home-page__section-heading p {
+  margin: 6px 0 0;
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.home-page__quick-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.quick-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 20px;
+  background: #ffffff;
+  padding: 16px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+}
+
+.quick-card__icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 14px;
+  background: #f3f4f6;
+  display: grid;
+  place-items: center;
+  font-size: 1rem;
+}
+
+.quick-card__title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.quick-card__text {
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: #6b7280;
+}
+
+.match-card {
+  border-radius: 24px;
+  background: #111827;
+  color: #ffffff;
+  padding: 18px;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.18);
+}
+
+.match-card__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.match-card__badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: #22c55e;
+  color: #0f172a;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.match-card__players {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.match-card__title {
+  margin: 0;
+  font-size: 1.3rem;
+  line-height: 1.1;
+  font-weight: 800;
+}
+
+.match-card__place {
+  margin: 8px 0 0;
+  font-size: 0.92rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.match-card__meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.match-card__meta-item {
+  padding: 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.match-card__meta-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.68);
+}
+
+.match-card__meta-value {
+  font-size: 0.92rem;
+  color: #ffffff;
+}
+
+.match-card--empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.match-card__empty-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.08);
+  display: grid;
+  place-items: center;
+  font-size: 1.2rem;
+  margin-bottom: 16px;
+}
+
+.match-card__cta {
+  min-height: 46px;
+  margin-top: 18px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 14px;
+  background: #22c55e;
+  color: #0f172a;
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.stat-card {
+  padding: 18px 16px;
+  border-radius: 20px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+}
+
+.stat-card__label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.82rem;
+  color: #6b7280;
+}
+
+.stat-card__value {
+  font-size: 1.6rem;
+  line-height: 1;
+  font-weight: 800;
+  color: #111827;
+}
+
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.activity-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 18px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+}
+
+.activity-item__dot {
+  width: 10px;
+  height: 10px;
+  margin-top: 6px;
+  border-radius: 50%;
+  background: #22c55e;
+  flex-shrink: 0;
+}
+
+.activity-item h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.activity-item p {
+  margin: 6px 0 0;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  color: #6b7280;
+}

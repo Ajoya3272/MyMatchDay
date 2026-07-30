@@ -1,0 +1,143 @@
+<ion-content class="home-page">
+  <section class="home-page__next-match">
+    <div class="home-page__section-heading">
+      <h2>Próximo partido</h2>
+      <p>Tu siguiente convocatoria de un vistazo.</p>
+    </div>
+
+    <article class="match-card" *ngIf="hasNextMatch; else emptyNextMatch">
+      <div class="match-card__top">
+        <span class="match-card__badge">Hoy · 20:30</span>
+        <span class="match-card__players">8/10 confirmados</span>
+      </div>
+
+      <h3 class="match-card__title">Solteros FC vs Casados FC</h3>
+      <p class="match-card__place">Campo municipal · Chiclana</p>
+
+      <div class="match-card__meta">
+        <div class="match-card__meta-item">
+          <span class="match-card__meta-label">Faltan</span>
+          <strong class="match-card__meta-value">2 jugadores</strong>
+        </div>
+
+        <div class="match-card__meta-item">
+          <span class="match-card__meta-label">Invitación</span>
+          <strong class="match-card__meta-value">Lista para enviar</strong>
+        </div>
+      </div>
+    </article>
+
+    <ng-template #emptyNextMatch>
+      <article class="match-card match-card--empty">
+        <div class="match-card__empty-icon">⚽</div>
+        <h3 class="match-card__title">No tienes ningún partido pendiente</h3>
+        <p class="match-card__place">Organiza uno e invita a tus amigos.</p>
+
+        <button
+          class="match-card__cta"
+          type="button"
+          routerLink="/crear-partido"
+        >
+          Crear partido
+        </button>
+      </article>
+    </ng-template>
+  </section>
+
+  <section class="home-page__quick-section">
+    <div class="home-page__section-heading">
+      <h2>Accesos rápidos</h2>
+      <p>Lo que más vas a usar en el día a día.</p>
+    </div>
+
+    <div class="home-page__quick-grid">
+      <button class="quick-card" type="button" routerLink="/crear-partido">
+        <span class="quick-card__icon">⚽</span>
+        <span class="quick-card__title">Crear partido</span>
+        <span class="quick-card__text">Monta una pachanga en segundos.</span>
+      </button>
+
+      <button class="quick-card" type="button">
+        <span class="quick-card__icon">📲</span>
+        <span class="quick-card__title">Invitar por WhatsApp</span>
+        <span class="quick-card__text">Comparte enlace directo al grupo.</span>
+      </button>
+
+      <button class="quick-card" type="button">
+        <span class="quick-card__icon">📝</span>
+        <span class="quick-card__title">Registrar resultado</span>
+        <span class="quick-card__text"
+          >Guarda marcador, goles y asistentes.</span
+        >
+      </button>
+
+      <button class="quick-card" type="button">
+        <span class="quick-card__icon">📊</span>
+        <span class="quick-card__title">Mis estadísticas</span>
+        <span class="quick-card__text">Consulta tus números al instante.</span>
+      </button>
+    </div>
+  </section>
+
+  <section class="home-page__stats">
+    <div class="home-page__section-heading">
+      <h2>Tu resumen</h2>
+      <p>Tus datos más importantes.</p>
+    </div>
+
+    <div class="stats-grid">
+      <article class="stat-card">
+        <span class="stat-card__label">Partidos</span>
+        <strong class="stat-card__value">24</strong>
+      </article>
+
+      <article class="stat-card">
+        <span class="stat-card__label">Victorias</span>
+        <strong class="stat-card__value">13</strong>
+      </article>
+
+      <article class="stat-card">
+        <span class="stat-card__label">Goles</span>
+        <strong class="stat-card__value">9</strong>
+      </article>
+
+      <article class="stat-card">
+        <span class="stat-card__label">Asistencias</span>
+        <strong class="stat-card__value">6</strong>
+      </article>
+    </div>
+  </section>
+
+  <section class="home-page__activity">
+    <div class="home-page__section-heading">
+      <h2>Actividad reciente</h2>
+      <p>Lo último que ha pasado en tu grupo.</p>
+    </div>
+
+    <div class="activity-list">
+      <article class="activity-item">
+        <span class="activity-item__dot"></span>
+        <div>
+          <h3>Ganaste 4-3 contra Los Primos</h3>
+          <p>Marcaste 1 gol y diste 1 asistencia.</p>
+        </div>
+      </article>
+
+      <article class="activity-item">
+        <span class="activity-item__dot"></span>
+        <div>
+          <h3>Juan confirmó asistencia</h3>
+          <p>Ya sois 8 jugadores para el partido de hoy.</p>
+        </div>
+      </article>
+
+      <article class="activity-item">
+        <span class="activity-item__dot"></span>
+        <div>
+          <h3>Nuevo enlace creado</h3>
+          <p>La invitación ya está lista para compartir.</p>
+        </div>
+      </article>
+    </div>
+  </section>
+</ion-content>

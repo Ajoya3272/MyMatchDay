@@ -1,0 +1,40 @@
+<header class="app-header">
+  <button
+    class="app-header__icon-btn"
+    type="button"
+    aria-label="Open menu"
+    (click)="openMainMenu()"
+  >
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+
+  <div class="app-header__brand">
+    <span class="app-header__logo">M</span>
+
+    <div class="app-header__brand-copy">
+      <p class="app-header__name">Matchday</p>
+      <p class="app-header__status">Your football app</p>
+    </div>
+  </div>
+
+  <div class="app-header__profile">
+    <button
+      class="app-header__avatar-btn"
+      type="button"
+      aria-label="Open profile menu"
+      (click)="toggleProfileMenu()"
+    >
+      <span class="app-header__avatar">S</span>
+    </button>
+
+    <div class="app-header__profile-menu" *ngIf="isProfileOpen">
+      <button type="button" class="app-header__profile-item">My profile</button>
+
+      <button type="button" class="app-header__profile-item">Settings</button>
+
+      <button type="button" class="app-header__profile-item">Log out</button>
+    </div>
+  </div>
+</header>

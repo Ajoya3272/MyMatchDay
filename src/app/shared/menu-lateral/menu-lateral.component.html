@@ -1,0 +1,69 @@
+<ion-content class="menu-lateral">
+  <div class="menu-lateral__top">
+    <div class="menu-lateral__brand">
+      <span class="menu-lateral__logo">M</span>
+
+      <div class="menu-lateral__brand-copy">
+        <p class="menu-lateral__eyebrow">Football tracker</p>
+        <h2 class="menu-lateral__title">Matchday</h2>
+      </div>
+    </div>
+  </div>
+
+  <ion-list lines="none" class="menu-lateral__list">
+    <ion-menu-toggle auto-hide="true">
+      <ion-item
+        button
+        detail="false"
+        routerLink="/stats"
+        class="menu-lateral__item"
+      >
+        <div class="menu-lateral__item-icon" slot="start">📊</div>
+        <ion-label>
+          <h3>Statistics</h3>
+          <p>Your matches, wins and performance.</p>
+        </ion-label>
+      </ion-item>
+    </ion-menu-toggle>
+
+    <ion-menu-toggle auto-hide="true">
+      <ion-item
+        button
+        detail="false"
+        routerLink="/organize-match"
+        class="menu-lateral__item"
+      >
+        <div class="menu-lateral__item-icon" slot="start">⚽</div>
+        <ion-label>
+          <h3>Organize match</h3>
+          <p>Create a game and invite your friends.</p>
+        </ion-label>
+      </ion-item>
+    </ion-menu-toggle>
+
+    <ion-menu-toggle auto-hide="true">
+      <ion-item
+        button
+        detail="false"
+        routerLink="/history"
+        class="menu-lateral__item"
+      >
+        <div class="menu-lateral__item-icon" slot="start">🕘</div>
+        <ion-label>
+          <h3>History</h3>
+          <p>See all your previous matches.</p>
+        </ion-label>
+      </ion-item>
+    </ion-menu-toggle>
+  </ion-list>
+
+  <div class="menu-lateral__bottom">
+    <div class="menu-lateral__mock-card">
+      <p class="menu-lateral__mock-label">Today</p>
+      <h3 class="menu-lateral__mock-title">Who are we playing today?</h3>
+      <p class="menu-lateral__mock-text">
+        Set today’s rival, time and pitch in seconds.
+      </p>
+    </div>
+  </div>
+</ion-content>
