@@ -1,0 +1,25 @@
+<ion-content class="invitation-page">
+  <div class="invitation-page__wrapper">
+    <div class="invitation-card">
+      <p class="invitation-card__eyebrow">Invitación</p>
+
+      <h1 class="invitation-card__title">Te han invitado a un partido</h1>
+
+      <p class="invitation-card__text">
+        Este enlace corresponde a la invitación:
+      </p>
+
+      <div class="invitation-card__slug">
+        {{ slug }}
+      </div>
+
+      <p class="invitation-card__text">
+        Aquí luego podrás cargar los datos reales del partido usando este slug.
+      </p>
+
+      <a routerLink="/home" class="invitation-card__action">
+        Volver al inicio
+      </a>
+    </div>
+  </div>
+</ion-content>

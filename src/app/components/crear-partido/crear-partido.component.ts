@@ -31,6 +31,8 @@ export class CrearPartidoComponent {
   inviteLink = '';
   stepAnimationClass = '';
   minDateTime = this.getMinDateTime();
+  linkCopied = false;
+  private copyFeedbackTimeout: ReturnType<typeof setTimeout> | null = null;
 
   form = this.fb.group({
     matchDate: ['', Validators.required],
@@ -82,24 +84,40 @@ export class CrearPartidoComponent {
 
     const matchName = this.form.controls.matchName.value ?? 'partido';
 
-    const slug = matchName
+    const slugBase = matchName
       .toLowerCase()
       .trim()
       .replace(/[^a-z0-9áéíóúüñ\s-]/gi, '')
       .replace(/\s+/g, '-');
 
-    this.inviteLink = `https://matchday.app/invitacion/${slug}-${Date.now()}`;
+    const finalSlug = `${slugBase || 'partido'}-${Date.now()}`;
+
+    this.inviteLink = `${window.location.origin}/invitacion/${finalSlug}`;
     this.created = true;
     this.currentStep = 3;
+    this.linkCopied = false;
     this.animateStep('forward');
   }
 
-  copyInvite(): void {
+  async copyInvite(): Promise<void> {
     if (!this.inviteLink) {
       return;
     }
 
-    navigator.clipboard?.writeText(this.inviteLink);
+    try {
+      await navigator.clipboard.writeText(this.inviteLink);
+      this.linkCopied = true;
+
+      if (this.copyFeedbackTimeout) {
+        clearTimeout(this.copyFeedbackTimeout);
+      }
+
+      this.copyFeedbackTimeout = setTimeout(() => {
+        this.linkCopied = false;
+      }, 3000);
+    } catch {
+      this.linkCopied = false;
+    }
   }
 
   goHome(): void {
@@ -113,6 +131,12 @@ export class CrearPartidoComponent {
     this.inviteLink = '';
     this.stepAnimationClass = '';
     this.minDateTime = this.getMinDateTime();
+    this.linkCopied = false;
+
+    if (this.copyFeedbackTimeout) {
+      clearTimeout(this.copyFeedbackTimeout);
+      this.copyFeedbackTimeout = null;
+    }
 
     this.form.reset({
       matchDate: '',

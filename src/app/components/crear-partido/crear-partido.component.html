@@ -211,11 +211,23 @@
 
       <button
         *ngIf="currentStep === 3"
-        class="primary-action"
+        class="primary-action copy-action"
         type="button"
+        [class.copy-action--copied]="linkCopied"
         (click)="copyInvite()"
       >
-        Copiar enlace
+        <span class="copy-action__content">
+          <span class="copy-action__label" [class.is-hidden]="linkCopied">
+            Copiar enlace
+          </span>
+
+          <span
+            class="copy-action__label copy-action__label--success"
+            [class.is-visible]="linkCopied"
+          >
+            Enlace copiado!
+          </span>
+        </span>
       </button>
     </div>
   </section>
