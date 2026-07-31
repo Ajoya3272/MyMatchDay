@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { HomeComponent } from './components/home/home.component';
 import { CrearPartidoComponent } from './components/crear-partido/crear-partido.component';
 import { InvitacionComponent } from './components/invitacion/invitacion.component';
+import { DetallesPartidoComponent } from './components/detalles-partido/detalles-partido.component';
 
 export const routes: Routes = [
   {
@@ -20,5 +21,9 @@ export const routes: Routes = [
   {
     path: 'invitacion/:slug',
     component: InvitacionComponent,
+  },
+  {
+    path: 'detalles-partido',
+    component: DetallesPartidoComponent,
   },
 ];
