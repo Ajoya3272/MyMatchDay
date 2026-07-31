@@ -1,14 +1,17 @@
 <ion-app>
-  <ion-menu
-    contentId="main-content"
-    menuId="main-menu"
-    side="start"
-    type="overlay"
-    class="main-side-menu"
-  >
-    <app-menu-lateral></app-menu-lateral>
-  </ion-menu>
+  @if (!hideLayout) {
+    <ion-menu
+      contentId="main-content"
+      menuId="main-menu"
+      side="start"
+      type="overlay"
+      class="main-side-menu"
+    >
+      <app-menu-lateral></app-menu-lateral>
+    </ion-menu>
 
-  <app-header></app-header>
+    <app-header></app-header>
+  }
+
   <ion-router-outlet id="main-content"></ion-router-outlet>
 </ion-app>

@@ -1,0 +1,119 @@
+<ion-content [fullscreen]="true" class="login-content" [scrollY]="false">
+  <div class="login-shell">
+    <section class="login-card">
+      <div class="brand-block">
+        <div class="brand-logo">
+          <ion-icon name="football-outline"></ion-icon>
+        </div>
+
+        <h1>Iniciar sesión</h1>
+        <p>Accede para gestionar tus partidos, invitaciones y resultados.</p>
+      </div>
+
+      <form
+        [formGroup]="loginForm"
+        (ngSubmit)="onSubmit()"
+        novalidate
+        class="login-form"
+      >
+        <div class="field-group">
+          <label for="email">Correo electrónico</label>
+
+          <ion-item lines="none" class="custom-item">
+            <ion-icon name="mail-outline" slot="start"></ion-icon>
+
+            <ion-input
+              id="email"
+              type="email"
+              formControlName="email"
+              placeholder="tuemail@ejemplo.com"
+              inputmode="email"
+              autocomplete="email"
+            >
+            </ion-input>
+          </ion-item>
+
+          <div class="error-slot">
+            @if (email.touched && email.invalid) {
+              <ion-note color="danger">
+                @if (email.errors?.["required"]) {
+                  El correo es obligatorio.
+                } @else if (email.errors?.["email"]) {
+                  Introduce un correo válido.
+                }
+              </ion-note>
+            }
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="password">Contraseña</label>
+
+          <ion-item lines="none" class="custom-item password-item">
+            <ion-icon name="key-outline" slot="start"></ion-icon>
+
+            <ion-input
+              id="password"
+              [type]="showPassword ? 'text' : 'password'"
+              formControlName="password"
+              placeholder="Introduce tu contraseña"
+              autocomplete="current-password"
+            >
+            </ion-input>
+
+            <button
+              type="button"
+              class="password-toggle"
+              slot="end"
+              (click)="togglePasswordVisibility()"
+              [attr.aria-label]="
+                showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
+              "
+            >
+              <ion-icon
+                class="toggle-eye-icon"
+                [class.is-visible]="showPassword"
+                [class.is-animating]="iconAnimating"
+                [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"
+              >
+              </ion-icon>
+            </button>
+          </ion-item>
+
+          <div class="error-slot">
+            @if (password.touched && password.invalid) {
+              <ion-note color="danger">
+                @if (password.errors?.["required"]) {
+                  La contraseña es obligatoria.
+                } @else if (password.errors?.["minlength"]) {
+                  Debe tener al menos 6 caracteres.
+                }
+              </ion-note>
+            }
+          </div>
+        </div>
+
+        <ion-button
+          type="submit"
+          expand="block"
+          class="login-btn"
+          [class.is-loading]="loading"
+          [disabled]="loading"
+        >
+          @if (!loading) {
+            <span>Entrar</span>
+          } @else {
+            <ion-spinner name="crescent"></ion-spinner>
+          }
+        </ion-button>
+
+        <div class="register-block">
+          <span>No tienes cuenta?</span>
+          <a routerLink="/registro-usuario" class="register-link">
+            Regístrate ahora
+          </a>
+        </div>
+      </form>
+    </section>
+  </div>
+</ion-content>

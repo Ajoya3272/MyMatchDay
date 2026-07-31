@@ -1,0 +1,200 @@
+<ion-content [fullscreen]="true" class="register-content" [scrollY]="false">
+  <div class="register-shell">
+    <section class="register-card">
+      <div class="brand-block">
+        <div class="brand-logo">
+          <ion-icon name="football-outline"></ion-icon>
+        </div>
+
+        <h1>Crear cuenta</h1>
+        <p>
+          Regístrate para organizar partidos, invitar jugadores y gestionar tus
+          eventos.
+        </p>
+      </div>
+
+      <form
+        [formGroup]="registerForm"
+        (ngSubmit)="onSubmit()"
+        novalidate
+        class="register-form"
+      >
+        <div class="field-group">
+          <label for="nombre">Nombre</label>
+
+          <ion-item lines="none" class="custom-item">
+            <ion-icon name="person-outline" slot="start"></ion-icon>
+
+            <ion-input
+              id="nombre"
+              type="text"
+              formControlName="nombre"
+              placeholder="Tu nombre"
+              autocomplete="name"
+            >
+            </ion-input>
+          </ion-item>
+
+          <div class="error-slot">
+            @if (nombre.touched && nombre.invalid) {
+              <ion-note color="danger">
+                @if (nombre.errors?.["required"]) {
+                  El nombre es obligatorio.
+                } @else if (nombre.errors?.["minlength"]) {
+                  El nombre debe tener al menos 2 caracteres.
+                }
+              </ion-note>
+            }
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="email">Correo electrónico</label>
+
+          <ion-item lines="none" class="custom-item">
+            <ion-icon name="mail-outline" slot="start"></ion-icon>
+
+            <ion-input
+              id="email"
+              type="email"
+              formControlName="email"
+              placeholder="tuemail@ejemplo.com"
+              inputmode="email"
+              autocomplete="email"
+            >
+            </ion-input>
+          </ion-item>
+
+          <div class="error-slot">
+            @if (email.touched && email.invalid) {
+              <ion-note color="danger">
+                @if (email.errors?.["required"]) {
+                  El correo es obligatorio.
+                } @else if (email.errors?.["email"]) {
+                  Introduce un correo válido.
+                }
+              </ion-note>
+            }
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="password">Contraseña</label>
+
+          <ion-item lines="none" class="custom-item password-item">
+            <ion-icon name="key-outline" slot="start"></ion-icon>
+
+            <ion-input
+              id="password"
+              [type]="showPassword ? 'text' : 'password'"
+              formControlName="password"
+              placeholder="Crea una contraseña"
+              autocomplete="new-password"
+            >
+            </ion-input>
+
+            <button
+              type="button"
+              class="password-toggle"
+              slot="end"
+              (click)="togglePasswordVisibility()"
+              [attr.aria-label]="
+                showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
+              "
+            >
+              <ion-icon
+                class="toggle-eye-icon"
+                [class.is-visible]="showPassword"
+                [class.is-animating]="passwordIconAnimating"
+                [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"
+              >
+              </ion-icon>
+            </button>
+          </ion-item>
+
+          <div class="error-slot">
+            @if (password.touched && password.invalid) {
+              <ion-note color="danger">
+                @if (password.errors?.["required"]) {
+                  La contraseña es obligatoria.
+                } @else if (password.errors?.["minlength"]) {
+                  Debe tener al menos 6 caracteres.
+                }
+              </ion-note>
+            }
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="confirmPassword">Confirmar contraseña</label>
+
+          <ion-item lines="none" class="custom-item password-item">
+            <ion-icon name="key-outline" slot="start"></ion-icon>
+
+            <ion-input
+              id="confirmPassword"
+              [type]="showConfirmPassword ? 'text' : 'password'"
+              formControlName="confirmPassword"
+              placeholder="Repite la contraseña"
+              autocomplete="new-password"
+            >
+            </ion-input>
+
+            <button
+              type="button"
+              class="password-toggle"
+              slot="end"
+              (click)="toggleConfirmPasswordVisibility()"
+              [attr.aria-label]="
+                showConfirmPassword
+                  ? 'Ocultar confirmación de contraseña'
+                  : 'Mostrar confirmación de contraseña'
+              "
+            >
+              <ion-icon
+                class="toggle-eye-icon"
+                [class.is-visible]="showConfirmPassword"
+                [class.is-animating]="confirmPasswordIconAnimating"
+                [name]="showConfirmPassword ? 'eye-off-outline' : 'eye-outline'"
+              >
+              </ion-icon>
+            </button>
+          </ion-item>
+
+          <div class="error-slot">
+            @if (confirmPassword.touched && confirmPassword.invalid) {
+              <ion-note color="danger">
+                @if (confirmPassword.errors?.["required"]) {
+                  Debes confirmar la contraseña.
+                }
+              </ion-note>
+            } @else if (passwordsDoNotMatch) {
+              <ion-note color="danger">
+                Las contraseñas no coinciden.
+              </ion-note>
+            }
+          </div>
+        </div>
+
+        <ion-button
+          type="submit"
+          expand="block"
+          class="register-btn"
+          [class.is-loading]="loading"
+          [disabled]="loading"
+        >
+          @if (!loading) {
+            <span>Crear cuenta</span>
+          } @else {
+            <ion-spinner name="crescent"></ion-spinner>
+          }
+        </ion-button>
+
+        <div class="login-block">
+          <span>¿Ya tienes cuenta?</span>
+          <a routerLink="/login" class="login-link">Inicia sesión</a>
+        </div>
+      </form>
+    </section>
+  </div>
+</ion-content>

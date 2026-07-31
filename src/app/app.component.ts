@@ -1,24 +1,43 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
+import { filter } from 'rxjs/operators';
 import { IonApp, IonMenu, IonRouterOutlet } from '@ionic/angular/standalone';
+
 import { HeaderComponent } from './shared/header/header.component';
 import { MenuLateralComponent } from './shared/menu-lateral/menu-lateral.component';
-import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-root',
+  templateUrl: 'app.component.html',
+  styleUrls: ['app.component.scss'],
   standalone: true,
   imports: [
     IonApp,
-    CommonModule,
-    HeaderComponent,
-    MenuLateralComponent,
     IonMenu,
     IonRouterOutlet,
+    HeaderComponent,
+    MenuLateralComponent,
   ],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.scss',
 })
 export class AppComponent {
-  title = 'football-app';
+  hideLayout = false;
+
+  constructor(private router: Router) {
+    this.updateLayout(this.router.url);
+
+    this.router.events
+      .pipe(
+        filter(
+          (event): event is NavigationEnd => event instanceof NavigationEnd,
+        ),
+      )
+      .subscribe((event) => {
+        this.updateLayout(event.urlAfterRedirects);
+      });
+  }
+
+  private updateLayout(url: string): void {
+    this.hideLayout =
+      url.startsWith('/login') || url.startsWith('/registro-usuario');
+  }
 }
