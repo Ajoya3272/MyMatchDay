@@ -106,33 +106,62 @@
   }
 }
 
-.password-item {
-  .password-toggle {
-    border: 0;
-    background: transparent;
-    padding: 0;
-    width: 36px;
-    height: 36px;
-    display: grid;
-    place-items: center;
-    cursor: pointer;
-    color: #6b7280;
-    flex-shrink: 0;
-  }
+.material-field {
+  width: 100%;
+  margin: 0;
+  --mdc-outlined-text-field-container-shape: 16px;
+  --mdc-outlined-text-field-outline-color: rgba(17, 24, 39, 0.08);
+  --mdc-outlined-text-field-hover-outline-color: rgba(17, 24, 39, 0.12);
+  --mdc-outlined-text-field-focus-outline-color: var(--matchday-green);
+  --mdc-outlined-text-field-caret-color: var(--matchday-green);
+  --mat-select-enabled-trigger-text-color: var(--matchday-black);
+  --mat-select-placeholder-text-color: #9ca3af;
+  --mat-select-enabled-arrow-color: #6b7280;
+  --mat-datepicker-toggle-icon-color: #6b7280;
+}
 
-  .toggle-eye-icon {
-    font-size: 1.15rem;
-    transform-origin: center;
-    transition: color 180ms ease;
-  }
+.material-field ::ng-deep .mat-mdc-text-field-wrapper {
+  background: #f9fafb;
+  border-radius: 16px;
+}
 
-  .toggle-eye-icon.is-visible {
-    color: var(--matchday-green);
-  }
+.material-field ::ng-deep .mat-mdc-form-field-flex {
+  min-height: 54px;
+  align-items: center;
+}
 
-  .toggle-eye-icon.is-animating {
-    animation: eyeTogglePop 220ms ease;
-  }
+.material-field ::ng-deep .mat-mdc-form-field-infix {
+  min-height: auto;
+  padding-top: 14px;
+  padding-bottom: 14px;
+}
+
+.material-field ::ng-deep .mat-mdc-select-trigger {
+  min-height: 24px;
+  display: flex;
+  align-items: center;
+}
+
+.material-field ::ng-deep .mat-mdc-select-value-text,
+.material-field ::ng-deep .mat-mdc-input-element,
+.material-field ::ng-deep input.mat-mdc-input-element {
+  color: var(--matchday-black) !important;
+  font-size: 0.98rem;
+}
+
+.material-field ::ng-deep .mat-mdc-input-element::placeholder {
+  color: #9ca3af;
+  opacity: 1;
+}
+
+.material-field ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+  display: none;
+}
+
+.material-field.mat-focused ::ng-deep .mdc-notched-outline__leading,
+.material-field.mat-focused ::ng-deep .mdc-notched-outline__notch,
+.material-field.mat-focused ::ng-deep .mdc-notched-outline__trailing {
+  border-color: var(--matchday-green) !important;
 }
 
 .error-slot {
@@ -143,6 +172,10 @@
     font-size: 0.78rem;
     line-height: 1.1;
   }
+}
+
+.global-error {
+  min-height: auto;
 }
 
 .register-btn {
@@ -183,6 +216,35 @@
   transform: none;
   filter: none;
   opacity: 0.75;
+}
+
+.password-item {
+  .password-toggle {
+    border: 0;
+    background: transparent;
+    padding: 0;
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    color: #6b7280;
+    flex-shrink: 0;
+  }
+
+  .toggle-eye-icon {
+    font-size: 1.15rem;
+    transform-origin: center;
+    transition: color 180ms ease;
+  }
+
+  .toggle-eye-icon.is-visible {
+    color: var(--matchday-green);
+  }
+
+  .toggle-eye-icon.is-animating {
+    animation: eyeTogglePop 220ms ease;
+  }
 }
 
 .login-block {
@@ -240,4 +302,36 @@
     height: 56px;
     margin-bottom: 10px;
   }
+}
+
+::ng-deep .matchday-select-panel {
+  border-radius: 16px !important;
+  overflow: hidden;
+}
+
+::ng-deep .matchday-select-panel .mat-mdc-option.mdc-list-item--selected {
+  background: rgba(34, 197, 94, 0.1) !important;
+}
+
+::ng-deep .matchday-datepicker-panel .mat-datepicker-content,
+::ng-deep .mat-datepicker-content {
+  border-radius: 20px !important;
+  overflow: hidden;
+}
+
+::ng-deep .matchday-datepicker-panel .mat-calendar-body-selected,
+::ng-deep .mat-calendar-body-selected {
+  background-color: var(--matchday-green) !important;
+  color: #ffffff !important;
+}
+
+::ng-deep
+  .matchday-datepicker-panel
+  .mat-calendar-body-today:not(.mat-calendar-body-selected),
+::ng-deep .mat-calendar-body-today:not(.mat-calendar-body-selected) {
+  border-color: var(--matchday-green) !important;
+}
+
+::ng-deep .mat-datepicker-toggle-default-icon {
+  color: #6b7280;
 }

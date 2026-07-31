@@ -55,13 +55,13 @@ export class RegistroUsuarioService {
     const [year, month, day] = fechaNacimiento.split('-').map(Number);
     const fechaNacimientoDate = new Date(year, month - 1, day);
 
-    await setDoc(doc(this.firestore, `usuarios/${user.uid}`), {
+    await setDoc(doc(this.firestore, 'usuarios', user.uid), {
       uid: user.uid,
       email: user.email ?? email,
       nombre,
       sexo,
       fechaNacimiento: Timestamp.fromDate(fechaNacimientoDate),
-      emailVerificado: false,
+      emailVerificado: user.emailVerified,
       fechaCreacion: serverTimestamp(),
       fechaActualizacion: serverTimestamp(),
     });

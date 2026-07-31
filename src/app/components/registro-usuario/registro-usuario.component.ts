@@ -2,13 +2,14 @@ import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, inject } from '@angular/core';
 import {
   AbstractControl,
-  NonNullableFormBuilder,
+  FormBuilder,
   ReactiveFormsModule,
   ValidationErrors,
   ValidatorFn,
   Validators,
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+
 import {
   IonButton,
   IonContent,
@@ -16,13 +17,11 @@ import {
   IonInput,
   IonItem,
   IonNote,
-  IonSelect,
-  IonSelectOption,
   IonSpinner,
 } from '@ionic/angular/standalone';
+
 import { addIcons } from 'ionicons';
 import {
-  calendarOutline,
   eyeOffOutline,
   eyeOutline,
   footballOutline,
@@ -30,7 +29,20 @@ import {
   mailOutline,
   personOutline,
 } from 'ionicons/icons';
+
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+import { MatInputModule } from '@angular/material/input';
+import { MatNativeDateModule, MatOptionModule } from '@angular/material/core';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+
 import { RegistroUsuarioService } from '../../services/registro-usuario.service';
+
+type SexoUsuario = 'hombre' | 'mujer';
+
+function isSexoUsuario(value: string): value is SexoUsuario {
+  return value === 'hombre' || value === 'mujer';
+}
 
 const passwordsMatchValidator: ValidatorFn = (
   control: AbstractControl,
@@ -60,13 +72,17 @@ const passwordsMatchValidator: ValidatorFn = (
     IonInput,
     IonItem,
     IonNote,
-    IonSelect,
-    IonSelectOption,
     IonSpinner,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatOptionModule,
+    MatInputModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
   ],
 })
 export class RegistroUsuarioComponent implements OnDestroy {
-  private fb = inject(NonNullableFormBuilder);
+  private fb = inject(FormBuilder);
   private router = inject(Router);
   private registroUsuarioService = inject(RegistroUsuarioService);
 
@@ -79,18 +95,25 @@ export class RegistroUsuarioComponent implements OnDestroy {
 
   registerForm = this.fb.group(
     {
-      nombre: this.fb.control('', [
+      nombre: this.fb.nonNullable.control('', [
         Validators.required,
         Validators.minLength(2),
       ]),
-      email: this.fb.control('', [Validators.required, Validators.email]),
-      sexo: this.fb.control<'hombre' | 'mujer' | ''>('', [Validators.required]),
-      fechaNacimiento: this.fb.control('', [Validators.required]),
-      password: this.fb.control('', [
+      email: this.fb.nonNullable.control('', [
+        Validators.required,
+        Validators.email,
+      ]),
+      sexo: this.fb.nonNullable.control<SexoUsuario | ''>('', [
+        Validators.required,
+      ]),
+      fechaNacimiento: this.fb.control<Date | null>(null, [
+        Validators.required,
+      ]),
+      password: this.fb.nonNullable.control('', [
         Validators.required,
         Validators.minLength(6),
       ]),
-      confirmPassword: this.fb.control('', [Validators.required]),
+      confirmPassword: this.fb.nonNullable.control('', [Validators.required]),
     },
     {
       validators: passwordsMatchValidator,
@@ -102,7 +125,6 @@ export class RegistroUsuarioComponent implements OnDestroy {
       footballOutline,
       personOutline,
       mailOutline,
-      calendarOutline,
       keyOutline,
       eyeOutline,
       eyeOffOutline,
@@ -158,6 +180,16 @@ export class RegistroUsuarioComponent implements OnDestroy {
     }, 220);
   }
 
+  private formatFechaNacimiento(fecha: Date | null): string {
+    if (!fecha) return '';
+
+    const year = fecha.getFullYear();
+    const month = String(fecha.getMonth() + 1).padStart(2, '0');
+    const day = String(fecha.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+  }
+
   async onSubmit(): Promise<void> {
     this.registerForm.markAllAsTouched();
     this.errorMessage = '';
@@ -166,8 +198,17 @@ export class RegistroUsuarioComponent implements OnDestroy {
 
     const formValue = this.registerForm.getRawValue();
 
-    if (formValue.sexo !== 'hombre' && formValue.sexo !== 'mujer') {
+    if (!isSexoUsuario(formValue.sexo)) {
       this.errorMessage = 'Selecciona un sexo válido.';
+      return;
+    }
+
+    const fechaNacimientoFormateada = this.formatFechaNacimiento(
+      formValue.fechaNacimiento,
+    );
+
+    if (!fechaNacimientoFormateada) {
+      this.errorMessage = 'Selecciona una fecha de nacimiento válida.';
       return;
     }
 
@@ -179,7 +220,7 @@ export class RegistroUsuarioComponent implements OnDestroy {
         email: formValue.email.trim().toLowerCase(),
         password: formValue.password,
         sexo: formValue.sexo,
-        fechaNacimiento: formValue.fechaNacimiento,
+        fechaNacimiento: fechaNacimientoFormateada,
       });
 
       await this.router.navigate(['/verificacion-usuario'], {
@@ -215,7 +256,7 @@ export class RegistroUsuarioComponent implements OnDestroy {
       nombre: '',
       email: '',
       sexo: '',
-      fechaNacimiento: '',
+      fechaNacimiento: null,
       password: '',
       confirmPassword: '',
     });

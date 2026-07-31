@@ -8,3 +8,8 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import "@ionic/angular/css/palettes/dark.system.css";
+
+:root {
+  --matchday-green: #22c55e;
+  --matchday-black: #111827;
+}

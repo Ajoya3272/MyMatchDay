@@ -1,0 +1,64 @@
+@use "@angular/material" as mat;
+
+@include mat.core();
+
+$matchday-green-palette: (
+  50: #e8f9ef,
+  100: #c6efd7,
+  200: #a0e5bd,
+  300: #7adba3,
+  400: #5bd48f,
+  500: #22c55e,
+  600: #1fb356,
+  700: #199b4a,
+  800: #14833f,
+  900: #0c5f2c,
+  A100: #b9ffcf,
+  A200: #86ffab,
+  A400: #53ff87,
+  A700: #39ff75,
+  contrast: (
+    50: #111827,
+    100: #111827,
+    200: #111827,
+    300: #111827,
+    400: #111827,
+    500: #ffffff,
+    600: #ffffff,
+    700: #ffffff,
+    800: #ffffff,
+    900: #ffffff,
+    A100: #111827,
+    A200: #111827,
+    A400: #111827,
+    A700: #111827,
+  ),
+);
+
+$football-app-primary: mat.define-palette(
+  $matchday-green-palette,
+  500,
+  300,
+  700
+);
+$football-app-accent: mat.define-palette(
+  $matchday-green-palette,
+  A200,
+  A100,
+  A400
+);
+$football-app-warn: mat.define-palette(mat.$red-palette);
+
+$football-app-theme: mat.define-light-theme(
+  (
+    color: (
+      primary: $football-app-primary,
+      accent: $football-app-accent,
+      warn: $football-app-warn,
+    ),
+    typography: mat.define-typography-config(),
+    density: 0,
+  )
+);
+
+@include mat.all-component-themes($football-app-theme);

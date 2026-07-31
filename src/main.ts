@@ -10,6 +10,7 @@ import { provideFirestore, getFirestore } from '@angular/fire/firestore';
 import { AppComponent } from './app/app.component';
 import { routes } from './app/app.routes';
 import { firebaseConfig } from './enviroments/enviroment';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 
 bootstrapApplication(AppComponent, {
   providers: [
@@ -19,6 +20,6 @@ bootstrapApplication(AppComponent, {
       provideFirebaseApp(() => initializeApp(firebaseConfig)),
       provideAuth(() => getAuth()),
       provideFirestore(() => getFirestore()),
-    ),
+    ), provideAnimationsAsync(),
   ],
 }).catch((err) => console.error(err));

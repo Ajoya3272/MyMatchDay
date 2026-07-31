@@ -79,19 +79,21 @@
         <div class="field-group">
           <label for="sexo">Sexo</label>
 
-          <ion-item lines="none" class="custom-item">
-            <ion-icon name="person-outline" slot="start"></ion-icon>
-
-            <ion-select
+          <mat-form-field
+            appearance="outline"
+            subscriptSizing="dynamic"
+            class="material-field"
+          >
+            <mat-select
               id="sexo"
               formControlName="sexo"
-              interface="popover"
-              placeholder="Selecciona una opción"
+              placeholder="Seleccionar sexo"
+              panelClass="matchday-select-panel"
             >
-              <ion-select-option value="hombre">Hombre</ion-select-option>
-              <ion-select-option value="mujer">Mujer</ion-select-option>
-            </ion-select>
-          </ion-item>
+              <mat-option value="hombre">Hombre</mat-option>
+              <mat-option value="mujer">Mujer</mat-option>
+            </mat-select>
+          </mat-form-field>
 
           <div class="error-slot">
             @if (sexo.touched && sexo.invalid) {
@@ -107,15 +109,32 @@
         <div class="field-group">
           <label for="fechaNacimiento">Fecha de nacimiento</label>
 
-          <ion-item lines="none" class="custom-item">
-            <ion-icon name="calendar-outline" slot="start"></ion-icon>
-
-            <ion-input
+          <mat-form-field
+            appearance="outline"
+            subscriptSizing="dynamic"
+            class="material-field"
+          >
+            <input
               id="fechaNacimiento"
-              type="date"
+              matInput
+              [matDatepicker]="picker"
               formControlName="fechaNacimiento"
-            ></ion-input>
-          </ion-item>
+              placeholder="Selecciona tu fecha"
+              readonly
+              (click)="picker.open()"
+            />
+
+            <mat-datepicker-toggle
+              matIconSuffix
+              [for]="picker"
+            ></mat-datepicker-toggle>
+
+            <mat-datepicker
+              #picker
+              touchUi="true"
+              panelClass="matchday-datepicker-panel"
+            ></mat-datepicker>
+          </mat-form-field>
 
           <div class="error-slot">
             @if (fechaNacimiento.touched && fechaNacimiento.invalid) {
