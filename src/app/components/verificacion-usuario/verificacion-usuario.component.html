@@ -1,0 +1,60 @@
+<ion-content [fullscreen]="true" class="register-content" [scrollY]="false">
+  <div class="register-shell">
+    <section class="register-card">
+      <div class="brand-block">
+        <div class="brand-logo">
+          <ion-icon name="football-outline"></ion-icon>
+        </div>
+
+        <h1>Verifica tu cuenta</h1>
+      </div>
+
+      @if (loading) {
+        <div class="verify-block">
+          <ion-spinner name="crescent"></ion-spinner>
+          <p>Verificando tu cuenta...</p>
+        </div>
+      } @else if (verificado) {
+        <div class="verify-block">
+          <ion-icon
+            name="checkmark-circle-outline"
+            class="status-icon success"
+          ></ion-icon>
+
+          <ion-note color="success">Correo verificado correctamente.</ion-note>
+
+          <p>Tu cuenta ya está activada.</p>
+          <p>Te redirigimos al inicio de sesión para continuar.</p>
+
+          <ion-button expand="block" class="register-btn" (click)="irALogin()">
+            Ir a iniciar sesión
+          </ion-button>
+        </div>
+      } @else {
+        <div class="verify-block">
+          <ion-icon name="mail-outline" class="status-icon mail"></ion-icon>
+
+          <p>
+            Hemos enviado un enlace de verificación
+            @if (email) {
+              <span
+                >a <strong>{{ email }}</strong></span
+              >
+            }
+            .
+          </p>
+
+          <p>Abre tu correo y pulsa el enlace para completar el registro.</p>
+
+          @if (errorMessage) {
+            <ion-note color="danger">{{ errorMessage }}</ion-note>
+          }
+
+          <div class="login-block">
+            <a routerLink="/login" class="login-link">Ir a iniciar sesión</a>
+          </div>
+        </div>
+      }
+    </section>
+  </div>
+</ion-content>

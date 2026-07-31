@@ -31,8 +31,7 @@
               formControlName="nombre"
               placeholder="Tu nombre"
               autocomplete="name"
-            >
-            </ion-input>
+            ></ion-input>
           </ion-item>
 
           <div class="error-slot">
@@ -61,8 +60,7 @@
               placeholder="tuemail@ejemplo.com"
               inputmode="email"
               autocomplete="email"
-            >
-            </ion-input>
+            ></ion-input>
           </ion-item>
 
           <div class="error-slot">
@@ -72,6 +70,58 @@
                   El correo es obligatorio.
                 } @else if (email.errors?.["email"]) {
                   Introduce un correo válido.
+                }
+              </ion-note>
+            }
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="sexo">Sexo</label>
+
+          <ion-item lines="none" class="custom-item">
+            <ion-icon name="person-outline" slot="start"></ion-icon>
+
+            <ion-select
+              id="sexo"
+              formControlName="sexo"
+              interface="popover"
+              placeholder="Selecciona una opción"
+            >
+              <ion-select-option value="hombre">Hombre</ion-select-option>
+              <ion-select-option value="mujer">Mujer</ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <div class="error-slot">
+            @if (sexo.touched && sexo.invalid) {
+              <ion-note color="danger">
+                @if (sexo.errors?.["required"]) {
+                  El sexo es obligatorio.
+                }
+              </ion-note>
+            }
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="fechaNacimiento">Fecha de nacimiento</label>
+
+          <ion-item lines="none" class="custom-item">
+            <ion-icon name="calendar-outline" slot="start"></ion-icon>
+
+            <ion-input
+              id="fechaNacimiento"
+              type="date"
+              formControlName="fechaNacimiento"
+            ></ion-input>
+          </ion-item>
+
+          <div class="error-slot">
+            @if (fechaNacimiento.touched && fechaNacimiento.invalid) {
+              <ion-note color="danger">
+                @if (fechaNacimiento.errors?.["required"]) {
+                  La fecha de nacimiento es obligatoria.
                 }
               </ion-note>
             }
@@ -90,8 +140,7 @@
               formControlName="password"
               placeholder="Crea una contraseña"
               autocomplete="new-password"
-            >
-            </ion-input>
+            ></ion-input>
 
             <button
               type="button"
@@ -107,8 +156,7 @@
                 [class.is-visible]="showPassword"
                 [class.is-animating]="passwordIconAnimating"
                 [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"
-              >
-              </ion-icon>
+              ></ion-icon>
             </button>
           </ion-item>
 
@@ -137,8 +185,7 @@
               formControlName="confirmPassword"
               placeholder="Repite la contraseña"
               autocomplete="new-password"
-            >
-            </ion-input>
+            ></ion-input>
 
             <button
               type="button"
@@ -156,8 +203,7 @@
                 [class.is-visible]="showConfirmPassword"
                 [class.is-animating]="confirmPasswordIconAnimating"
                 [name]="showConfirmPassword ? 'eye-off-outline' : 'eye-outline'"
-              >
-              </ion-icon>
+              ></ion-icon>
             </button>
           </ion-item>
 
@@ -174,6 +220,12 @@
               </ion-note>
             }
           </div>
+        </div>
+
+        <div class="error-slot global-error">
+          @if (errorMessage) {
+            <ion-note color="danger">{{ errorMessage }}</ion-note>
+          }
         </div>
 
         <ion-button

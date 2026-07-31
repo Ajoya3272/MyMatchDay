@@ -2,13 +2,13 @@ import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, inject } from '@angular/core';
 import {
   AbstractControl,
+  NonNullableFormBuilder,
   ReactiveFormsModule,
   ValidationErrors,
   ValidatorFn,
   Validators,
-  NonNullableFormBuilder,
 } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import {
   IonButton,
   IonContent,
@@ -16,17 +16,21 @@ import {
   IonInput,
   IonItem,
   IonNote,
+  IonSelect,
+  IonSelectOption,
   IonSpinner,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
-  footballOutline,
-  personOutline,
-  mailOutline,
-  keyOutline,
-  eyeOutline,
+  calendarOutline,
   eyeOffOutline,
+  eyeOutline,
+  footballOutline,
+  keyOutline,
+  mailOutline,
+  personOutline,
 } from 'ionicons/icons';
+import { RegistroUsuarioService } from '../../services/registro-usuario.service';
 
 const passwordsMatchValidator: ValidatorFn = (
   control: AbstractControl,
@@ -56,26 +60,41 @@ const passwordsMatchValidator: ValidatorFn = (
     IonInput,
     IonItem,
     IonNote,
+    IonSelect,
+    IonSelectOption,
     IonSpinner,
   ],
 })
 export class RegistroUsuarioComponent implements OnDestroy {
   private fb = inject(NonNullableFormBuilder);
+  private router = inject(Router);
+  private registroUsuarioService = inject(RegistroUsuarioService);
 
   loading = false;
   showPassword = false;
   showConfirmPassword = false;
   passwordIconAnimating = false;
   confirmPasswordIconAnimating = false;
+  errorMessage = '';
 
   registerForm = this.fb.group(
     {
-      nombre: ['', [Validators.required, Validators.minLength(2)]],
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-      confirmPassword: ['', [Validators.required]],
+      nombre: this.fb.control('', [
+        Validators.required,
+        Validators.minLength(2),
+      ]),
+      email: this.fb.control('', [Validators.required, Validators.email]),
+      sexo: this.fb.control<'hombre' | 'mujer' | ''>('', [Validators.required]),
+      fechaNacimiento: this.fb.control('', [Validators.required]),
+      password: this.fb.control('', [
+        Validators.required,
+        Validators.minLength(6),
+      ]),
+      confirmPassword: this.fb.control('', [Validators.required]),
     },
-    { validators: passwordsMatchValidator },
+    {
+      validators: passwordsMatchValidator,
+    },
   );
 
   constructor() {
@@ -83,6 +102,7 @@ export class RegistroUsuarioComponent implements OnDestroy {
       footballOutline,
       personOutline,
       mailOutline,
+      calendarOutline,
       keyOutline,
       eyeOutline,
       eyeOffOutline,
@@ -97,6 +117,14 @@ export class RegistroUsuarioComponent implements OnDestroy {
     return this.registerForm.controls.email;
   }
 
+  get sexo() {
+    return this.registerForm.controls.sexo;
+  }
+
+  get fechaNacimiento() {
+    return this.registerForm.controls.fechaNacimiento;
+  }
+
   get password() {
     return this.registerForm.controls.password;
   }
@@ -108,11 +136,11 @@ export class RegistroUsuarioComponent implements OnDestroy {
   get passwordsDoNotMatch() {
     return (
       this.registerForm.hasError('passwordsMismatch') &&
-      this.confirmPassword.touched
+      (this.password.touched || this.confirmPassword.touched)
     );
   }
 
-  togglePasswordVisibility() {
+  togglePasswordVisibility(): void {
     this.passwordIconAnimating = true;
     this.showPassword = !this.showPassword;
 
@@ -121,7 +149,7 @@ export class RegistroUsuarioComponent implements OnDestroy {
     }, 220);
   }
 
-  toggleConfirmPasswordVisibility() {
+  toggleConfirmPasswordVisibility(): void {
     this.confirmPasswordIconAnimating = true;
     this.showConfirmPassword = !this.showConfirmPassword;
 
@@ -130,20 +158,53 @@ export class RegistroUsuarioComponent implements OnDestroy {
     }, 220);
   }
 
-  async onSubmit() {
+  async onSubmit(): Promise<void> {
     this.registerForm.markAllAsTouched();
+    this.errorMessage = '';
 
     if (this.registerForm.invalid) return;
+
+    const formValue = this.registerForm.getRawValue();
+
+    if (formValue.sexo !== 'hombre' && formValue.sexo !== 'mujer') {
+      this.errorMessage = 'Selecciona un sexo válido.';
+      return;
+    }
 
     try {
       this.loading = true;
 
-      const formValue = this.registerForm.getRawValue();
-      console.log('Registro submit', formValue);
+      await this.registroUsuarioService.registrarUsuario({
+        nombre: formValue.nombre.trim(),
+        email: formValue.email.trim().toLowerCase(),
+        password: formValue.password,
+        sexo: formValue.sexo,
+        fechaNacimiento: formValue.fechaNacimiento,
+      });
 
-      await new Promise((resolve) => setTimeout(resolve, 900));
-    } catch (error) {
+      await this.router.navigate(['/verificacion-usuario'], {
+        queryParams: { email: formValue.email.trim().toLowerCase() },
+      });
+    } catch (error: any) {
       console.error('Error en registro', error);
+
+      switch (error?.code) {
+        case 'auth/email-already-in-use':
+          this.errorMessage = 'Ese correo ya está registrado.';
+          break;
+        case 'auth/invalid-email':
+          this.errorMessage = 'El correo no es válido.';
+          break;
+        case 'auth/weak-password':
+          this.errorMessage = 'La contraseña es demasiado débil.';
+          break;
+        case 'auth/network-request-failed':
+          this.errorMessage = 'Error de red. Revisa tu conexión.';
+          break;
+        default:
+          this.errorMessage = 'No se pudo crear la cuenta. Inténtalo de nuevo.';
+          break;
+      }
     } finally {
       this.loading = false;
     }
@@ -153,13 +214,17 @@ export class RegistroUsuarioComponent implements OnDestroy {
     this.registerForm.reset({
       nombre: '',
       email: '',
+      sexo: '',
+      fechaNacimiento: '',
       password: '',
       confirmPassword: '',
     });
+
     this.loading = false;
     this.showPassword = false;
     this.showConfirmPassword = false;
     this.passwordIconAnimating = false;
     this.confirmPasswordIconAnimating = false;
+    this.errorMessage = '';
   }
 }

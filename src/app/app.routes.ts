@@ -21,6 +21,13 @@ export const routes: Routes = [
     component: RegistroUsuarioComponent,
   },
   {
+    path: 'verificacion-usuario',
+    loadComponent: () =>
+      import('./components/verificacion-usuario/verificacion-usuario.component').then(
+        (m) => m.VerificacionUsuarioComponent,
+      ),
+  },
+  {
     path: 'home',
     component: HomeComponent,
   },

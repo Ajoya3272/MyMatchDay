@@ -16,6 +16,12 @@
         novalidate
         class="login-form"
       >
+        @if (successMessage) {
+          <div class="message-slot">
+            <ion-note color="success">{{ successMessage }}</ion-note>
+          </div>
+        }
+
         <div class="field-group">
           <label for="email">Correo electrónico</label>
 
@@ -29,8 +35,7 @@
               placeholder="tuemail@ejemplo.com"
               inputmode="email"
               autocomplete="email"
-            >
-            </ion-input>
+            ></ion-input>
           </ion-item>
 
           <div class="error-slot">
@@ -58,8 +63,7 @@
               formControlName="password"
               placeholder="Introduce tu contraseña"
               autocomplete="current-password"
-            >
-            </ion-input>
+            ></ion-input>
 
             <button
               type="button"
@@ -75,8 +79,7 @@
                 [class.is-visible]="showPassword"
                 [class.is-animating]="iconAnimating"
                 [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"
-              >
-              </ion-icon>
+              ></ion-icon>
             </button>
           </ion-item>
 
@@ -91,6 +94,12 @@
               </ion-note>
             }
           </div>
+        </div>
+
+        <div class="error-slot global-error">
+          @if (errorMessage) {
+            <ion-note color="danger">{{ errorMessage }}</ion-note>
+          }
         </div>
 
         <ion-button
