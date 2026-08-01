@@ -1,10 +1,13 @@
 import { Injectable, inject } from '@angular/core';
 import {
   Auth,
+  User,
   UserCredential,
+  authState,
   signInWithEmailAndPassword,
   signOut,
 } from '@angular/fire/auth';
+import { map, Observable } from 'rxjs';
 
 export interface LoginPayload {
   email: string;
@@ -16,6 +19,12 @@ export interface LoginPayload {
 })
 export class LoginService {
   private auth = inject(Auth);
+
+  user$: Observable<User | null> = authState(this.auth);
+
+  inicialUsuario$: Observable<string> = this.user$.pipe(
+    map((user) => this.obtenerInicialUsuario(user)),
+  );
 
   async iniciarSesion(data: LoginPayload): Promise<UserCredential> {
     const credential = await signInWithEmailAndPassword(
@@ -40,4 +49,11 @@ export class LoginService {
   async cerrarSesion(): Promise<void> {
     await signOut(this.auth);
   }
+
+  obtenerInicialUsuario(user: User | null): string {
+    const nombre = user?.displayName?.trim() || user?.email?.trim() || 'U';
+
+    return nombre.charAt(0).toUpperCase();
+  }
 }
+0;

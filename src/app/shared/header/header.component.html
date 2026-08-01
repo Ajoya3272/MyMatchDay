@@ -2,7 +2,7 @@
   <button
     class="app-header__icon-btn"
     type="button"
-    aria-label="Open menu"
+    aria-label="Abrir menú"
     (click)="openMainMenu()"
   >
     <span></span>
@@ -19,20 +19,45 @@
     <strong class="app-header__title">MYMATCHDAY</strong>
   </button>
 
-  <div class="app-header__profile">
+  <div class="app-header__profile" (click)="onProfileAreaClick($event)">
     <button
       class="app-header__avatar-btn"
       type="button"
-      aria-label="Open profile menu"
+      aria-label="Abrir menú de perfil"
       (click)="toggleProfileMenu()"
     >
-      <span class="app-header__avatar">S</span>
+      <span class="app-header__avatar">
+        {{ (inicialUsuario$ | async) ?? "U" }}
+      </span>
     </button>
 
     <div class="app-header__profile-menu" *ngIf="isProfileOpen">
-      <button type="button" class="app-header__profile-item">My profile</button>
-      <button type="button" class="app-header__profile-item">Settings</button>
-      <button type="button" class="app-header__profile-item">Log out</button>
+      <button
+        type="button"
+        class="app-header__profile-item"
+        (click)="goPerfil()"
+      >
+        <ion-icon name="person-outline" aria-hidden="true"></ion-icon>
+        <span>Mi perfil</span>
+      </button>
+
+      <button
+        type="button"
+        class="app-header__profile-item"
+        (click)="goAjustes()"
+      >
+        <ion-icon name="settings-outline" aria-hidden="true"></ion-icon>
+        <span>Ajustes</span>
+      </button>
+
+      <button
+        type="button"
+        class="app-header__profile-item app-header__profile-item--danger"
+        (click)="cerrarSesion()"
+      >
+        <ion-icon name="log-out-outline" aria-hidden="true"></ion-icon>
+        <span>Cerrar sesión</span>
+      </button>
     </div>
   </div>
 </header>

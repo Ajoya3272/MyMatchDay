@@ -69,6 +69,16 @@ export class LoginComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     const verified = this.route.snapshot.queryParamMap.get('verified');
 
+    this.loginForm.reset({
+      email: '',
+      password: '',
+    });
+
+    this.errorMessage = '';
+    this.showPassword = false;
+    this.iconAnimating = false;
+    this.successMessage = '';
+
     if (verified === '1') {
       this.successMessage =
         'Correo verificado correctamente. Ya puedes iniciar sesión.';
@@ -107,6 +117,11 @@ export class LoginComponent implements OnInit, OnDestroy {
       await this.loginService.iniciarSesion({
         email: email.trim().toLowerCase(),
         password,
+      });
+
+      this.loginForm.reset({
+        email: '',
+        password: '',
       });
 
       await this.router.navigate(['/home']);
