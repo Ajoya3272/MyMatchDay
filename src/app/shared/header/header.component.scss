@@ -139,7 +139,12 @@
   flex-direction: column;
   gap: 4px;
   z-index: 50;
-  box-shadow: 0 14px 28px rgba(17, 24, 39, 0.12);
+  box-shadow:
+    0 10px 20px rgba(17, 24, 39, 0.08),
+    0 14px 28px rgba(17, 24, 39, 0.12);
+  transform-origin: top right;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
 }
 
 .app-header__profile-item {
@@ -158,7 +163,8 @@
   gap: 10px;
   transition:
     background-color 0.18s ease,
-    color 0.18s ease;
+    color 0.18s ease,
+    transform 0.18s ease;
 }
 
 .app-header__profile-item span {
@@ -175,6 +181,10 @@
 
 .app-header__profile-item:hover {
   background: #f0fdf4;
+}
+
+.app-header__profile-item:active {
+  transform: scale(0.985);
 }
 
 .app-header__profile-item--danger {

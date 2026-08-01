@@ -46,7 +46,11 @@
       </ng-template>
     </button>
 
-    <div class="app-header__profile-menu" *ngIf="isProfileOpen">
+    <div
+      class="app-header__profile-menu"
+      *ngIf="isProfileOpen"
+      @profileMenuAnimation
+    >
       <button
         type="button"
         class="app-header__profile-item"

@@ -5,6 +5,7 @@ import { MenuController, IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { logOutOutline, personOutline, settingsOutline } from 'ionicons/icons';
 import { LoginService } from '../../services/login.service';
+import { animate, style, transition, trigger } from '@angular/animations';
 
 @Component({
   selector: 'app-header',
@@ -12,6 +13,32 @@ import { LoginService } from '../../services/login.service';
   styleUrls: ['./header.component.scss'],
   standalone: true,
   imports: [CommonModule, IonIcon],
+  animations: [
+    trigger('profileMenuAnimation', [
+      transition(':enter', [
+        style({
+          opacity: 0,
+          transform: 'translateY(-8px) scale(0.98)',
+        }),
+        animate(
+          '180ms ease-out',
+          style({
+            opacity: 1,
+            transform: 'translateY(0) scale(1)',
+          }),
+        ),
+      ]),
+      transition(':leave', [
+        animate(
+          '140ms ease-in',
+          style({
+            opacity: 0,
+            transform: 'translateY(-6px) scale(0.98)',
+          }),
+        ),
+      ]),
+    ]),
+  ],
 })
 export class HeaderComponent {
   private menuCtrl = inject(MenuController);
