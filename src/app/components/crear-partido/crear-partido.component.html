@@ -1,4 +1,6 @@
 <ion-content class="create-match-page">
+  <app-spinner *ngIf="creatingMatch" texto="Creando partido..."></app-spinner>
+
   <section class="create-match-page__wrapper">
     <div class="create-match-page__header">
       <p class="create-match-page__eyebrow">Nuevo partido</p>
@@ -59,10 +61,20 @@
                 class="field-error"
                 *ngIf="
                   form.controls.matchDate.touched &&
-                  form.controls.matchDate.invalid
+                  form.controls.matchDate.errors?.['required']
                 "
               >
                 Selecciona una fecha y una hora.
+              </span>
+
+              <span
+                class="field-error"
+                *ngIf="
+                  form.controls.matchDate.touched &&
+                  form.controls.matchDate.errors?.['pastDate']
+                "
+              >
+                La fecha no puede ser anterior a la actual.
               </span>
             </div>
           </ng-container>
@@ -72,61 +84,123 @@
               <h2>Datos del partido</h2>
               <p>Completa la información básica para crear la convocatoria.</p>
 
+              <div class="players-grid">
+                <div class="field-block">
+                  <label class="field-label" for="equipoA">
+                    Nombre del equipo A
+                  </label>
+
+                  <input
+                    id="equipoA"
+                    class="field-input"
+                    type="text"
+                    formControlName="equipoA"
+                    placeholder="Ej: Solteros FC"
+                  />
+
+                  <span
+                    class="field-error"
+                    *ngIf="
+                      form.controls.equipoA.touched &&
+                      form.controls.equipoA.errors?.['required']
+                    "
+                  >
+                    Escribe el nombre del equipo A.
+                  </span>
+
+                  <span
+                    class="field-error"
+                    *ngIf="
+                      form.controls.equipoA.touched &&
+                      form.controls.equipoA.errors?.['maxlength']
+                    "
+                  >
+                    El nombre del equipo A es demasiado largo.
+                  </span>
+                </div>
+
+                <div class="field-block">
+                  <label class="field-label" for="equipoB">
+                    Nombre del equipo B
+                  </label>
+
+                  <input
+                    id="equipoB"
+                    class="field-input"
+                    type="text"
+                    formControlName="equipoB"
+                    placeholder="Ej: Casados FC"
+                  />
+
+                  <span
+                    class="field-error"
+                    *ngIf="
+                      form.controls.equipoB.touched &&
+                      form.controls.equipoB.errors?.['required']
+                    "
+                  >
+                    Escribe el nombre del equipo B.
+                  </span>
+
+                  <span
+                    class="field-error"
+                    *ngIf="
+                      form.controls.equipoB.touched &&
+                      form.controls.equipoB.errors?.['maxlength']
+                    "
+                  >
+                    El nombre del equipo B es demasiado largo.
+                  </span>
+
+                  <span
+                    class="field-error"
+                    *ngIf="
+                      form.controls.equipoB.touched &&
+                      form.controls.equipoB.errors?.['sameTeamName']
+                    "
+                  >
+                    El equipo A y el equipo B no pueden llamarse igual.
+                  </span>
+                </div>
+              </div>
+
               <div class="field-block">
-                <label class="field-label" for="matchName">
-                  Nombre del partido
+                <label class="field-label" for="playerCount">
+                  Número de jugadores
                 </label>
 
                 <input
-                  id="matchName"
+                  id="playerCount"
                   class="field-input"
-                  type="text"
-                  formControlName="matchName"
-                  placeholder="Ej: Solteros FC vs Casados FC"
+                  type="number"
+                  formControlName="playerCount"
+                  placeholder="Ej: 10"
                 />
 
                 <span
                   class="field-error"
                   *ngIf="
-                    form.controls.matchName.touched &&
-                    form.controls.matchName.invalid
+                    form.controls.playerCount.touched &&
+                    form.controls.playerCount.errors?.['required']
                   "
                 >
-                  Escribe un nombre para el partido.
+                  Indica el número de jugadores.
                 </span>
-              </div>
 
-              <div class="players-grid">
-                <div class="field-block">
-                  <label class="field-label" for="minPlayers">
-                    Jugadores mínimos
-                  </label>
-
-                  <input
-                    id="minPlayers"
-                    class="field-input"
-                    type="number"
-                    formControlName="minPlayers"
-                  />
-                </div>
-
-                <div class="field-block">
-                  <label class="field-label" for="maxPlayers">
-                    Jugadores máximos
-                  </label>
-
-                  <input
-                    id="maxPlayers"
-                    class="field-input"
-                    type="number"
-                    formControlName="maxPlayers"
-                  />
-                </div>
+                <span
+                  class="field-error"
+                  *ngIf="
+                    form.controls.playerCount.touched &&
+                    form.controls.playerCount.errors?.['min']
+                  "
+                >
+                  Debe haber al menos 2 jugadores.
+                </span>
               </div>
 
               <div class="field-block">
                 <label class="field-label" for="durationMinutes">
-                  Duración del partido (minutos)
+                  Tiempo de partido (minutos)
                 </label>
 
                 <input
@@ -136,17 +210,27 @@
                   formControlName="durationMinutes"
                   placeholder="Ej: 90"
                 />
-              </div>
 
-              <span
-                class="field-error"
-                *ngIf="
-                  form.controls.minPlayers.errors?.['minGreaterThanMax'] ||
-                  form.controls.maxPlayers.errors?.['maxLowerThanMin']
-                "
-              >
-                El mínimo no puede ser mayor que el máximo.
-              </span>
+                <span
+                  class="field-error"
+                  *ngIf="
+                    form.controls.durationMinutes.touched &&
+                    form.controls.durationMinutes.errors?.['required']
+                  "
+                >
+                  Indica la duración del partido.
+                </span>
+
+                <span
+                  class="field-error"
+                  *ngIf="
+                    form.controls.durationMinutes.touched &&
+                    form.controls.durationMinutes.errors?.['min']
+                  "
+                >
+                  La duración debe ser mayor que 0.
+                </span>
+              </div>
             </div>
           </ng-container>
 
@@ -177,6 +261,7 @@
         *ngIf="currentStep === 2"
         class="secondary-action"
         type="button"
+        [disabled]="creatingMatch"
         (click)="prevStep()"
       >
         Atrás
@@ -186,6 +271,7 @@
         *ngIf="currentStep === 1"
         class="primary-action"
         type="button"
+        [disabled]="creatingMatch"
         (click)="nextStep()"
       >
         Continuar
@@ -195,9 +281,10 @@
         *ngIf="currentStep === 2"
         class="primary-action"
         type="button"
+        [disabled]="creatingMatch"
         (click)="createMatch()"
       >
-        Crear partido
+        {{ creatingMatch ? "Creando..." : "Crear partido" }}
       </button>
 
       <button
@@ -225,7 +312,7 @@
             class="copy-action__label copy-action__label--success"
             [class.is-visible]="linkCopied"
           >
-            Enlace copiado!
+            ¡Enlace copiado!
           </span>
         </span>
       </button>
