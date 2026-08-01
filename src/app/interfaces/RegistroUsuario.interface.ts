@@ -17,6 +17,7 @@ export interface UsuarioFirestore {
   emailVerificado: boolean;
   fechaCreacion: Timestamp;
   fechaActualizacion: Timestamp;
+  fotoPerfilUrl?: string;
 }
 
 export interface UsuarioFirestoreWrite {
@@ -28,4 +29,5 @@ export interface UsuarioFirestoreWrite {
   emailVerificado: boolean;
   fechaCreacion: ReturnType<typeof serverTimestamp>;
   fechaActualizacion: ReturnType<typeof serverTimestamp>;
+  fotoPerfilUrl?: string;
 }

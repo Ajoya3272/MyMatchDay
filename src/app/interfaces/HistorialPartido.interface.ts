@@ -8,4 +8,5 @@ export interface HistorialPartidoFirestore {
   goles: number;
   nombrePartido: string;
   partidoId: string;
+  jugadoresId: string[];
 }

@@ -1,3 +1,102 @@
-<p>
-  mi-perfil works!
-</p>
+<ion-content class="mi-perfil-page">
+  <input
+    #fileInput
+    type="file"
+    accept="image/*"
+    hidden
+    (change)="onFileSelected($event)"
+  />
+
+  <section
+    class="mi-perfil-page__wrapper"
+    *ngIf="usuario$ | async as usuario; else estadoCarga"
+  >
+    <section class="perfil-card">
+      <div class="perfil-card__header">
+        <div class="perfil-card__avatar-wrap">
+          <div
+            class="perfil-card__avatar"
+            *ngIf="!usuario.fotoPerfilUrl; else avatarConImagen"
+          >
+            {{
+              (usuario.nombre || usuario.email || "U").charAt(0).toUpperCase()
+            }}
+          </div>
+
+          <ng-template #avatarConImagen>
+            <img
+              class="perfil-card__avatar perfil-card__avatar--image"
+              [src]="usuario.fotoPerfilUrl"
+              alt="Foto de perfil"
+            />
+          </ng-template>
+
+          <button
+            class="perfil-card__avatar-action"
+            type="button"
+            aria-label="Cambiar foto de perfil"
+            [disabled]="subiendoFoto"
+            (click)="cambiarFotoPerfil()"
+          >
+            {{ subiendoFoto ? "..." : "+" }}
+          </button>
+        </div>
+
+        <div class="perfil-card__identity">
+          <h1>{{ usuario.nombre }}</h1>
+          <p>{{ usuario.email }}</p>
+        </div>
+      </div>
+
+      <div class="perfil-card__info">
+        <article class="perfil-item">
+          <span class="perfil-item__label">Nombre</span>
+          <strong class="perfil-item__value">{{ usuario.nombre }}</strong>
+        </article>
+
+        <article class="perfil-item">
+          <span class="perfil-item__label">Correo electrónico</span>
+          <strong class="perfil-item__value">{{ usuario.email }}</strong>
+        </article>
+
+        <article class="perfil-item">
+          <span class="perfil-item__label">Sexo</span>
+          <strong class="perfil-item__value">{{ usuario.sexo }}</strong>
+        </article>
+
+        <article class="perfil-item">
+          <span class="perfil-item__label">Fecha de nacimiento</span>
+          <strong class="perfil-item__value">
+            {{ usuario.fechaNacimiento?.toDate() | date: "dd/MM/yyyy" }}
+          </strong>
+        </article>
+      </div>
+    </section>
+  </section>
+
+  <ng-template #estadoCarga>
+    <section class="mi-perfil-page__wrapper">
+      <section class="perfil-card">
+        <div class="perfil-card__header">
+          <div class="perfil-card__avatar-wrap">
+            <div class="perfil-card__avatar">U</div>
+
+            <button
+              class="perfil-card__avatar-action"
+              type="button"
+              aria-label="Cambiar foto de perfil"
+              disabled
+            >
+              +
+            </button>
+          </div>
+
+          <div class="perfil-card__identity">
+            <h1>Cargando perfil...</h1>
+            <p>Espera un momento.</p>
+          </div>
+        </div>
+      </section>
+    </section>
+  </ng-template>
+</ion-content>

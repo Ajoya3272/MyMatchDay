@@ -12,25 +12,7 @@ import {
   serverTimestamp,
   setDoc,
 } from '@angular/fire/firestore';
-
-export interface RegistroUsuarioPayload {
-  nombre: string;
-  email: string;
-  password: string;
-  sexo: 'hombre' | 'mujer';
-  fechaNacimiento: string;
-}
-
-export interface UsuarioFirestore {
-  uid: string;
-  email: string;
-  nombre: string;
-  sexo: 'hombre' | 'mujer';
-  fechaNacimiento: Timestamp;
-  emailVerificado: boolean;
-  fechaCreacion: Timestamp;
-  fechaActualizacion: Timestamp;
-}
+import { RegistroUsuarioPayload } from '../interfaces/RegistroUsuario.interface';
 
 @Injectable({
   providedIn: 'root',
