@@ -1,4 +1,6 @@
 <ion-content class="mi-perfil-page">
+  <app-spinner *ngIf="subiendoFoto"></app-spinner>
+
   <input
     #fileInput
     type="file"
@@ -67,7 +69,7 @@
         <article class="perfil-item">
           <span class="perfil-item__label">Fecha de nacimiento</span>
           <strong class="perfil-item__value">
-            {{ usuario.fechaNacimiento?.toDate() | date: "dd/MM/yyyy" }}
+            {{ usuario.fechaNacimiento.toDate() | date: "dd/MM/yyyy" }}
           </strong>
         </article>
       </div>
