@@ -15,7 +15,7 @@
     "@angular/common": "^17.2.0",
     "@angular/compiler": "^17.2.0",
     "@angular/core": "^17.2.0",
-    "@angular/fire": "^17.0.1",
+    "@angular/fire": "17.1.0",
     "@angular/forms": "^17.2.0",
     "@angular/material": "^17.3.10",
     "@angular/platform-browser": "^17.2.0",
@@ -24,7 +24,7 @@
     "@capacitor/angular": "^2.0.3",
     "@capacitor/core": "latest",
     "@ionic/angular": "^8.8.16",
-    "firebase": "^12.17.0",
+    "firebase": "10.14.1",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.3"
