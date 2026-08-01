@@ -113,6 +113,17 @@
   font-size: 0.9rem;
   font-weight: 700;
   text-transform: uppercase;
+  overflow: hidden;
+  line-height: 1;
+}
+
+.app-header__avatar--image {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: block;
+  object-fit: cover;
+  background: #111827;
 }
 
 .app-header__profile-menu {

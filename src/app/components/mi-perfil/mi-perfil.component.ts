@@ -1,26 +1,10 @@
 import { CommonModule } from '@angular/common';
-import {
-  Component,
-  ElementRef,
-  OnInit,
-  ViewChild,
-  inject,
-} from '@angular/core';
-import { Auth, authState } from '@angular/fire/auth';
-import {
-  Firestore,
-  doc,
-  docData,
-  updateDoc,
-  serverTimestamp,
-} from '@angular/fire/firestore';
-import { Observable, switchMap, of, firstValueFrom } from 'rxjs';
+import { Component, ElementRef, ViewChild, inject } from '@angular/core';
 import { IonContent } from '@ionic/angular/standalone';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Platform } from '@ionic/angular';
-import { UsuarioFirestore } from '../../interfaces/RegistroUsuario.interface';
-import { cloudinary } from '../../../enviroments/enviroment';
 import { SpinnerComponent } from '../../components/spinner/spinner.component';
+import { MiPerfilService } from '../../services/mi-perfil.service';
 
 @Component({
   selector: 'app-mi-perfil',
@@ -29,34 +13,14 @@ import { SpinnerComponent } from '../../components/spinner/spinner.component';
   imports: [IonContent, CommonModule, SpinnerComponent],
   standalone: true,
 })
-export class MiPerfilComponent implements OnInit {
-  private auth = inject(Auth);
-  private firestore = inject(Firestore);
+export class MiPerfilComponent {
   private platform = inject(Platform);
-
-  private readonly cloudName = cloudinary.cloudName;
-  private readonly uploadPreset = cloudinary.uploadPreset;
+  private miPerfilService = inject(MiPerfilService);
 
   @ViewChild('fileInput') fileInput?: ElementRef<HTMLInputElement>;
 
-  usuario$: Observable<UsuarioFirestore | null> = of(null);
-  uid: string | null = null;
+  usuario$ = this.miPerfilService.usuario$;
   subiendoFoto = false;
-
-  ngOnInit(): void {
-    this.usuario$ = authState(this.auth).pipe(
-      switchMap((user) => {
-        if (!user) {
-          this.uid = null;
-          return of(null);
-        }
-
-        this.uid = user.uid;
-        const userDocRef = doc(this.firestore, `usuarios/${user.uid}`);
-        return docData(userDocRef) as Observable<UsuarioFirestore>;
-      }),
-    );
-  }
 
   async cambiarFotoPerfil(): Promise<void> {
     if (this.subiendoFoto) {
@@ -79,16 +43,8 @@ export class MiPerfilComponent implements OnInit {
       return;
     }
 
-    try {
-      this.subiendoFoto = true;
-      const imageUrl = await this.subirACloudinary(file);
-      await this.guardarFotoPerfil(imageUrl);
-    } catch (error) {
-      console.error('Error al subir foto desde web:', error);
-    } finally {
-      this.subiendoFoto = false;
-      input.value = '';
-    }
+    await this.procesarCambioDeFoto(file);
+    input.value = '';
   }
 
   private async cambiarFotoDesdeMovil(): Promise<void> {
@@ -118,8 +74,7 @@ export class MiPerfilComponent implements OnInit {
         type: blob.type || 'image/jpeg',
       });
 
-      const imageUrl = await this.subirACloudinary(file);
-      await this.guardarFotoPerfil(imageUrl);
+      await this.miPerfilService.cambiarFotoPerfil(file);
     } catch (error) {
       console.error('Error al cambiar la foto de perfil:', error);
     } finally {
@@ -127,40 +82,14 @@ export class MiPerfilComponent implements OnInit {
     }
   }
 
-  private async subirACloudinary(file: File): Promise<string> {
-    const url = `https://api.cloudinary.com/v1_1/${this.cloudName}/image/upload`;
-
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', this.uploadPreset);
-
-    const response = await fetch(url, {
-      method: 'POST',
-      body: formData,
-    });
-
-    const data = await response.json();
-
-    if (!response.ok || !data.secure_url) {
-      console.error('Respuesta de Cloudinary:', data);
-      throw new Error('No se pudo subir la imagen a Cloudinary');
+  private async procesarCambioDeFoto(file: File): Promise<void> {
+    try {
+      this.subiendoFoto = true;
+      await this.miPerfilService.cambiarFotoPerfil(file);
+    } catch (error) {
+      console.error('Error al subir foto desde web:', error);
+    } finally {
+      this.subiendoFoto = false;
     }
-
-    return data.secure_url;
-  }
-
-  private async guardarFotoPerfil(fotoPerfilUrl: string): Promise<void> {
-    const currentUser = await firstValueFrom(authState(this.auth));
-
-    if (!currentUser) {
-      return;
-    }
-
-    const userDocRef = doc(this.firestore, `usuarios/${currentUser.uid}`);
-
-    await updateDoc(userDocRef, {
-      fotoPerfilUrl,
-      fechaActualizacion: serverTimestamp(),
-    });
   }
 }

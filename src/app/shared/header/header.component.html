@@ -26,9 +26,24 @@
       aria-label="Abrir menú de perfil"
       (click)="toggleProfileMenu()"
     >
-      <span class="app-header__avatar">
-        {{ (inicialUsuario$ | async) ?? "U" }}
-      </span>
+      <ng-container *ngIf="user$ | async as user; else avatarFallbackGlobal">
+        <img
+          *ngIf="user?.fotoPerfilUrl; else avatarFallbackUsuario"
+          class="app-header__avatar app-header__avatar--image"
+          [src]="user.fotoPerfilUrl"
+          alt="Foto de perfil"
+        />
+
+        <ng-template #avatarFallbackUsuario>
+          <span class="app-header__avatar">
+            {{ (inicialUsuario$ | async) ?? "U" }}
+          </span>
+        </ng-template>
+      </ng-container>
+
+      <ng-template #avatarFallbackGlobal>
+        <span class="app-header__avatar">U</span>
+      </ng-template>
     </button>
 
     <div class="app-header__profile-menu" *ngIf="isProfileOpen">

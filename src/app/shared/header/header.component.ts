@@ -3,12 +3,7 @@ import { Component, HostListener, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { MenuController, IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import {
-  logOutOutline,
-  menuOutline,
-  personOutline,
-  settingsOutline,
-} from 'ionicons/icons';
+import { logOutOutline, personOutline, settingsOutline } from 'ionicons/icons';
 import { LoginService } from '../../services/login.service';
 
 @Component({
@@ -30,7 +25,6 @@ export class HeaderComponent {
 
   constructor() {
     addIcons({
-      menuOutline,
       personOutline,
       settingsOutline,
       logOutOutline,

@@ -4,6 +4,7 @@ import {
   UserCredential,
   createUserWithEmailAndPassword,
   sendEmailVerification,
+  signOut,
 } from '@angular/fire/auth';
 import {
   Firestore,
@@ -28,7 +29,7 @@ export class RegistroUsuarioService {
 
     const userCredential = await createUserWithEmailAndPassword(
       this.auth,
-      email,
+      email.trim().toLowerCase(),
       password,
     );
 
@@ -39,7 +40,7 @@ export class RegistroUsuarioService {
 
     await setDoc(doc(this.firestore, 'usuarios', user.uid), {
       uid: user.uid,
-      email: user.email ?? email,
+      email: user.email ?? email.trim().toLowerCase(),
       nombre,
       sexo,
       fechaNacimiento: Timestamp.fromDate(fechaNacimientoDate),
@@ -54,6 +55,8 @@ export class RegistroUsuarioService {
       url: 'http://localhost:8100/verificacion-usuario',
       handleCodeInApp: false,
     });
+
+    await signOut(this.auth);
 
     return userCredential;
   }

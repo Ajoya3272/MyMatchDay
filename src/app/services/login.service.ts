@@ -1,13 +1,14 @@
 import { Injectable, inject } from '@angular/core';
 import {
   Auth,
-  User,
   UserCredential,
   authState,
   signInWithEmailAndPassword,
   signOut,
 } from '@angular/fire/auth';
-import { map, Observable } from 'rxjs';
+import { Firestore, doc, docData, updateDoc } from '@angular/fire/firestore';
+import { map, Observable, of, shareReplay, switchMap } from 'rxjs';
+import { UsuarioFirestore } from '../interfaces/RegistroUsuario.interface';
 
 export interface LoginPayload {
   email: string;
@@ -19,11 +20,30 @@ export interface LoginPayload {
 })
 export class LoginService {
   private auth = inject(Auth);
+  private firestore = inject(Firestore);
 
-  user$: Observable<User | null> = authState(this.auth);
+  authUser$ = authState(this.auth).pipe(
+    shareReplay({ bufferSize: 1, refCount: true }),
+  );
+
+  user$: Observable<UsuarioFirestore | null> = this.authUser$.pipe(
+    switchMap((user) => {
+      if (!user) {
+        return of(null);
+      }
+
+      const userDocRef = doc(this.firestore, `usuarios/${user.uid}`);
+      return docData(userDocRef) as Observable<UsuarioFirestore>;
+    }),
+    shareReplay({ bufferSize: 1, refCount: true }),
+  );
 
   inicialUsuario$: Observable<string> = this.user$.pipe(
     map((user) => this.obtenerInicialUsuario(user)),
+  );
+
+  fotoPerfilUrl$: Observable<string | null> = this.user$.pipe(
+    map((user) => user?.fotoPerfilUrl ?? null),
   );
 
   async iniciarSesion(data: LoginPayload): Promise<UserCredential> {
@@ -43,6 +63,13 @@ export class LoginService {
       throw error;
     }
 
+    await credential.user.getIdToken(true);
+
+    await this.sincronizarEmailVerificado(
+      credential.user.uid,
+      credential.user.emailVerified,
+    );
+
     return credential;
   }
 
@@ -50,10 +77,19 @@ export class LoginService {
     await signOut(this.auth);
   }
 
-  obtenerInicialUsuario(user: User | null): string {
-    const nombre = user?.displayName?.trim() || user?.email?.trim() || 'U';
-
+  obtenerInicialUsuario(user: UsuarioFirestore | null): string {
+    const nombre = user?.nombre?.trim() || user?.email?.trim() || 'U';
     return nombre.charAt(0).toUpperCase();
   }
+
+  private async sincronizarEmailVerificado(
+    uid: string,
+    emailVerificado: boolean,
+  ): Promise<void> {
+    const userDocRef = doc(this.firestore, `usuarios/${uid}`);
+
+    await updateDoc(userDocRef, {
+      emailVerificado,
+    });
+  }
 }
-0;
