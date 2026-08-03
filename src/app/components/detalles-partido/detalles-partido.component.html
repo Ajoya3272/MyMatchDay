@@ -77,7 +77,12 @@
               </div>
 
               <button
-                *ngIf="vm.esOrganizador && !vm.estaEnEquipoA"
+                *ngIf="
+                  vm.estaAntesDeEmpezar &&
+                  vm.nombreUsuarioActual &&
+                  vm.uidUsuarioActual &&
+                  !vm.estaEnEquipoA
+                "
                 class="team-join-btn"
                 type="button"
                 (click)="unirseAEquipo(partido, 'A', vm)"
@@ -121,7 +126,12 @@
               </div>
 
               <button
-                *ngIf="vm.esOrganizador && !vm.estaEnEquipoB"
+                *ngIf="
+                  vm.estaAntesDeEmpezar &&
+                  vm.nombreUsuarioActual &&
+                  vm.uidUsuarioActual &&
+                  !vm.estaEnEquipoB
+                "
                 class="team-join-btn"
                 type="button"
                 (click)="unirseAEquipo(partido, 'B', vm)"
@@ -193,7 +203,7 @@
           </div>
         </section>
 
-        <section class="detalles-page__actions">
+        <section class="detalles-page__actions" *ngIf="vm.estaAntesDeEmpezar">
           <button
             class="partido-invite-btn"
             type="button"

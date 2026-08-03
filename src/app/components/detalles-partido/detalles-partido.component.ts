@@ -36,6 +36,8 @@ interface DetallesPartidoVm extends PartidoDetalleView {
   estaEnEquipoA: boolean;
   estaEnEquipoB: boolean;
   estaEnPartido: boolean;
+  estaAntesDeEmpezar: boolean;
+  estaFinalizado: boolean;
   jugadoresEquipoAVista: JugadorVista[];
   jugadoresEquipoBVista: JugadorVista[];
   jugadoresSinEquipoVista: JugadorVista[];
@@ -116,6 +118,8 @@ export class DetallesPartidoComponent {
           estaEnEquipoA: false,
           estaEnEquipoB: false,
           estaEnPartido: false,
+          estaAntesDeEmpezar: false,
+          estaFinalizado: false,
           jugadoresEquipoAVista: [],
           jugadoresEquipoBVista: [],
           jugadoresSinEquipoVista: [],
@@ -199,6 +203,15 @@ export class DetallesPartidoComponent {
       const esOrganizador =
         !!authUser && partido.organizadorId === authUser.uid;
 
+      const inicio = partido.fecha?.toDate?.() ?? null;
+      const ahora = new Date();
+      const fin = inicio
+        ? new Date(inicio.getTime() + partido.duracionMinutos * 60_000)
+        : null;
+
+      const estaAntesDeEmpezar = !!inicio && ahora < inicio;
+      const estaFinalizado = !!fin && ahora >= fin;
+
       return {
         partido,
         jugadoresTotales,
@@ -216,6 +229,8 @@ export class DetallesPartidoComponent {
         estaEnEquipoA,
         estaEnEquipoB,
         estaEnPartido,
+        estaAntesDeEmpezar,
+        estaFinalizado,
         jugadoresEquipoAVista,
         jugadoresEquipoBVista,
         jugadoresSinEquipoVista,
@@ -224,6 +239,10 @@ export class DetallesPartidoComponent {
   );
 
   async invitarJugadores(partido: Partido): Promise<void> {
+    if (!this.estaAntesDeEmpezar(partido)) {
+      return;
+    }
+
     const enlace = this.obtenerEnlaceInvitacion(partido);
 
     const shareData = {
@@ -250,7 +269,11 @@ export class DetallesPartidoComponent {
     equipo: 'A' | 'B',
     vm: DetallesPartidoVm,
   ): Promise<void> {
-    if (!vm.esOrganizador || !vm.nombreUsuarioActual || !vm.uidUsuarioActual) {
+    if (!vm.estaAntesDeEmpezar) {
+      return;
+    }
+
+    if (!vm.nombreUsuarioActual || !vm.uidUsuarioActual) {
       return;
     }
 
@@ -279,6 +302,16 @@ export class DetallesPartidoComponent {
     } catch (error) {
       console.error('Error al unirse al equipo:', error);
     }
+  }
+
+  private estaAntesDeEmpezar(partido: Partido): boolean {
+    const inicio = partido.fecha?.toDate?.();
+
+    if (!inicio) {
+      return false;
+    }
+
+    return new Date() < inicio;
   }
 
   private obtenerEnlaceInvitacion(partido: Partido): string {

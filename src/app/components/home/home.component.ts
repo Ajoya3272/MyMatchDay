@@ -7,13 +7,23 @@ import {
   Firestore,
   collection,
   collectionData,
+  doc,
   query,
+  updateDoc,
   where,
 } from '@angular/fire/firestore';
 import { Observable, of } from 'rxjs';
 import { map, shareReplay, switchMap, tap } from 'rxjs/operators';
 import { CarruselComponent } from '../carrusel/carrusel.component';
 import { Partido } from '../../interfaces/Partido.interface';
+
+type EstadoPartido = 'pendiente' | 'en progreso' | 'finalizado';
+
+export interface PartidoHomeView extends Partido {
+  estadoCalculado: EstadoPartido;
+  estadoTexto: string;
+  estadoClase: 'pending' | 'progress' | 'finished';
+}
 
 @Component({
   selector: 'app-home',
@@ -27,16 +37,10 @@ export class HomeComponent {
   private firestore = inject(Firestore);
 
   userMatches$: Observable<Partido[]> = authState(this.auth).pipe(
-    tap((user) => {
-      console.log('[HOME] Usuario autenticado:', user);
-    }),
     switchMap((user) => {
       if (!user) {
-        console.log('[HOME] No hay usuario autenticado');
         return of([] as Partido[]);
       }
-
-      console.log('[HOME] UID para recoger partidos:', user.uid);
 
       const partidosRef = collection(this.firestore, 'partidos');
       const partidosQuery = query(
@@ -46,36 +50,144 @@ export class HomeComponent {
 
       return collectionData(partidosQuery, {
         idField: 'partidoId',
-      }).pipe(
-        map((partidos) => partidos as Partido[]),
-        tap((partidos) => {
-          console.log('[HOME] Partidos del usuario logueado:', partidos);
-        }),
-      );
+      }).pipe(map((partidos) => partidos as Partido[]));
     }),
     shareReplay({ bufferSize: 1, refCount: true }),
   );
 
-  pendingMatches$: Observable<Partido[]> = this.userMatches$.pipe(
-    map((partidos) => {
-      const now = new Date();
-
-      return partidos
-        .filter((partido) => {
-          const fechaPartido = partido.fecha?.toDate?.();
-          return (
-            !!fechaPartido &&
-            fechaPartido >= now &&
-            partido.estado !== 'finalizado'
-          );
-        })
-        .sort(
-          (a, b) => a.fecha.toDate().getTime() - b.fecha.toDate().getTime(),
-        );
-    }),
+  pendingMatches$: Observable<PartidoHomeView[]> = this.userMatches$.pipe(
     tap((partidos) => {
-      console.log('[HOME] Partidos pendientes:', partidos);
+      this.sincronizarEstados(partidos);
     }),
+    map((partidos) =>
+      partidos
+        .map((partido) => this.mapearPartidoHome(partido))
+        .filter((partido) => this.debeMostrarEnCarrusel(partido))
+        .sort((a, b) => this.ordenarPartidosCarrusel(a, b)),
+    ),
     shareReplay({ bufferSize: 1, refCount: true }),
   );
+
+  private mapearPartidoHome(partido: Partido): PartidoHomeView {
+    const estadoCalculado = this.calcularEstado(partido);
+
+    return {
+      ...partido,
+      estadoCalculado,
+      estadoTexto: this.obtenerTextoEstado(estadoCalculado),
+      estadoClase: this.obtenerClaseEstado(estadoCalculado),
+      estado: estadoCalculado,
+    };
+  }
+
+  private calcularEstado(partido: Partido): EstadoPartido {
+    const inicio = partido.fecha?.toDate?.();
+
+    if (!inicio) {
+      return 'pendiente';
+    }
+
+    const fin = new Date(inicio.getTime() + partido.duracionMinutos * 60_000);
+    const ahora = new Date();
+
+    if (ahora < inicio) {
+      return 'pendiente';
+    }
+
+    if (ahora >= inicio && ahora < fin) {
+      return 'en progreso';
+    }
+
+    return 'finalizado';
+  }
+
+  private debeMostrarEnCarrusel(partido: PartidoHomeView): boolean {
+    const inicio = partido.fecha?.toDate?.();
+
+    if (!inicio) {
+      return false;
+    }
+
+    const fin = new Date(inicio.getTime() + partido.duracionMinutos * 60_000);
+    const ahora = Date.now();
+    const ventana24h = 24 * 60 * 60 * 1000;
+
+    if (partido.estadoCalculado === 'pendiente') {
+      return true;
+    }
+
+    if (partido.estadoCalculado === 'en progreso') {
+      return true;
+    }
+
+    return ahora - fin.getTime() <= ventana24h;
+  }
+
+  private ordenarPartidosCarrusel(
+    a: PartidoHomeView,
+    b: PartidoHomeView,
+  ): number {
+    const prioridadEstado: Record<EstadoPartido, number> = {
+      'en progreso': 0,
+      pendiente: 1,
+      finalizado: 2,
+    };
+
+    const diferenciaEstado =
+      prioridadEstado[a.estadoCalculado] - prioridadEstado[b.estadoCalculado];
+
+    if (diferenciaEstado !== 0) {
+      return diferenciaEstado;
+    }
+
+    return a.fecha.toDate().getTime() - b.fecha.toDate().getTime();
+  }
+
+  private obtenerTextoEstado(estado: EstadoPartido): string {
+    if (estado === 'en progreso') {
+      return 'En juego';
+    }
+
+    if (estado === 'finalizado') {
+      return 'Finalizado';
+    }
+
+    return 'Pendiente';
+  }
+
+  private obtenerClaseEstado(
+    estado: EstadoPartido,
+  ): 'pending' | 'progress' | 'finished' {
+    if (estado === 'en progreso') {
+      return 'progress';
+    }
+
+    if (estado === 'finalizado') {
+      return 'finished';
+    }
+
+    return 'pending';
+  }
+
+  private sincronizarEstados(partidos: Partido[]): void {
+    partidos.forEach((partido) => {
+      const estadoCalculado = this.calcularEstado(partido);
+
+      if (partido.estado !== estadoCalculado) {
+        this.actualizarEstadoPartido(partido.partidoId, estadoCalculado);
+      }
+    });
+  }
+
+  private async actualizarEstadoPartido(
+    partidoId: string,
+    estado: EstadoPartido,
+  ): Promise<void> {
+    try {
+      const partidoRef = doc(this.firestore, `partidos/${partidoId}`);
+      await updateDoc(partidoRef, { estado });
+    } catch (error) {
+      console.error('[HOME] Error actualizando estado del partido:', error);
+    }
+  }
 }

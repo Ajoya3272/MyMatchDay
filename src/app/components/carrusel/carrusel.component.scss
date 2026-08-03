@@ -35,25 +35,96 @@
 .match-card {
   position: relative;
   border-radius: 24px;
-  background: var(--matchday-black);
-  color: #ffffff;
   padding: 18px;
+  background-color: var(--matchday-black);
+  color: #ffffff;
   box-shadow: 0 16px 40px rgba(15, 23, 42, 0.18);
+  transition:
+    background-color 300ms cubic-bezier(0.16, 1, 0.3, 1),
+    color 220ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 300ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.match-card--pending {
+  background-color: var(--matchday-pending);
+  color: #ffffff;
+}
+
+.match-card--progress {
+  background-color: var(--matchday-progress);
+  color: #0f172a;
+  box-shadow: 0 16px 40px rgba(96, 165, 250, 0.26);
+}
+
+.match-card--finished {
+  background-color: var(--matchday-finished);
+  color: #ffffff;
+  box-shadow: 0 16px 40px rgba(107, 114, 128, 0.22);
 }
 
 .match-card__top {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
   margin-bottom: 14px;
+}
+
+.match-card__status {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  transition:
+    background-color 220ms cubic-bezier(0.16, 1, 0.3, 1),
+    color 220ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 220ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.match-card--pending .match-card__status {
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+}
+
+.match-card--progress .match-card__status {
+  background: rgba(255, 255, 255, 0.82);
+  color: #1e3a8a;
+  box-shadow: 0 6px 18px rgba(255, 255, 255, 0.18);
+}
+
+.match-card--finished .match-card__status {
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
 }
 
 .match-card__title {
   margin: 0;
-  font-size: 1.3rem;
+  font-size: 1.15rem;
   line-height: 1.1;
   font-weight: 800;
+  transition: color 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.match-card__teams {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 600;
+  transition: color 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.match-card--pending .match-card__teams,
+.match-card--finished .match-card__teams {
+  color: rgba(255, 255, 255, 0.84);
+}
+
+.match-card--progress .match-card__teams {
+  color: rgba(15, 23, 42, 0.84);
 }
 
 .match-card__meta {
@@ -66,7 +137,18 @@
 .match-card__meta-item {
   padding: 14px;
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.08);
+  background-color: rgba(255, 255, 255, 0.08);
+  transition:
+    background-color 220ms cubic-bezier(0.16, 1, 0.3, 1),
+    color 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.match-card--progress .match-card__meta-item {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.match-card--finished .match-card__meta-item {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .match-card__meta-label {
@@ -74,11 +156,17 @@
   margin-bottom: 6px;
   font-size: 0.78rem;
   color: rgba(255, 255, 255, 0.68);
+  transition: color 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.match-card--progress .match-card__meta-label {
+  color: rgba(15, 23, 42, 0.7);
 }
 
 .match-card__meta-value {
   font-size: 0.92rem;
-  color: #ffffff;
+  color: inherit;
+  transition: color 220ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .match-card__cta {
@@ -87,10 +175,31 @@
   padding: 0 16px;
   border: 0;
   border-radius: 14px;
-  background: var(--matchday-green);
+  background-color: var(--matchday-green);
   color: #0f172a;
   font-size: 0.95rem;
   font-weight: 800;
+  transition:
+    background-color 220ms cubic-bezier(0.16, 1, 0.3, 1),
+    color 220ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 220ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.match-card--progress .match-card__cta {
+  background-color: #ffffff;
+  color: #0f172a;
+  box-shadow: 0 10px 24px rgba(255, 255, 255, 0.24);
+}
+
+.match-card--finished .match-card__cta {
+  background-color: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.match-card__cta:active {
+  transform: scale(0.98);
 }
 
 .match-card__dots {
@@ -113,4 +222,18 @@
 .match-card__dot--active {
   background: #22c55e;
   transform: scale(1.15);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .match-card,
+  .match-card__status,
+  .match-card__title,
+  .match-card__teams,
+  .match-card__meta-item,
+  .match-card__meta-label,
+  .match-card__meta-value,
+  .match-card__cta,
+  .match-card__dot {
+    transition: none;
+  }
 }
