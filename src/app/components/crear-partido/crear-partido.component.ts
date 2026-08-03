@@ -126,7 +126,11 @@ export class CrearPartidoComponent {
         durationMinutes: Number(this.form.controls.durationMinutes.value ?? 90),
       });
 
-      this.inviteLink = `${window.location.origin}/invitacion/${partidoId}`;
+      const inviteLink = `${window.location.origin}/invitacion/${partidoId}`;
+
+      await this.partidoService.guardarEnlaceInvitacion(partidoId, inviteLink);
+
+      this.inviteLink = inviteLink;
       this.created = true;
       this.currentStep = 3;
       this.linkCopied = false;

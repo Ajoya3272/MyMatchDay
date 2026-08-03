@@ -5,16 +5,10 @@ import { IonContent } from '@ionic/angular/standalone';
 import { Firestore, doc, docData } from '@angular/fire/firestore';
 import { Observable, of } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
-import { Partido } from '../../interfaces/Partido.interface';
-
-interface PartidoDetalleView {
-  partido: Partido | null;
-  jugadoresTotales: string[];
-  jugadoresEquipoA: string[];
-  jugadoresEquipoB: string[];
-  jugadoresSinEquipo: string[];
-  plazasLibres: number;
-}
+import {
+  Partido,
+  PartidoDetalleView,
+} from '../../interfaces/Partido.interface';
 
 @Component({
   selector: 'app-detalles-partido',
@@ -81,6 +75,36 @@ export class DetallesPartidoComponent {
       };
     }),
   );
+
+  async invitarJugadores(partido: Partido): Promise<void> {
+    const enlace = this.obtenerEnlaceInvitacion(partido);
+
+    const shareData = {
+      title: partido.nombre,
+      text: `Únete a mi partido "${partido.nombre}" en MYMATCHDAY`,
+      url: enlace,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+        return;
+      }
+
+      await navigator.clipboard.writeText(enlace);
+      alert('Enlace de invitación copiado al portapapeles');
+    } catch (error) {
+      console.error('Error al compartir la invitación:', error);
+    }
+  }
+
+  private obtenerEnlaceInvitacion(partido: Partido): string {
+    if (partido.enlaceInvitacion?.trim()) {
+      return partido.enlaceInvitacion;
+    }
+
+    return `${window.location.origin}/invitacion/${partido.partidoId}`;
+  }
 
   trackByNombre(index: number, nombre: string): string {
     return `${index}-${nombre}`;

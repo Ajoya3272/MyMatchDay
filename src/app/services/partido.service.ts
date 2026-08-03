@@ -7,19 +7,14 @@ import {
   doc,
   serverTimestamp,
   setDoc,
+  updateDoc,
 } from '@angular/fire/firestore';
 import { firstValueFrom } from 'rxjs';
 import { LoginService } from './login.service';
-import { PartidoWrite } from '../interfaces/Partido.interface';
-
-export interface CrearPartidoPayload {
-  matchDate: string;
-  equipoA: string;
-  equipoB: string;
-  playerCount: number;
-  durationMinutes: number;
-  ubicacion: string;
-}
+import {
+  CrearPartidoPayload,
+  PartidoWrite,
+} from '../interfaces/Partido.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -71,5 +66,17 @@ export class PartidoService {
     await setDoc(partidoDocRef, partidoData);
 
     return partidoDocRef.id;
+  }
+
+  async guardarEnlaceInvitacion(
+    partidoId: string,
+    enlaceInvitacion: string,
+  ): Promise<void> {
+    const partidoRef = doc(this.firestore, `partidos/${partidoId}`);
+
+    await updateDoc(partidoRef, {
+      enlaceInvitacion,
+      fechaActualizacion: serverTimestamp(),
+    });
   }
 }

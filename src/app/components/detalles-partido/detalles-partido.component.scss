@@ -180,6 +180,29 @@ ion-content.detalles-page {
   text-decoration: none;
 }
 
+.detalles-page__actions {
+  margin-top: 16px;
+  padding-bottom: 24px;
+}
+
+.partido-invite-btn {
+  width: 100%;
+  min-height: 52px;
+  padding: 0 18px;
+  border: none;
+  border-radius: 16px;
+  background: #22c55e;
+  color: #0f172a;
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  box-shadow: 0 10px 24px rgba(34, 197, 94, 0.22);
+}
+
+.partido-invite-btn:active {
+  transform: scale(0.99);
+}
+
 @media (min-width: 768px) {
   .partido-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
