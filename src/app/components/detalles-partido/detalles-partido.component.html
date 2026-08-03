@@ -89,15 +89,26 @@
                 <article
                   class="player-row player-row--compact"
                   *ngFor="
-                    let jugador of vm.jugadoresEquipoA;
-                    trackBy: trackByNombre
+                    let jugador of vm.jugadoresEquipoAVista;
+                    trackBy: trackByJugadorVista
                   "
                 >
                   <span class="player-row__avatar">
-                    {{ jugador.charAt(0).toUpperCase() }}
+                    <img
+                      *ngIf="jugador.fotoPerfilUrl; else avatarLetraA"
+                      class="player-row__avatar-image"
+                      [src]="jugador.fotoPerfilUrl"
+                      [alt]="jugador.nombre || 'Jugador'"
+                    />
+                    <ng-template #avatarLetraA>
+                      {{ (jugador.nombre.charAt(0) || "?").toUpperCase() }}
+                    </ng-template>
                   </span>
+
                   <div class="player-row__content">
-                    <strong>{{ jugador }}</strong>
+                    <strong>{{
+                      jugador.nombre || "Jugador sin nombre"
+                    }}</strong>
                   </div>
                 </article>
               </div>
@@ -122,15 +133,26 @@
                 <article
                   class="player-row player-row--compact"
                   *ngFor="
-                    let jugador of vm.jugadoresEquipoB;
-                    trackBy: trackByNombre
+                    let jugador of vm.jugadoresEquipoBVista;
+                    trackBy: trackByJugadorVista
                   "
                 >
                   <span class="player-row__avatar">
-                    {{ jugador.charAt(0).toUpperCase() }}
+                    <img
+                      *ngIf="jugador.fotoPerfilUrl; else avatarLetraB"
+                      class="player-row__avatar-image"
+                      [src]="jugador.fotoPerfilUrl"
+                      [alt]="jugador.nombre || 'Jugador'"
+                    />
+                    <ng-template #avatarLetraB>
+                      {{ (jugador.nombre.charAt(0) || "?").toUpperCase() }}
+                    </ng-template>
                   </span>
+
                   <div class="player-row__content">
-                    <strong>{{ jugador }}</strong>
+                    <strong>{{
+                      jugador.nombre || "Jugador sin nombre"
+                    }}</strong>
                   </div>
                 </article>
               </div>
@@ -148,16 +170,24 @@
             <article
               class="player-row"
               *ngFor="
-                let jugador of vm.jugadoresSinEquipo;
-                trackBy: trackByNombre
+                let jugador of vm.jugadoresSinEquipoVista;
+                trackBy: trackByJugadorVista
               "
             >
               <span class="player-row__avatar">
-                {{ jugador.charAt(0).toUpperCase() }}
+                <img
+                  *ngIf="jugador.fotoPerfilUrl; else avatarLetraSinEquipo"
+                  class="player-row__avatar-image"
+                  [src]="jugador.fotoPerfilUrl"
+                  [alt]="jugador.nombre || 'Jugador'"
+                />
+                <ng-template #avatarLetraSinEquipo>
+                  {{ (jugador.nombre.charAt(0) || "?").toUpperCase() }}
+                </ng-template>
               </span>
 
               <div class="player-row__content">
-                <strong>{{ jugador }}</strong>
+                <strong>{{ jugador.nombre || "Jugador sin nombre" }}</strong>
               </div>
             </article>
           </div>
@@ -173,12 +203,6 @@
           </button>
         </section>
       </section>
-
-      <ng-template #sinJugadores>
-        <section class="partido-panel partido-panel--empty">
-          <p>Todavía no se ha unido nadie a este partido.</p>
-        </section>
-      </ng-template>
 
       <ng-template #sinEquipoA>
         <div class="team-card__empty">Aún no hay jugadores en este equipo.</div>

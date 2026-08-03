@@ -18,15 +18,27 @@ import {
   Partido,
   PartidoDetalleView,
 } from '../../interfaces/Partido.interface';
+import { UsuarioFirestore } from '../../interfaces/RegistroUsuario.interface';
 import { LoginService } from '../../services/login.service';
+import { UsuariosService } from '../../services/usuario.service';
+
+interface JugadorVista {
+  uid: string | null;
+  nombre: string;
+  fotoPerfilUrl: string | null;
+}
 
 interface DetallesPartidoVm extends PartidoDetalleView {
   esOrganizador: boolean;
   nombreUsuarioActual: string | null;
   uidUsuarioActual: string | null;
+  fotoUrlUsuarioActual: string | null;
   estaEnEquipoA: boolean;
   estaEnEquipoB: boolean;
   estaEnPartido: boolean;
+  jugadoresEquipoAVista: JugadorVista[];
+  jugadoresEquipoBVista: JugadorVista[];
+  jugadoresSinEquipoVista: JugadorVista[];
 }
 
 @Component({
@@ -41,6 +53,7 @@ export class DetallesPartidoComponent {
   private firestore = inject(Firestore);
   private auth = inject(Auth);
   private loginService = inject(LoginService);
+  private usuariosService = inject(UsuariosService);
 
   partidoId$: Observable<string | null> = this.route.queryParamMap.pipe(
     map((params) => params.get('partidoId')),
@@ -60,12 +73,34 @@ export class DetallesPartidoComponent {
   authUser$ = authState(this.auth);
   currentUser$ = this.loginService.user$;
 
+  private usuariosParticipantes$: Observable<UsuarioFirestore[]> =
+    this.partido$.pipe(
+      switchMap((partido) => {
+        if (!partido?.jugadoresId?.length) {
+          return of([]);
+        }
+
+        const observables = partido.jugadoresId.map((uid) =>
+          this.usuariosService.obtenerUsuarioPorUid(uid),
+        );
+
+        return combineLatest(observables).pipe(
+          map((usuarios) =>
+            usuarios.filter(
+              (usuario): usuario is UsuarioFirestore => !!usuario,
+            ),
+          ),
+        );
+      }),
+    );
+
   vm$: Observable<DetallesPartidoVm> = combineLatest([
     this.partido$,
     this.authUser$,
     this.currentUser$,
+    this.usuariosParticipantes$,
   ]).pipe(
-    map(([partido, authUser, currentUser]) => {
+    map(([partido, authUser, currentUser, usuariosParticipantes]) => {
       if (!partido) {
         return {
           partido: null,
@@ -77,16 +112,62 @@ export class DetallesPartidoComponent {
           esOrganizador: false,
           nombreUsuarioActual: null,
           uidUsuarioActual: authUser?.uid ?? null,
+          fotoUrlUsuarioActual: currentUser?.fotoPerfilUrl ?? null,
           estaEnEquipoA: false,
           estaEnEquipoB: false,
           estaEnPartido: false,
+          jugadoresEquipoAVista: [],
+          jugadoresEquipoBVista: [],
+          jugadoresSinEquipoVista: [],
         };
       }
 
       const jugadoresEquipoA = partido.jugadoresEquipoA ?? [];
       const jugadoresEquipoB = partido.jugadoresEquipoB ?? [];
       const jugadoresTotales = partido.participantes ?? [];
+      const jugadoresIds = partido.jugadoresId ?? [];
+
       const nombreUsuarioActual = currentUser?.nombre ?? null;
+      const fotoUrlUsuarioActual = currentUser?.fotoPerfilUrl ?? null;
+
+      const mapaUsuariosPorUid = new Map(
+        usuariosParticipantes.map((usuario) => [usuario.uid, usuario]),
+      );
+
+      const jugadoresVistaTotales: JugadorVista[] = jugadoresTotales.map(
+        (nombre, index) => {
+          const uid = jugadoresIds[index] ?? null;
+          const usuario = uid ? mapaUsuariosPorUid.get(uid) : null;
+
+          return {
+            uid,
+            nombre,
+            fotoPerfilUrl: usuario?.fotoPerfilUrl ?? null,
+          };
+        },
+      );
+
+      const mapaVistaPorNombre = new Map(
+        jugadoresVistaTotales.map((jugador) => [jugador.nombre, jugador]),
+      );
+
+      const jugadoresEquipoAVista: JugadorVista[] = jugadoresEquipoA.map(
+        (nombre) =>
+          mapaVistaPorNombre.get(nombre) ?? {
+            uid: null,
+            nombre,
+            fotoPerfilUrl: null,
+          },
+      );
+
+      const jugadoresEquipoBVista: JugadorVista[] = jugadoresEquipoB.map(
+        (nombre) =>
+          mapaVistaPorNombre.get(nombre) ?? {
+            uid: null,
+            nombre,
+            fotoPerfilUrl: null,
+          },
+      );
 
       const jugadoresConEquipo = new Set([
         ...jugadoresEquipoA,
@@ -95,6 +176,15 @@ export class DetallesPartidoComponent {
 
       const jugadoresSinEquipo = jugadoresTotales.filter(
         (jugador) => !jugadoresConEquipo.has(jugador),
+      );
+
+      const jugadoresSinEquipoVista: JugadorVista[] = jugadoresSinEquipo.map(
+        (nombre) =>
+          mapaVistaPorNombre.get(nombre) ?? {
+            uid: null,
+            nombre,
+            fotoPerfilUrl: null,
+          },
       );
 
       const estaEnEquipoA =
@@ -122,9 +212,13 @@ export class DetallesPartidoComponent {
         esOrganizador,
         nombreUsuarioActual,
         uidUsuarioActual: authUser?.uid ?? null,
+        fotoUrlUsuarioActual,
         estaEnEquipoA,
         estaEnEquipoB,
         estaEnPartido,
+        jugadoresEquipoAVista,
+        jugadoresEquipoBVista,
+        jugadoresSinEquipoVista,
       };
     }),
   );
@@ -172,7 +266,6 @@ export class DetallesPartidoComponent {
           jugadoresEquipoB: arrayRemove(nombre),
           fechaActualizacion: serverTimestamp(),
         });
-
         return;
       }
 
@@ -196,7 +289,7 @@ export class DetallesPartidoComponent {
     return `${window.location.origin}/invitacion/${partido.partidoId}`;
   }
 
-  trackByNombre(index: number, nombre: string): string {
-    return `${index}-${nombre}`;
+  trackByJugadorVista(index: number, jugador: JugadorVista): string {
+    return jugador.uid ?? `${index}-${jugador.nombre}`;
   }
 }
