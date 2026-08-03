@@ -1,0 +1,46 @@
+<div class="matches-carousel-shell">
+  <div #matchesCarousel class="matches-carousel" (scroll)="onCarouselScroll()">
+    <div class="match-slide" *ngFor="let match of matches">
+      <article class="match-card">
+        <div class="match-card__top">
+          <h3 class="match-card__title">
+            {{ match.nombre }}
+          </h3>
+        </div>
+
+        <div class="match-card__meta">
+          <div class="match-card__meta-item">
+            <span class="match-card__meta-label">Cuándo</span>
+            <strong class="match-card__meta-value">
+              {{ match.fecha.toDate() | date: "dd/MM/yyyy" }} ·
+              {{ match.fecha.toDate() | date: "HH:mm" }}
+            </strong>
+          </div>
+
+          <div class="match-card__meta-item">
+            <span class="match-card__meta-label">Ubicación</span>
+            <strong class="match-card__meta-value">
+              {{ match.ubicacion || "Por confirmar" }}
+            </strong>
+          </div>
+        </div>
+
+        <button
+          class="match-card__cta"
+          type="button"
+          [routerLink]="['/detalle-partido', match.partidoId]"
+        >
+          Ver detalles
+        </button>
+
+        <div class="match-card__dots" *ngIf="matches.length > 1">
+          <span
+            class="match-card__dot"
+            *ngFor="let _ of matches; let i = index"
+            [class.match-card__dot--active]="i === activeMatchIndex"
+          ></span>
+        </div>
+      </article>
+    </div>
+  </div>
+</div>
