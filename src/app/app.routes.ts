@@ -67,6 +67,14 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'detalles-partido',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./components/detalles-partido/detalles-partido.component').then(
+        (m) => m.DetallesPartidoComponent,
+      ),
+  },
+  {
     path: '**',
     redirectTo: 'login',
   },

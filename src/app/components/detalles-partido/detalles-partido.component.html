@@ -1,3 +1,174 @@
-<p>
-  detalles-partido works!
-</p>
+<ion-content class="detalles-page">
+  <ng-container *ngIf="vm$ | async as vm">
+    <ng-container *ngIf="vm.partido as partido; else estadoVacio">
+      <section class="detalles-page__wrapper">
+        <section class="partido-panel">
+          <div class="partido-panel__heading">
+            <h2>Información del partido</h2>
+            <p>Todos los datos principales de la convocatoria.</p>
+          </div>
+
+          <div class="partido-summary">
+            <h1 class="partido-summary__title">
+              {{ partido.nombre }}
+            </h1>
+
+            <p class="partido-summary__organizador">
+              Organizado por {{ partido.organizador }}
+            </p>
+          </div>
+
+          <div class="partido-grid">
+            <article class="info-card">
+              <span class="info-card__label">Ubicación</span>
+              <strong class="info-card__value">
+                {{ partido.ubicacion || "Por confirmar" }}
+              </strong>
+            </article>
+
+            <article class="info-card">
+              <span class="info-card__label">Fecha</span>
+              <strong class="info-card__value">
+                {{ partido.fecha.toDate() | date: "dd/MM/yyyy" }}
+              </strong>
+            </article>
+
+            <article class="info-card">
+              <span class="info-card__label">Hora</span>
+              <strong class="info-card__value">
+                {{ partido.fecha.toDate() | date: "HH:mm" }}
+              </strong>
+            </article>
+
+            <article class="info-card">
+              <span class="info-card__label">Duración</span>
+              <strong class="info-card__value">
+                {{ partido.duracionMinutos }} min
+              </strong>
+            </article>
+
+            <article class="info-card">
+              <span class="info-card__label">Jugadores</span>
+              <strong class="info-card__value">
+                {{ vm.jugadoresTotales.length }} / {{ partido.numeroJugadores }}
+              </strong>
+            </article>
+
+            <article class="info-card">
+              <span class="info-card__label">Plazas libres</span>
+              <strong class="info-card__value">
+                {{ vm.plazasLibres }}
+              </strong>
+            </article>
+          </div>
+        </section>
+
+        <section class="partido-panel">
+          <div class="partido-panel__heading">
+            <h2>Equipos</h2>
+            <p>Jugadores distribuidos por lado.</p>
+          </div>
+
+          <div class="teams-grid">
+            <section class="team-card">
+              <div class="team-card__header">
+                <h3>{{ partido.equipoA }}</h3>
+                <span>{{ vm.jugadoresEquipoA.length }} jugadores</span>
+              </div>
+
+              <div *ngIf="vm.jugadoresEquipoA.length > 0; else sinEquipoA">
+                <article
+                  class="player-row player-row--compact"
+                  *ngFor="
+                    let jugador of vm.jugadoresEquipoA;
+                    trackBy: trackByNombre
+                  "
+                >
+                  <span class="player-row__avatar">
+                    {{ jugador.charAt(0).toUpperCase() }}
+                  </span>
+                  <div class="player-row__content">
+                    <strong>{{ jugador }}</strong>
+                  </div>
+                </article>
+              </div>
+            </section>
+
+            <section class="team-card">
+              <div class="team-card__header">
+                <h3>{{ partido.equipoB }}</h3>
+                <span>{{ vm.jugadoresEquipoB.length }} jugadores</span>
+              </div>
+
+              <div *ngIf="vm.jugadoresEquipoB.length > 0; else sinEquipoB">
+                <article
+                  class="player-row player-row--compact"
+                  *ngFor="
+                    let jugador of vm.jugadoresEquipoB;
+                    trackBy: trackByNombre
+                  "
+                >
+                  <span class="player-row__avatar">
+                    {{ jugador.charAt(0).toUpperCase() }}
+                  </span>
+                  <div class="player-row__content">
+                    <strong>{{ jugador }}</strong>
+                  </div>
+                </article>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section class="partido-panel" *ngIf="vm.jugadoresSinEquipo.length > 0">
+          <div class="partido-panel__heading">
+            <h2>Sin equipo asignado</h2>
+            <p>Jugadores apuntados pendientes de elegir lado.</p>
+          </div>
+
+          <div class="players-list">
+            <article
+              class="player-row"
+              *ngFor="
+                let jugador of vm.jugadoresSinEquipo;
+                trackBy: trackByNombre
+              "
+            >
+              <span class="player-row__avatar">
+                {{ jugador.charAt(0).toUpperCase() }}
+              </span>
+
+              <div class="player-row__content">
+                <strong>{{ jugador }}</strong>
+              </div>
+            </article>
+          </div>
+        </section>
+      </section>
+
+      <ng-template #sinJugadores>
+        <section class="partido-panel partido-panel--empty">
+          <p>Todavía no se ha unido nadie a este partido.</p>
+        </section>
+      </ng-template>
+
+      <ng-template #sinEquipoA>
+        <div class="team-card__empty">Aún no hay jugadores en este equipo.</div>
+      </ng-template>
+
+      <ng-template #sinEquipoB>
+        <div class="team-card__empty">Aún no hay jugadores en este equipo.</div>
+      </ng-template>
+    </ng-container>
+  </ng-container>
+
+  <ng-template #estadoVacio>
+    <section class="detalles-page__wrapper">
+      <section class="partido-panel partido-panel--empty">
+        <h2>Partido no encontrado</h2>
+        <p>No se pudo cargar la información del partido.</p>
+        <a class="partido-back-btn" [routerLink]="['/home']">Volver</a>
+      </section>
+    </section>
+  </ng-template>
+</ion-content>

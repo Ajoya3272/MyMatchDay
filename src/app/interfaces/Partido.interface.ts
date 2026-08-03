@@ -16,6 +16,9 @@ export interface Partido {
   participantes: string[];
   numeroJugadores: number;
   duracionMinutos: number;
+
+  jugadoresEquipoA?: string[];
+  jugadoresEquipoB?: string[];
 }
 
 export interface PartidoWrite {
@@ -34,6 +37,10 @@ export interface PartidoWrite {
   participantes: string[];
   numeroJugadores: number;
   duracionMinutos: number;
+
+  jugadoresEquipoA?: string[];
+  jugadoresEquipoB?: string[];
+
   fechaCreacion: ReturnType<typeof serverTimestamp>;
   fechaActualizacion: ReturnType<typeof serverTimestamp>;
 }

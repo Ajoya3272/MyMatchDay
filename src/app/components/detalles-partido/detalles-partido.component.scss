@@ -1,0 +1,191 @@
+ion-content.detalles-page {
+  --background: #ffffff;
+}
+
+.detalles-page__wrapper {
+  padding: 92px 16px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.partido-panel {
+  border-radius: 24px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  padding: 18px;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.06);
+}
+
+.partido-panel--empty {
+  text-align: center;
+}
+
+.partido-panel__heading {
+  margin-bottom: 14px;
+}
+
+.partido-panel__heading h2 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--matchday-black);
+}
+
+.partido-panel__heading p {
+  margin: 6px 0 0;
+  font-size: 0.88rem;
+  color: #6b7280;
+}
+
+.partido-summary {
+  margin-bottom: 16px;
+}
+
+.partido-summary__title {
+  margin: 0;
+  font-size: 1.45rem;
+  line-height: 1.08;
+  font-weight: 800;
+  color: var(--matchday-black);
+}
+
+.partido-summary__organizador {
+  margin: 8px 0 0;
+  font-size: 0.92rem;
+  color: #6b7280;
+}
+
+.partido-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.info-card {
+  border-radius: 18px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  padding: 14px;
+}
+
+.info-card__label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.78rem;
+  color: #6b7280;
+}
+
+.info-card__value {
+  font-size: 0.95rem;
+  line-height: 1.35;
+  color: var(--matchday-black);
+}
+
+.players-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.player-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+}
+
+.player-row--compact {
+  padding: 10px 12px;
+}
+
+.player-row__avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--matchday-green);
+  color: #0f172a;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.player-row__content {
+  min-width: 0;
+}
+
+.player-row__content strong {
+  display: block;
+  color: var(--matchday-black);
+  font-size: 0.94rem;
+}
+
+.teams-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.team-card {
+  border-radius: 20px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  padding: 14px;
+}
+
+.team-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.team-card__header h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--matchday-black);
+}
+
+.team-card__header span {
+  font-size: 0.82rem;
+  color: #6b7280;
+}
+
+.team-card__empty {
+  padding: 10px 0 2px;
+  font-size: 0.88rem;
+  color: #6b7280;
+}
+
+.partido-back-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  margin-top: 16px;
+  padding: 0 16px;
+  border-radius: 14px;
+  background: var(--matchday-green);
+  color: #0f172a;
+  font-size: 0.95rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+@media (min-width: 768px) {
+  .partido-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .teams-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

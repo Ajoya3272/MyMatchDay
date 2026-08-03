@@ -1,6 +1,9 @@
 <div class="matches-carousel-shell">
   <div #matchesCarousel class="matches-carousel" (scroll)="onCarouselScroll()">
-    <div class="match-slide" *ngFor="let match of matches">
+    <div
+      class="match-slide"
+      *ngFor="let match of matches; trackBy: trackByPartidoId"
+    >
       <article class="match-card">
         <div class="match-card__top">
           <h3 class="match-card__title">
@@ -28,7 +31,8 @@
         <button
           class="match-card__cta"
           type="button"
-          [routerLink]="['/detalle-partido', match.partidoId]"
+          [routerLink]="['/detalles-partido']"
+          [queryParams]="{ partidoId: match.partidoId }"
         >
           Ver detalles
         </button>
