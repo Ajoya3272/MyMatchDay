@@ -76,6 +76,15 @@
                 <span>{{ vm.jugadoresEquipoA.length }} jugadores</span>
               </div>
 
+              <button
+                *ngIf="vm.esOrganizador && !vm.estaEnEquipoA"
+                class="team-join-btn"
+                type="button"
+                (click)="unirseAEquipo(partido, 'A', vm)"
+              >
+                Unirme a este equipo
+              </button>
+
               <div *ngIf="vm.jugadoresEquipoA.length > 0; else sinEquipoA">
                 <article
                   class="player-row player-row--compact"
@@ -99,6 +108,15 @@
                 <h3>{{ partido.equipoB }}</h3>
                 <span>{{ vm.jugadoresEquipoB.length }} jugadores</span>
               </div>
+
+              <button
+                *ngIf="vm.esOrganizador && !vm.estaEnEquipoB"
+                class="team-join-btn"
+                type="button"
+                (click)="unirseAEquipo(partido, 'B', vm)"
+              >
+                Unirme a este equipo
+              </button>
 
               <div *ngIf="vm.jugadoresEquipoB.length > 0; else sinEquipoB">
                 <article
