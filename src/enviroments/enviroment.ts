@@ -1,4 +1,4 @@
-export const firebaseConfig = {
+export const environment = {
   apiKey: 'AIzaSyCLFtYUGlIkYwDhtPRjrO2-nh4YORY0LrA',
   authDomain: 'football-app-18c93.firebaseapp.com',
   projectId: 'football-app-18c93',
@@ -6,6 +6,8 @@ export const firebaseConfig = {
   messagingSenderId: '856738938096',
   appId: '1:856738938096:web:f884860a9d416d0561d635',
   measurementId: 'G-V5MHH501XM',
+  appUrl: 'https://joinmatch.es',
+  production: true,
 };
 
 export const cloudinary = {

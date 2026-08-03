@@ -7,13 +7,11 @@ import {
   Firestore,
   collection,
   collectionData,
-  doc,
   query,
-  updateDoc,
   where,
 } from '@angular/fire/firestore';
 import { Observable, of } from 'rxjs';
-import { map, shareReplay, switchMap, tap } from 'rxjs/operators';
+import { map, shareReplay, switchMap } from 'rxjs/operators';
 import { CarruselComponent } from '../carrusel/carrusel.component';
 import { Partido } from '../../interfaces/Partido.interface';
 
@@ -56,9 +54,6 @@ export class HomeComponent {
   );
 
   pendingMatches$: Observable<PartidoHomeView[]> = this.userMatches$.pipe(
-    tap((partidos) => {
-      this.sincronizarEstados(partidos);
-    }),
     map((partidos) =>
       partidos
         .map((partido) => this.mapearPartidoHome(partido))
@@ -167,27 +162,5 @@ export class HomeComponent {
     }
 
     return 'pending';
-  }
-
-  private sincronizarEstados(partidos: Partido[]): void {
-    partidos.forEach((partido) => {
-      const estadoCalculado = this.calcularEstado(partido);
-
-      if (partido.estado !== estadoCalculado) {
-        this.actualizarEstadoPartido(partido.partidoId, estadoCalculado);
-      }
-    });
-  }
-
-  private async actualizarEstadoPartido(
-    partidoId: string,
-    estado: EstadoPartido,
-  ): Promise<void> {
-    try {
-      const partidoRef = doc(this.firestore, `partidos/${partidoId}`);
-      await updateDoc(partidoRef, { estado });
-    } catch (error) {
-      console.error('[HOME] Error actualizando estado del partido:', error);
-    }
   }
 }

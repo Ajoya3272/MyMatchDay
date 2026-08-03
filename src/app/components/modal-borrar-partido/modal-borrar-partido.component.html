@@ -1,0 +1,77 @@
+<div
+  class="delete-match-modal"
+  *ngIf="isOpen"
+  (click)="onBackdropClick($event)"
+>
+  <div
+    class="delete-match-modal__dialog"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="delete-match-title"
+    aria-describedby="delete-match-description"
+  >
+    <button
+      type="button"
+      class="delete-match-modal__close"
+      aria-label="Cerrar modal"
+      (click)="onCancel()"
+      [disabled]="loading"
+    >
+      ✕
+    </button>
+
+    <span class="delete-match-modal__badge"> Cancelar partido </span>
+
+    <h3 id="delete-match-title" class="delete-match-modal__title">
+      ¿Quieres cancelar este partido?
+    </h3>
+
+    <p id="delete-match-description" class="delete-match-modal__text">
+      Esta acción eliminará el partido de forma permanente y no se puede
+      deshacer.
+    </p>
+
+    <div class="delete-match-modal__card" *ngIf="partido as match">
+      <span class="delete-match-modal__label">Partido</span>
+      <strong class="delete-match-modal__match-name">
+        {{ match.nombre }}
+      </strong>
+
+      <div class="delete-match-modal__meta">
+        <div class="delete-match-modal__meta-item">
+          <span class="delete-match-modal__meta-label">Fecha</span>
+          <strong class="delete-match-modal__meta-value">
+            {{ match.fecha.toDate() | date: "dd/MM/yyyy" }}
+          </strong>
+        </div>
+
+        <div class="delete-match-modal__meta-item">
+          <span class="delete-match-modal__meta-label">Hora</span>
+          <strong class="delete-match-modal__meta-value">
+            {{ match.fecha.toDate() | date: "HH:mm" }}
+          </strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="delete-match-modal__actions">
+      <button
+        type="button"
+        class="delete-match-modal__button delete-match-modal__button--secondary"
+        (click)="onCancel()"
+        [disabled]="loading"
+      >
+        Volver
+      </button>
+
+      <button
+        type="button"
+        class="delete-match-modal__button delete-match-modal__button--danger"
+        (click)="onConfirm()"
+        [disabled]="loading"
+      >
+        {{ loading ? "Cancelando..." : "Sí, cancelar partido" }}
+      </button>
+    </div>
+  </div>
+</div>

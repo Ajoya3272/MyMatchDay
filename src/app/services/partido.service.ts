@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Auth, authState } from '@angular/fire/auth';
+import { Auth } from '@angular/fire/auth';
 import {
   Firestore,
   Timestamp,
@@ -10,6 +10,7 @@ import {
   updateDoc,
 } from '@angular/fire/firestore';
 import { firstValueFrom } from 'rxjs';
+import { filter, take } from 'rxjs/operators';
 import { LoginService } from './login.service';
 import {
   CrearPartidoPayload,
@@ -25,16 +26,18 @@ export class PartidoService {
   private loginService = inject(LoginService);
 
   async crearPartido(data: CrearPartidoPayload): Promise<string> {
-    const authUser = await firstValueFrom(authState(this.auth));
-    const usuario = await firstValueFrom(this.loginService.user$);
+    const authUser = this.auth.currentUser;
 
     if (!authUser) {
       throw new Error('No hay usuario autenticado');
     }
 
-    if (!usuario) {
-      throw new Error('No se encontraron los datos del usuario');
-    }
+    const usuario = await firstValueFrom(
+      this.loginService.user$.pipe(
+        filter((user): user is NonNullable<typeof user> => !!user),
+        take(1),
+      ),
+    );
 
     const partidosCollectionRef = collection(this.firestore, 'partidos');
     const partidoDocRef = doc(partidosCollectionRef);
@@ -57,6 +60,8 @@ export class PartidoService {
       golesEquipoB: 0,
       jugadoresId: [],
       participantes: [],
+      jugadoresEquipoA: [],
+      jugadoresEquipoB: [],
       numeroJugadores: Number(data.playerCount),
       duracionMinutos: Number(data.durationMinutes),
       fechaCreacion: serverTimestamp(),

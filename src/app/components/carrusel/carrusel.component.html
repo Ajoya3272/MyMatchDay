@@ -9,8 +9,8 @@
         [ngClass]="'match-card--' + getEstadoClase(match)"
       >
         <div class="match-card__top">
-          <span class="match-card__status" *ngIf="shouldShowStatusBadge(match)">
-            {{ getEstadoBadgeTexto(match) }}
+          <span class="match-card__status">
+            {{ match.estadoTexto || match.estado }}
           </span>
 
           <h3 class="match-card__title">
@@ -35,14 +35,27 @@
           </div>
         </div>
 
-        <button
-          class="match-card__cta"
-          type="button"
-          [routerLink]="['/detalles-partido']"
-          [queryParams]="{ partidoId: match.partidoId }"
-        >
-          Ver detalles
-        </button>
+        <div class="match-card__actions">
+          <button
+            class="match-card__cta"
+            type="button"
+            [routerLink]="['/detalles-partido']"
+            [queryParams]="{ partidoId: match.partidoId }"
+            [disabled]="deletingMatchId === match.partidoId"
+          >
+            Ver detalles
+          </button>
+
+          <button
+            *ngIf="isPending(match)"
+            class="match-card__cta match-card__cta--danger"
+            type="button"
+            [disabled]="deletingMatchId === match.partidoId"
+            (click)="openDeleteModal(match)"
+          >
+            Cancelar partido
+          </button>
+        </div>
 
         <div class="match-card__dots" *ngIf="matches.length > 1">
           <span
@@ -55,3 +68,11 @@
     </div>
   </div>
 </div>
+
+<app-modal-borrar-partido
+  [isOpen]="isDeleteModalOpen"
+  [loading]="!!deletingMatchId"
+  [partido]="selectedMatchToDelete"
+  (cancel)="closeDeleteModal()"
+  (confirm)="confirmDeleteMatch()"
+></app-modal-borrar-partido>

@@ -9,6 +9,7 @@ import {
 } from '@ionic/angular/standalone';
 import { PartidoService } from '../../services/partido.service';
 import { SpinnerComponent } from '../spinner/spinner.component';
+import { environment } from '../../../enviroments/enviroment';
 
 @Component({
   selector: 'app-crear-partido',
@@ -126,7 +127,7 @@ export class CrearPartidoComponent {
         durationMinutes: Number(this.form.controls.durationMinutes.value ?? 90),
       });
 
-      const inviteLink = `${window.location.origin}/invitacion/${partidoId}`;
+      const inviteLink = `${this.getAppUrl()}/invitacion/${partidoId}`;
 
       await this.partidoService.guardarEnlaceInvitacion(partidoId, inviteLink);
 
@@ -166,6 +167,16 @@ export class CrearPartidoComponent {
   goHome(): void {
     this.resetCreateMatch();
     this.router.navigate(['/home']);
+  }
+
+  private getAppUrl(): string {
+    const configuredUrl = environment.appUrl?.trim();
+
+    if (configuredUrl) {
+      return configuredUrl.replace(/\/+$/, '');
+    }
+
+    return window.location.origin.replace(/\/+$/, '');
   }
 
   private resetCreateMatch(): void {

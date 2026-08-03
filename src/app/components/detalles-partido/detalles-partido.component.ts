@@ -21,6 +21,7 @@ import {
 import { UsuarioFirestore } from '../../interfaces/RegistroUsuario.interface';
 import { LoginService } from '../../services/login.service';
 import { UsuariosService } from '../../services/usuario.service';
+import { environment } from '../../../enviroments/enviroment';
 
 interface JugadorVista {
   uid: string | null;
@@ -247,7 +248,7 @@ export class DetallesPartidoComponent {
 
     const shareData = {
       title: partido.nombre,
-      text: `Únete a mi partido "${partido.nombre}" en MYMATCHDAY`,
+      text: `Únete a mi partido "${partido.nombre}" en JoinMatch`,
       url: enlace,
     };
 
@@ -316,10 +317,20 @@ export class DetallesPartidoComponent {
 
   private obtenerEnlaceInvitacion(partido: Partido): string {
     if (partido.enlaceInvitacion?.trim()) {
-      return partido.enlaceInvitacion;
+      return partido.enlaceInvitacion.trim();
     }
 
-    return `${window.location.origin}/invitacion/${partido.partidoId}`;
+    return `${this.getAppUrl()}/invitacion/${partido.partidoId}`;
+  }
+
+  private getAppUrl(): string {
+    const configuredUrl = environment.appUrl?.trim();
+
+    if (configuredUrl) {
+      return configuredUrl.replace(/\/+$/, '');
+    }
+
+    return window.location.origin.replace(/\/+$/, '');
   }
 
   trackByJugadorVista(index: number, jugador: JugadorVista): string {

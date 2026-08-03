@@ -1,7 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, Input, ViewChild } from '@angular/core';
+import { Component, ElementRef, Input, ViewChild, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { Firestore, deleteDoc, doc } from '@angular/fire/firestore';
 import { Partido } from '../../interfaces/Partido.interface';
+import { ModalBorrarPartidoComponent } from '../modal-borrar-partido/modal-borrar-partido.component';
 
 type EstadoPartidoVista = 'pending' | 'progress' | 'finished';
 
@@ -15,15 +17,19 @@ export interface PartidoCarrusel extends Partido {
   templateUrl: './carrusel.component.html',
   styleUrls: ['./carrusel.component.scss'],
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, ModalBorrarPartidoComponent],
 })
 export class CarruselComponent {
+  private firestore = inject(Firestore);
   private _matches: PartidoCarrusel[] = [];
 
   @ViewChild('matchesCarousel')
   matchesCarousel?: ElementRef<HTMLDivElement>;
 
   activeMatchIndex = 0;
+  deletingMatchId: string | null = null;
+  selectedMatchToDelete: PartidoCarrusel | null = null;
+  isDeleteModalOpen = false;
 
   @Input({ required: true })
   set matches(value: PartidoCarrusel[] | null | undefined) {
@@ -76,24 +82,47 @@ export class CarruselComponent {
     return 'pending';
   }
 
-  shouldShowStatusBadge(match: PartidoCarrusel): boolean {
-    const estado = this.getEstadoClase(match);
-    return (
-      estado === 'pending' || estado === 'progress' || estado === 'finished'
-    );
+  isPending(match: PartidoCarrusel): boolean {
+    return this.getEstadoClase(match) === 'pending';
   }
 
-  getEstadoBadgeTexto(match: PartidoCarrusel): string {
-    const estado = this.getEstadoClase(match);
-
-    if (estado === 'progress') {
-      return 'En juego';
+  openDeleteModal(match: PartidoCarrusel): void {
+    if (!match.partidoId || this.deletingMatchId) {
+      return;
     }
 
-    if (estado === 'finished') {
-      return 'Finalizado';
+    this.selectedMatchToDelete = match;
+    this.isDeleteModalOpen = true;
+  }
+
+  closeDeleteModal(): void {
+    if (this.deletingMatchId) {
+      return;
     }
 
-    return 'Pendiente';
+    this.isDeleteModalOpen = false;
+    this.selectedMatchToDelete = null;
+  }
+
+  async confirmDeleteMatch(): Promise<void> {
+    const match = this.selectedMatchToDelete;
+
+    if (!match?.partidoId || this.deletingMatchId) {
+      return;
+    }
+
+    try {
+      this.deletingMatchId = match.partidoId;
+
+      const partidoRef = doc(this.firestore, `partidos/${match.partidoId}`);
+      await deleteDoc(partidoRef);
+
+      this.isDeleteModalOpen = false;
+      this.selectedMatchToDelete = null;
+    } catch (error) {
+      console.error('[CARRUSEL] Error al cancelar el partido:', error);
+    } finally {
+      this.deletingMatchId = null;
+    }
   }
 }

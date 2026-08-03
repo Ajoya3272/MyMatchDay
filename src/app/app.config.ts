@@ -10,12 +10,12 @@ import { provideAuth, getAuth } from '@angular/fire/auth';
 import { provideFirestore, getFirestore } from '@angular/fire/firestore';
 import { provideStorage, getStorage } from '@angular/fire/storage';
 import { routes } from './app.routes';
-import { firebaseConfig } from '../enviroments/enviroment';
+import { environment } from '../enviroments/enviroment';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideIonicAngular(),
-    provideFirebaseApp(() => initializeApp(firebaseConfig)),
+    provideFirebaseApp(() => initializeApp(environment)),
     provideAuth(() => getAuth()),
     provideFirestore(() => getFirestore()),
     provideRouter(routes, withEnabledBlockingInitialNavigation()),
