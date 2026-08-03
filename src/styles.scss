@@ -20,8 +20,7 @@ $football-app-theme: mat.define-light-theme(
 
 @include mat.all-component-themes($football-app-theme);
 
-@import url("https://fonts.googleapis.com/css2?family=Futura+PT:wght@400;700&display=swap");
-
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap");
 :root {
   --matchday-green: #22c55e;
   --matchday-black: #111827;
