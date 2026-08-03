@@ -18,6 +18,7 @@ export interface CrearPartidoPayload {
   equipoB: string;
   playerCount: number;
   durationMinutes: number;
+  ubicacion: string;
 }
 
 @Injectable({
@@ -45,6 +46,7 @@ export class PartidoService {
 
     const equipoA = data.equipoA.trim();
     const equipoB = data.equipoB.trim();
+    const ubicacion = data.ubicacion.trim();
 
     const partidoData: PartidoWrite = {
       partidoId: partidoDocRef.id,
@@ -55,6 +57,7 @@ export class PartidoService {
       estado: 'pendiente',
       equipoA,
       equipoB,
+      ubicacion,
       golesEquipoA: 0,
       golesEquipoB: 0,
       jugadoresId: [],

@@ -49,13 +49,47 @@
               <h2>Selecciona fecha y hora</h2>
               <p>Elige cuándo se va a jugar el partido.</p>
 
-              <ion-datetime
-                class="create-match-datetime"
-                presentation="date-time"
-                formControlName="matchDate"
-                hourCycle="h23"
-                locale="es-ES"
-              ></ion-datetime>
+              <div class="datetime-stack">
+                <div class="datetime-block">
+                  <label class="field-label" for="matchDateOnly">
+                    Fecha del partido
+                  </label>
+
+                  <ion-datetime
+                    id="matchDateOnly"
+                    class="create-match-datetime"
+                    presentation="date"
+                    locale="es-ES"
+                    hourCycle="h23"
+                    [value]="form.controls.matchDate.value"
+                    (ionChange)="onDateSelected($event)"
+                  ></ion-datetime>
+                </div>
+
+                <div class="field-block field-block--time">
+                  <label class="field-label" for="matchTime">
+                    Hora del partido
+                  </label>
+
+                  <input
+                    id="matchTime"
+                    class="field-input field-input--time"
+                    type="time"
+                    formControlName="matchTime"
+                    step="60"
+                  />
+
+                  <span
+                    class="field-error"
+                    *ngIf="
+                      form.controls.matchTime.touched &&
+                      form.controls.matchTime.errors?.['required']
+                    "
+                  >
+                    Selecciona una hora.
+                  </span>
+                </div>
+              </div>
 
               <span
                 class="field-error"
@@ -64,7 +98,7 @@
                   form.controls.matchDate.errors?.['required']
                 "
               >
-                Selecciona una fecha y una hora.
+                Selecciona una fecha.
               </span>
 
               <span
@@ -162,6 +196,39 @@
                     El equipo A y el equipo B no pueden llamarse igual.
                   </span>
                 </div>
+              </div>
+
+              <div class="field-block">
+                <label class="field-label" for="ubicacion"> Ubicación </label>
+
+                <input
+                  id="ubicacion"
+                  class="field-input"
+                  type="text"
+                  formControlName="ubicacion"
+                  placeholder="Ej: Campo municipal de Chiclana"
+                  maxlength="100"
+                />
+
+                <span
+                  class="field-error"
+                  *ngIf="
+                    form.controls.ubicacion.touched &&
+                    form.controls.ubicacion.errors?.['required']
+                  "
+                >
+                  Indica la ubicación del partido.
+                </span>
+
+                <span
+                  class="field-error"
+                  *ngIf="
+                    form.controls.ubicacion.touched &&
+                    form.controls.ubicacion.errors?.['maxlength']
+                  "
+                >
+                  La ubicación es demasiado larga.
+                </span>
               </div>
 
               <div class="field-block">

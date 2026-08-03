@@ -6,8 +6,6 @@ import {
   IonContent,
   IonDatetime,
   IonProgressBar,
-  IonDatetimeButton,
-  IonModal,
 } from '@ionic/angular/standalone';
 import { PartidoService } from '../../services/partido.service';
 import { SpinnerComponent } from '../spinner/spinner.component';
@@ -18,8 +16,6 @@ import { SpinnerComponent } from '../spinner/spinner.component';
   styleUrls: ['./crear-partido.component.scss'],
   standalone: true,
   imports: [
-    IonModal,
-    IonDatetimeButton,
     CommonModule,
     ReactiveFormsModule,
     IonContent,
@@ -44,8 +40,10 @@ export class CrearPartidoComponent {
 
   form = this.fb.group({
     matchDate: ['', Validators.required],
+    matchTime: ['', Validators.required],
     equipoA: ['', [Validators.required, Validators.maxLength(40)]],
     equipoB: ['', [Validators.required, Validators.maxLength(40)]],
+    ubicacion: ['', [Validators.required, Validators.maxLength(100)]],
     playerCount: [10, [Validators.required, Validators.min(2)]],
     durationMinutes: [90, [Validators.required, Validators.min(1)]],
   });
@@ -58,16 +56,43 @@ export class CrearPartidoComponent {
     this.resetCreateMatch();
   }
 
-  nextStep(): void {
-    this.minDateTime = this.getMinDateTime();
-    this.form.controls.matchDate.markAsTouched();
+  onDateSelected(event: CustomEvent): void {
+    const value = event.detail.value;
 
-    if (this.form.controls.matchDate.invalid) {
+    if (!value) {
+      this.form.controls.matchDate.setValue('');
+      this.form.controls.matchDate.markAsTouched();
       return;
     }
 
+    const selectedDate = Array.isArray(value) ? value[0] : value;
+    const dateOnly = String(selectedDate).slice(0, 10);
+
+    this.form.controls.matchDate.setValue(dateOnly);
+    this.form.controls.matchDate.markAsTouched();
+    this.clearControlError(this.form.controls.matchDate, 'pastDate');
+  }
+
+  nextStep(): void {
+    this.minDateTime = this.getMinDateTime();
+
+    this.form.controls.matchDate.markAsTouched();
+    this.form.controls.matchTime.markAsTouched();
+
+    if (
+      this.form.controls.matchDate.invalid ||
+      this.form.controls.matchTime.invalid
+    ) {
+      return;
+    }
+
+    this.clearControlError(this.form.controls.matchDate, 'pastDate');
+
     if (!this.isDateTimeValid()) {
-      this.form.controls.matchDate.setErrors({ pastDate: true });
+      this.form.controls.matchDate.setErrors({
+        ...(this.form.controls.matchDate.errors ?? {}),
+        pastDate: true,
+      });
       return;
     }
 
@@ -90,11 +115,13 @@ export class CrearPartidoComponent {
 
       const equipoA = this.form.controls.equipoA.value?.trim() ?? '';
       const equipoB = this.form.controls.equipoB.value?.trim() ?? '';
+      const ubicacion = this.form.controls.ubicacion.value?.trim() ?? '';
 
       const partidoId = await this.partidoService.crearPartido({
-        matchDate: this.form.controls.matchDate.value ?? '',
+        matchDate: this.buildMatchDateTime(),
         equipoA,
         equipoB,
+        ubicacion,
         playerCount: Number(this.form.controls.playerCount.value ?? 10),
         durationMinutes: Number(this.form.controls.durationMinutes.value ?? 90),
       });
@@ -153,8 +180,10 @@ export class CrearPartidoComponent {
 
     this.form.reset({
       matchDate: '',
+      matchTime: '',
       equipoA: '',
       equipoB: '',
+      ubicacion: '',
       playerCount: 10,
       durationMinutes: 90,
     });
@@ -164,11 +193,12 @@ export class CrearPartidoComponent {
   }
 
   private validateStep2(): boolean {
-    const { equipoA, equipoB, playerCount, durationMinutes } =
+    const { equipoA, equipoB, ubicacion, playerCount, durationMinutes } =
       this.form.controls;
 
     equipoA.markAsTouched();
     equipoB.markAsTouched();
+    ubicacion.markAsTouched();
     playerCount.markAsTouched();
     durationMinutes.markAsTouched();
 
@@ -177,6 +207,7 @@ export class CrearPartidoComponent {
     if (
       equipoA.invalid ||
       equipoB.invalid ||
+      ubicacion.invalid ||
       playerCount.invalid ||
       durationMinutes.invalid
     ) {
@@ -207,14 +238,22 @@ export class CrearPartidoComponent {
     control.setErrors(Object.keys(errors).length ? errors : null);
   }
 
-  private isDateTimeValid(): boolean {
-    const selectedValue = this.form.controls.matchDate.value;
+  private buildMatchDateTime(): string {
+    const date = this.form.controls.matchDate.value ?? '';
+    const time = this.form.controls.matchTime.value ?? '';
 
-    if (!selectedValue) {
+    return `${date}T${time}:00`;
+  }
+
+  private isDateTimeValid(): boolean {
+    const date = this.form.controls.matchDate.value;
+    const time = this.form.controls.matchTime.value;
+
+    if (!date || !time) {
       return false;
     }
 
-    const selectedDate = new Date(selectedValue);
+    const selectedDate = new Date(`${date}T${time}:00`);
     const currentDate = new Date();
 
     return selectedDate.getTime() >= currentDate.getTime();

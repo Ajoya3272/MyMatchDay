@@ -1,31 +1,66 @@
 <ion-content class="home-page">
   <section class="home-page__next-match">
     <div class="home-page__section-heading">
-      <h2>Próximo partido</h2>
-      <p>Tu siguiente convocatoria de un vistazo.</p>
+      <div>
+        <h2>Próximo partido</h2>
+        <p>Tu siguiente convocatoria de un vistazo.</p>
+      </div>
     </div>
 
-    <article class="match-card" *ngIf="hasNextMatch; else emptyNextMatch">
-      <div class="match-card__top">
-        <span class="match-card__badge">Hoy · 20:30</span>
-        <span class="match-card__players">8/10 confirmados</span>
-      </div>
+    <ng-container *ngIf="pendingMatches$ | async as pendingMatches">
+      <ng-container *ngIf="pendingMatches.length > 0; else emptyNextMatch">
+        <div class="matches-carousel-shell">
+          <div
+            #matchesCarousel
+            class="matches-carousel"
+            (scroll)="onCarouselScroll()"
+          >
+            <div class="match-slide" *ngFor="let match of pendingMatches">
+              <article class="match-card">
+                <div class="match-card__top">
+                  <h3 class="match-card__title">
+                    {{ match.nombre }}
+                  </h3>
+                </div>
 
-      <h3 class="match-card__title">Solteros FC vs Casados FC</h3>
-      <p class="match-card__place">Campo municipal · Chiclana</p>
+                <div class="match-card__meta">
+                  <div class="match-card__meta-item">
+                    <span class="match-card__meta-label">Cuándo</span>
+                    <strong class="match-card__meta-value">
+                      {{ match.fecha.toDate() | date: "dd/MM/yyyy" }} ·
+                      {{ match.fecha.toDate() | date: "HH:mm" }}
+                    </strong>
+                  </div>
 
-      <div class="match-card__meta">
-        <div class="match-card__meta-item">
-          <span class="match-card__meta-label">Faltan</span>
-          <strong class="match-card__meta-value">2 jugadores</strong>
+                  <div class="match-card__meta-item">
+                    <span class="match-card__meta-label">Ubicación</span>
+                    <strong class="match-card__meta-value">
+                      {{ match.ubicacion || "Por confirmar" }}
+                    </strong>
+                  </div>
+                </div>
+
+                <button
+                  class="match-card__cta"
+                  type="button"
+                  [routerLink]="['/detalle-partido', match.partidoId]"
+                >
+                  Ver detalles
+                </button>
+
+                <div class="match-card__dots" *ngIf="pendingMatches.length > 1">
+                  <span
+                    class="match-card__dot"
+                    *ngFor="let _ of pendingMatches; let i = index"
+                    [class.match-card__dot--active]="i === activeMatchIndex"
+                  ></span>
+                </div>
+              </article>
+            </div>
+          </div>
         </div>
-
-        <div class="match-card__meta-item">
-          <span class="match-card__meta-label">Invitación</span>
-          <strong class="match-card__meta-value">Lista para enviar</strong>
-        </div>
-      </div>
-    </article>
+      </ng-container>
+    </ng-container>
 
     <ng-template #emptyNextMatch>
       <article class="match-card match-card--empty">
@@ -66,9 +101,9 @@
       <button class="quick-card" type="button">
         <span class="quick-card__icon">📝</span>
         <span class="quick-card__title">Registrar resultado</span>
-        <span class="quick-card__text"
-          >Guarda marcador, goles y asistentes.</span
-        >
+        <span class="quick-card__text">
+          Guarda marcador, goles y asistentes.
+        </span>
       </button>
 
       <button class="quick-card" type="button">

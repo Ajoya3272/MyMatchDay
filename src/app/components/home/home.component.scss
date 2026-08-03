@@ -21,6 +21,10 @@ ion-content.home-page {
 }
 
 .home-page__section-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
   margin-bottom: 14px;
 }
 
@@ -35,6 +39,39 @@ ion-content.home-page {
   margin: 6px 0 0;
   font-size: 0.9rem;
   color: #6b7280;
+}
+
+.matches-carousel-shell {
+  position: relative;
+  overflow: hidden;
+}
+
+.matches-carousel {
+  display: flex;
+  overflow-x: auto;
+  padding: 0;
+  margin: 0;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.matches-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.match-slide {
+  flex: 0 0 100%;
+  min-width: 100%;
+  max-width: 100%;
+  scroll-snap-align: start;
+  padding-right: 12px;
+  box-sizing: border-box;
+}
+
+.match-slide:last-child {
+  padding-right: 0;
 }
 
 .home-page__quick-grid {
@@ -78,6 +115,7 @@ ion-content.home-page {
 }
 
 .match-card {
+  position: relative;
   border-radius: 24px;
   background: var(--matchday-black);
   color: #ffffff;
@@ -175,6 +213,28 @@ ion-content.home-page {
   color: #0f172a;
   font-size: 0.95rem;
   font-weight: 800;
+}
+
+.match-card__dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 14px;
+}
+
+.match-card__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.28);
+  transition:
+    transform 180ms ease,
+    background-color 180ms ease;
+}
+
+.match-card__dot--active {
+  background: #22c55e;
+  transform: scale(1.15);
 }
 
 .stats-grid {

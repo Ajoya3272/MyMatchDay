@@ -9,6 +9,7 @@ export interface Partido {
   estado: string;
   equipoA: string;
   equipoB: string;
+  ubicacion: string;
   golesEquipoA: number;
   golesEquipoB: number;
   jugadoresId: string[];
@@ -26,6 +27,7 @@ export interface PartidoWrite {
   estado: string;
   equipoA: string;
   equipoB: string;
+  ubicacion: string;
   golesEquipoA: number;
   golesEquipoB: number;
   jugadoresId: string[];
