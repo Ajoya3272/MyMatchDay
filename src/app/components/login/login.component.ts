@@ -19,6 +19,7 @@ import {
   keyOutline,
   mailOutline,
 } from 'ionicons/icons';
+import { Subscription } from 'rxjs';
 import { LoginService } from '../../services/login.service';
 
 @Component({
@@ -45,11 +46,14 @@ export class LoginComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private loginService = inject(LoginService);
 
+  private queryParamsSub?: Subscription;
+
   loading = false;
   showPassword = false;
   iconAnimating = false;
   errorMessage = '';
   successMessage = '';
+  returnUrl = '/home';
 
   loginForm = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
@@ -67,8 +71,6 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    const verified = this.route.snapshot.queryParamMap.get('verified');
-
     this.loginForm.reset({
       email: '',
       password: '',
@@ -79,10 +81,16 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.iconAnimating = false;
     this.successMessage = '';
 
-    if (verified === '1') {
+    this.queryParamsSub = this.route.queryParamMap.subscribe((params) => {
+      const verified = params.get('verified');
+      const returnUrl = params.get('returnUrl');
+
+      this.returnUrl = returnUrl || '/home';
       this.successMessage =
-        'Correo verificado correctamente. Ya puedes iniciar sesión.';
-    }
+        verified === '1'
+          ? 'Correo verificado correctamente. Ya puedes iniciar sesión.'
+          : '';
+    });
   }
 
   get email() {
@@ -105,9 +113,14 @@ export class LoginComponent implements OnInit, OnDestroy {
   async onSubmit(): Promise<void> {
     this.loginForm.markAllAsTouched();
     this.errorMessage = '';
-    this.successMessage = '';
+    this.successMessage =
+      this.route.snapshot.queryParamMap.get('verified') === '1'
+        ? 'Correo verificado correctamente. Ya puedes iniciar sesión.'
+        : '';
 
-    if (this.loginForm.invalid) return;
+    if (this.loginForm.invalid) {
+      return;
+    }
 
     try {
       this.loading = true;
@@ -124,7 +137,7 @@ export class LoginComponent implements OnInit, OnDestroy {
         password: '',
       });
 
-      await this.router.navigate(['/home']);
+      await this.router.navigateByUrl(this.returnUrl);
     } catch (error: any) {
       console.error('Error en login', error);
 
@@ -155,6 +168,8 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.queryParamsSub?.unsubscribe();
+
     this.loginForm.reset({
       email: '',
       password: '',
@@ -165,5 +180,6 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.iconAnimating = false;
     this.errorMessage = '';
     this.successMessage = '';
+    this.returnUrl = '/home';
   }
 }

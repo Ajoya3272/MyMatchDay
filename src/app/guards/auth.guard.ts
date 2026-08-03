@@ -1,16 +1,26 @@
 import { inject } from '@angular/core';
-import { CanActivateFn, Router } from '@angular/router';
+import {
+  CanActivateFn,
+  CanMatchFn,
+  Route,
+  Router,
+  UrlSegment,
+} from '@angular/router';
 import { Auth, authState } from '@angular/fire/auth';
 import { map, take } from 'rxjs';
 
-export const authGuard: CanActivateFn = () => {
+export const authGuard: CanActivateFn = (_route, state) => {
   const auth = inject(Auth);
   const router = inject(Router);
 
   return authState(auth).pipe(
     take(1),
     map((user) => {
-      return user ? true : router.createUrlTree(['/login']);
+      return user
+        ? true
+        : router.createUrlTree(['/login'], {
+            queryParams: { returnUrl: state.url },
+          });
     }),
   );
 };
@@ -23,6 +33,27 @@ export const publicGuard: CanActivateFn = () => {
     take(1),
     map((user) => {
       return user ? router.createUrlTree(['/home']) : true;
+    }),
+  );
+};
+
+export const invitacionGuard: CanMatchFn = (
+  _route: Route,
+  segments: UrlSegment[],
+) => {
+  const auth = inject(Auth);
+  const router = inject(Router);
+
+  const returnUrl = '/' + segments.map((segment) => segment.path).join('/');
+
+  return authState(auth).pipe(
+    take(1),
+    map((user) => {
+      return user
+        ? true
+        : router.createUrlTree(['/login'], {
+            queryParams: { returnUrl },
+          });
     }),
   );
 };

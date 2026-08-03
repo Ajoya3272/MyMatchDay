@@ -1,95 +1,101 @@
 <ion-content class="invitacion-page">
-  <div class="invitacion-page__wrapper">
-    <div class="invitacion-card">
-      <p class="invitacion-card__eyebrow">Invitación</p>
+  <ng-container *ngIf="!loading">
+    <div class="invitacion-page__wrapper" *ngIf="partido">
+      <div class="invitacion-card">
+        <p class="invitacion-card__eyebrow">Invitación</p>
 
-      <h1 class="invitacion-card__title">¿Quieres unirte al partido?</h1>
+        <h1 class="invitacion-card__title">¿Quieres unirte al partido?</h1>
 
-      <p class="invitacion-card__text invitacion-card__text--highlight">
-        <strong>{{ matchName }}</strong>
-      </p>
+        <p class="invitacion-card__text invitacion-card__text--highlight">
+          <strong>{{ matchName }}</strong>
+        </p>
 
-      <p class="invitacion-card__text">
-        Organizado por <strong>{{ organizerName }}</strong>
-      </p>
+        <p class="invitacion-card__text">
+          Organizado por <strong>{{ organizerName }}</strong>
+        </p>
 
-      <div class="invitacion-card__actions">
-        <button
-          class="invitacion-card__button invitacion-card__button--secondary"
-          type="button"
-          (click)="goHome()"
-          [disabled]="joining"
-        >
-          Cancelar
-        </button>
+        <div class="invitacion-card__actions">
+          <button
+            class="invitacion-card__button invitacion-card__button--secondary"
+            type="button"
+            (click)="goHome()"
+            [disabled]="joining"
+          >
+            Cancelar
+          </button>
 
-        <button
-          class="invitacion-card__button invitacion-card__button--primary"
-          type="button"
-          (click)="openTeamModal()"
-          [disabled]="joining"
-        >
-          {{ joining ? "Uniéndote..." : "Aceptar" }}
-        </button>
+          <button
+            class="invitacion-card__button invitacion-card__button--primary"
+            type="button"
+            (click)="openTeamModal()"
+            [disabled]="joining"
+          >
+            {{ joining ? "Uniéndote..." : "Aceptar" }}
+          </button>
+        </div>
       </div>
     </div>
-  </div>
 
-  <div
-    class="team-modal-backdrop"
-    *ngIf="showTeamModal"
-    (click)="closeTeamModal()"
-  >
-    <div class="team-modal" (click)="$event.stopPropagation()">
-      <p class="team-modal__eyebrow">Elegir equipo</p>
+    <div
+      class="team-modal-backdrop"
+      *ngIf="showTeamModal"
+      (click)="closeTeamModal()"
+    >
+      <div class="team-modal" (click)="$event.stopPropagation()">
+        <p class="team-modal__eyebrow">Elegir equipo</p>
 
-      <h2 class="team-modal__title">¿A qué equipo quieres unirte?</h2>
+        <h2 class="team-modal__title">¿A qué equipo quieres unirte?</h2>
 
-      <p class="team-modal__text" *ngIf="partido">
-        Selecciona un lado antes de continuar.
-      </p>
+        <p class="team-modal__text" *ngIf="partido">
+          Selecciona un lado antes de continuar.
+        </p>
 
-      <div class="team-modal__options" *ngIf="partido as partidoActual">
-        <button
-          type="button"
-          class="team-option"
-          [class.team-option--selected]="selectedTeam === 'A'"
-          (click)="selectTeam('A')"
-        >
-          <span class="team-option__label">Equipo A</span>
-          <strong class="team-option__name">{{ partidoActual.equipoA }}</strong>
-        </button>
+        <div class="team-modal__options" *ngIf="partido as partidoActual">
+          <button
+            type="button"
+            class="team-option"
+            [class.team-option--selected]="selectedTeam === 'A'"
+            (click)="selectTeam('A')"
+          >
+            <span class="team-option__label">Equipo A</span>
+            <strong class="team-option__name">{{
+              partidoActual.equipoA
+            }}</strong>
+          </button>
 
-        <button
-          type="button"
-          class="team-option"
-          [class.team-option--selected]="selectedTeam === 'B'"
-          (click)="selectTeam('B')"
-        >
-          <span class="team-option__label">Equipo B</span>
-          <strong class="team-option__name">{{ partidoActual.equipoB }}</strong>
-        </button>
-      </div>
+          <button
+            type="button"
+            class="team-option"
+            [class.team-option--selected]="selectedTeam === 'B'"
+            (click)="selectTeam('B')"
+          >
+            <span class="team-option__label">Equipo B</span>
+            <strong class="team-option__name">{{
+              partidoActual.equipoB
+            }}</strong>
+          </button>
+        </div>
 
-      <div class="team-modal__actions">
-        <button
-          class="invitacion-card__button invitacion-card__button--secondary"
-          type="button"
-          (click)="closeTeamModal()"
-          [disabled]="joining"
-        >
-          Volver
-        </button>
+        <div class="team-modal__actions">
+          <button
+            class="invitacion-card__button invitacion-card__button--secondary"
+            type="button"
+            (click)="closeTeamModal()"
+            [disabled]="joining"
+          >
+            Volver
+          </button>
 
-        <button
-          class="invitacion-card__button invitacion-card__button--primary"
-          type="button"
-          (click)="confirmJoin()"
-          [disabled]="!selectedTeam || joining"
-        >
-          {{ joining ? "Uniéndote..." : "Unirse" }}
-        </button>
+          <button
+            class="invitacion-card__button invitacion-card__button--primary"
+            type="button"
+            (click)="confirmJoin()"
+            [disabled]="!selectedTeam || joining"
+          >
+            {{ joining ? "Uniéndote..." : "Unirse" }}
+          </button>
+        </div>
       </div>
     </div>
-  </div>
+  </ng-container>
 </ion-content>

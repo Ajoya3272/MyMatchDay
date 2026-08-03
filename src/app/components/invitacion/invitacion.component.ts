@@ -26,12 +26,14 @@ export class InvitacionComponent implements OnInit {
   joining = false;
   showTeamModal = false;
   selectedTeam: 'A' | 'B' | null = null;
+  loading = true;
 
   async ngOnInit(): Promise<void> {
     this.slug = this.route.snapshot.paramMap.get('slug') ?? '';
     this.partidoId = this.slug;
 
     if (!this.partidoId) {
+      this.loading = false;
       return;
     }
 
@@ -41,6 +43,7 @@ export class InvitacionComponent implements OnInit {
       );
 
       if (!partido) {
+        this.loading = false;
         return;
       }
 
@@ -49,6 +52,8 @@ export class InvitacionComponent implements OnInit {
       this.organizerName = partido.organizador;
     } catch (error) {
       console.error('Error al cargar la invitación:', error);
+    } finally {
+      this.loading = false;
     }
   }
 
@@ -57,7 +62,7 @@ export class InvitacionComponent implements OnInit {
   }
 
   openTeamModal(): void {
-    if (!this.partido || this.joining) {
+    if (!this.partido || this.joining || this.loading) {
       return;
     }
 
@@ -79,7 +84,7 @@ export class InvitacionComponent implements OnInit {
   }
 
   async confirmJoin(): Promise<void> {
-    if (!this.partido || !this.selectedTeam || this.joining) {
+    if (!this.partido || !this.selectedTeam || this.joining || this.loading) {
       return;
     }
 

@@ -2,10 +2,9 @@ import { Routes } from '@angular/router';
 import { HomeComponent } from './components/home/home.component';
 import { CrearPartidoComponent } from './components/crear-partido/crear-partido.component';
 import { InvitacionComponent } from './components/invitacion/invitacion.component';
-import { DetallesPartidoComponent } from './components/detalles-partido/detalles-partido.component';
 import { LoginComponent } from './components/login/login.component';
 import { RegistroUsuarioComponent } from './components/registro-usuario/registro-usuario.component';
-import { authGuard, publicGuard } from './guards/auth.guard';
+import { authGuard, invitacionGuard, publicGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
   {
@@ -44,11 +43,15 @@ export const routes: Routes = [
   {
     path: 'invitacion/:slug',
     component: InvitacionComponent,
+    canMatch: [invitacionGuard],
   },
   {
     path: 'detalles-partido',
-    component: DetallesPartidoComponent,
     canActivate: [authGuard],
+    loadComponent: () =>
+      import('./components/detalles-partido/detalles-partido.component').then(
+        (m) => m.DetallesPartidoComponent,
+      ),
   },
   {
     path: 'mi-perfil',
@@ -64,14 +67,6 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./components/ajustes/ajustes.component').then(
         (m) => m.AjustesComponent,
-      ),
-  },
-  {
-    path: 'detalles-partido',
-    canActivate: [authGuard],
-    loadComponent: () =>
-      import('./components/detalles-partido/detalles-partido.component').then(
-        (m) => m.DetallesPartidoComponent,
       ),
   },
   {
