@@ -26,6 +26,8 @@ export class CarruselComponent {
   @ViewChild('matchesCarousel')
   matchesCarousel?: ElementRef<HTMLDivElement>;
 
+  @Input() currentUserUid: string | null = null;
+
   activeMatchIndex = 0;
   deletingMatchId: string | null = null;
   selectedMatchToDelete: PartidoCarrusel | null = null;
@@ -46,6 +48,10 @@ export class CarruselComponent {
     return this._matches;
   }
 
+  get matchesVisibles(): PartidoCarrusel[] {
+    return this._matches.filter((match) => !this.isFinished(match));
+  }
+
   onCarouselScroll(): void {
     const el = this.matchesCarousel?.nativeElement;
 
@@ -58,7 +64,7 @@ export class CarruselComponent {
 
     this.activeMatchIndex = Math.min(
       Math.max(nextIndex, 0),
-      Math.max(this.matches.length - 1, 0),
+      Math.max(this.matchesVisibles.length - 1, 0),
     );
   }
 
@@ -83,11 +89,31 @@ export class CarruselComponent {
   }
 
   isPending(match: PartidoCarrusel): boolean {
-    return this.getEstadoClase(match) === 'pending';
+    const estado = (match.estado ?? '').toLowerCase().trim();
+    return estado === 'pendiente' || this.getEstadoClase(match) === 'pending';
+  }
+
+  isFinished(match: PartidoCarrusel): boolean {
+    const estado = (match.estado ?? '').toLowerCase().trim();
+
+    return [
+      'finished',
+      'finalizado',
+      'terminado',
+      'completado',
+      'cerrado',
+      'acabado',
+    ].includes(estado);
+  }
+
+  puedeBorrar(match: PartidoCarrusel): boolean {
+    const esOrganizador =
+      !!this.currentUserUid && match.organizadorId === this.currentUserUid;
+    return esOrganizador && this.isPending(match);
   }
 
   openDeleteModal(match: PartidoCarrusel): void {
-    if (!match.partidoId || this.deletingMatchId) {
+    if (!match.partidoId || this.deletingMatchId || !this.puedeBorrar(match)) {
       return;
     }
 
@@ -107,7 +133,7 @@ export class CarruselComponent {
   async confirmDeleteMatch(): Promise<void> {
     const match = this.selectedMatchToDelete;
 
-    if (!match?.partidoId || this.deletingMatchId) {
+    if (!match?.partidoId || this.deletingMatchId || !this.puedeBorrar(match)) {
       return;
     }
 

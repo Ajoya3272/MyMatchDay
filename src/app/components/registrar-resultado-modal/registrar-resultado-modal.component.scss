@@ -1,0 +1,184 @@
+:host {
+  display: block;
+}
+
+.resultado-modal {
+  --background: rgba(15, 23, 42, 0.35);
+  color: var(--matchday-text);
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+}
+
+.resultado-modal__wrapper {
+  position: relative;
+  margin: 0 auto;
+  width: min(100%, 980px);
+  min-height: 100%;
+  padding: 88px 16px 24px;
+  background: var(--matchday-bg);
+  box-sizing: border-box;
+}
+
+.resultado-modal__header {
+  margin-bottom: 16px;
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.resultado-modal__eyebrow {
+  margin: 0 0 6px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--matchday-green);
+}
+
+.resultado-modal__title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.resultado-modal__subtitle {
+  margin: 8px 0 0;
+  font-size: 0.95rem;
+  color: var(--matchday-text-muted);
+}
+
+.resultado-modal__body {
+  display: grid;
+  gap: 12px;
+  padding-bottom: 18px;
+}
+
+.resultado-modal__card {
+  padding: 16px;
+  border-radius: 20px;
+  background: var(--matchday-surface);
+  border: 1px solid var(--matchday-border);
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.06);
+}
+
+.resultado-modal__section-title {
+  margin: 0 0 12px;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.resultado-modal__helper {
+  margin: -4px 0 12px;
+  font-size: 0.88rem;
+  color: var(--matchday-text-muted);
+}
+
+.score-grid,
+.player-stats__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.score-field,
+.duration-field,
+.player-stat-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.score-field span,
+.duration-field span,
+.player-stat-field span {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--matchday-text-muted);
+}
+
+.score-field input,
+.duration-field input,
+.player-stat-field input {
+  min-height: 46px;
+  padding: 0 14px;
+  border-radius: 14px;
+  border: 1px solid var(--matchday-border);
+  background: var(--matchday-surface-2);
+  color: var(--matchday-text);
+  font-size: 1rem;
+  outline: none;
+}
+
+.players-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.player-chip {
+  border: 1px solid var(--matchday-border);
+  background: var(--matchday-surface-2);
+  color: var(--matchday-text);
+  border-radius: 999px;
+  padding: 10px 14px;
+  font-weight: 700;
+}
+
+.player-chip--active {
+  background: var(--matchday-green);
+  color: #0f172a;
+  border-color: transparent;
+}
+
+.player-stats {
+  margin-top: 14px;
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(34, 197, 94, 0.08);
+  border: 1px solid rgba(34, 197, 94, 0.15);
+}
+
+.player-stats__title {
+  margin: 0 0 12px;
+  font-size: 0.98rem;
+  font-weight: 800;
+}
+
+.resultado-modal__footer {
+  display: flex;
+  gap: 10px;
+  margin-top: auto;
+  padding: 12px 16px calc(18px + env(safe-area-inset-bottom, 0px));
+  background: var(--matchday-bg);
+  position: sticky;
+  bottom: 0;
+}
+
+.btn {
+  flex: 1;
+  min-height: 46px;
+  border-radius: 14px;
+  border: 0;
+  font-weight: 800;
+}
+
+.btn--secondary {
+  background: var(--matchday-surface-2);
+  color: var(--matchday-text);
+}
+
+.btn--primary {
+  background: var(--matchday-green);
+  color: #0f172a;
+}
+
+@media (max-width: 420px) {
+  .score-grid,
+  .player-stats__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .resultado-modal__footer {
+    flex-direction: column;
+  }
+}

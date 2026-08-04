@@ -118,6 +118,41 @@
               <h2>Datos del partido</h2>
               <p>Completa la información básica para crear la convocatoria.</p>
 
+              <div class="field-block">
+                <label class="field-label" for="nombrePartido">
+                  Nombre del partido
+                </label>
+
+                <input
+                  id="nombrePartido"
+                  class="field-input"
+                  type="text"
+                  formControlName="nombrePartido"
+                  placeholder="Ej: Ganadores vs Perdedores"
+                  maxlength="60"
+                />
+
+                <span
+                  class="field-error"
+                  *ngIf="
+                    form.controls.nombrePartido.touched &&
+                    form.controls.nombrePartido.errors?.['required']
+                  "
+                >
+                  Escribe el nombre del partido.
+                </span>
+
+                <span
+                  class="field-error"
+                  *ngIf="
+                    form.controls.nombrePartido.touched &&
+                    form.controls.nombrePartido.errors?.['maxlength']
+                  "
+                >
+                  El nombre del partido es demasiado largo.
+                </span>
+              </div>
+
               <div class="players-grid">
                 <div class="field-block">
                   <label class="field-label" for="equipoA">

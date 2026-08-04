@@ -1,0 +1,103 @@
+<ng-container *ngIf="isOpen">
+  <ion-content class="resultado-modal" [fullscreen]="true">
+    <section class="resultado-modal__wrapper">
+      <header class="resultado-modal__header">
+        <p class="resultado-modal__eyebrow">Registrar resultado</p>
+        <h1 class="resultado-modal__title">{{ partido?.nombre }}</h1>
+      </header>
+
+      <div class="resultado-modal__body">
+        <section class="resultado-modal__card">
+          <h2 class="resultado-modal__section-title">Marcador final</h2>
+
+          <div class="score-grid">
+            <label class="score-field">
+              <span>Goles {{ partido?.equipoA }}</span>
+              <input type="number" min="0" [(ngModel)]="golesEquipoA" />
+            </label>
+
+            <label class="score-field">
+              <span>Goles {{ partido?.equipoB }}</span>
+              <input type="number" min="0" [(ngModel)]="golesEquipoB" />
+            </label>
+          </div>
+        </section>
+
+        <section class="resultado-modal__card">
+          <h2 class="resultado-modal__section-title">Duración real</h2>
+          <label class="duration-field">
+            <span>Minutos jugados</span>
+            <input type="number" min="1" [(ngModel)]="duracionRealMinutos" />
+          </label>
+        </section>
+
+        <section class="resultado-modal__card">
+          <h2 class="resultado-modal__section-title">Jugadores</h2>
+          <p class="resultado-modal__helper">
+            Selecciona un jugador para asignar goles y asistencias.
+          </p>
+
+          <div class="players-list">
+            <button
+              type="button"
+              class="player-chip"
+              *ngFor="let jugador of jugadores; trackBy: trackByJugadorId"
+              [class.player-chip--active]="
+                jugador.jugadorId === jugadorSeleccionadoId
+              "
+              (click)="seleccionarJugador(jugador)"
+            >
+              {{ jugador.nombre }}
+            </button>
+          </div>
+
+          <div class="player-stats" *ngIf="jugadorSeleccionado">
+            <h3 class="player-stats__title">
+              {{ jugadorSeleccionado.nombre }}
+            </h3>
+
+            <div class="player-stats__grid">
+              <label class="player-stat-field">
+                <span>Goles</span>
+                <input
+                  type="number"
+                  min="0"
+                  [(ngModel)]="statsJugadorSeleccionado.goles"
+                />
+              </label>
+
+              <label class="player-stat-field">
+                <span>Asistencias</span>
+                <input
+                  type="number"
+                  min="0"
+                  [(ngModel)]="statsJugadorSeleccionado.asistencias"
+                />
+              </label>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <footer class="resultado-modal__footer">
+        <button
+          type="button"
+          class="btn btn--secondary"
+          (click)="cerrar()"
+          [disabled]="loading"
+        >
+          Cancelar
+        </button>
+
+        <button
+          type="button"
+          class="btn btn--primary"
+          (click)="guardar()"
+          [disabled]="loading"
+        >
+          {{ loading ? "Guardando..." : "Guardar resultado" }}
+        </button>
+      </footer>
+    </section>
+  </ion-content>
+</ng-container>

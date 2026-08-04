@@ -2,7 +2,7 @@
   <div #matchesCarousel class="matches-carousel" (scroll)="onCarouselScroll()">
     <div
       class="match-slide"
-      *ngFor="let match of matches; trackBy: trackByPartidoId"
+      *ngFor="let match of matchesVisibles; trackBy: trackByPartidoId"
     >
       <article
         class="match-card"
@@ -16,6 +16,10 @@
           <h3 class="match-card__title">
             {{ match.nombre }}
           </h3>
+
+          <p class="match-card__teams">
+            {{ match.equipoA }} vs {{ match.equipoB }}
+          </p>
         </div>
 
         <div class="match-card__meta">
@@ -47,7 +51,7 @@
           </button>
 
           <button
-            *ngIf="isPending(match)"
+            *ngIf="puedeBorrar(match)"
             class="match-card__cta match-card__cta--danger"
             type="button"
             [disabled]="deletingMatchId === match.partidoId"
@@ -57,10 +61,10 @@
           </button>
         </div>
 
-        <div class="match-card__dots" *ngIf="matches.length > 1">
+        <div class="match-card__dots" *ngIf="matchesVisibles.length > 1">
           <span
             class="match-card__dot"
-            *ngFor="let _ of matches; let i = index"
+            *ngFor="let _ of matchesVisibles; let i = index"
             [class.match-card__dot--active]="i === activeMatchIndex"
           ></span>
         </div>

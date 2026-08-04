@@ -7,7 +7,10 @@
 
     <ng-container *ngIf="pendingMatches$ | async as pendingMatches">
       <ng-container *ngIf="pendingMatches.length > 0; else emptyNextMatch">
-        <app-carrusel [matches]="pendingMatches"></app-carrusel>
+        <app-carrusel
+          [matches]="pendingMatches"
+          [currentUserUid]="uidUsuarioActual"
+        ></app-carrusel>
       </ng-container>
     </ng-container>
 
@@ -47,7 +50,11 @@
         <span class="quick-card__text">Comparte enlace directo al grupo.</span>
       </button>
 
-      <button class="quick-card" type="button">
+      <button
+        class="quick-card"
+        type="button"
+        routerLink="/registrar-resultado"
+      >
         <span class="quick-card__icon">📝</span>
         <span class="quick-card__title">Registrar resultado</span>
         <span class="quick-card__text">
@@ -55,7 +62,7 @@
         </span>
       </button>
 
-      <button class="quick-card" type="button">
+      <button class="quick-card" type="button" routerLink="/estadisticas">
         <span class="quick-card__icon">📊</span>
         <span class="quick-card__title">Mis estadísticas</span>
         <span class="quick-card__text">Consulta tus números al instante.</span>

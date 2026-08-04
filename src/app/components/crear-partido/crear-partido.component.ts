@@ -42,6 +42,7 @@ export class CrearPartidoComponent {
   form = this.fb.group({
     matchDate: ['', Validators.required],
     matchTime: ['', Validators.required],
+    nombrePartido: ['', [Validators.required, Validators.maxLength(60)]],
     equipoA: ['', [Validators.required, Validators.maxLength(40)]],
     equipoB: ['', [Validators.required, Validators.maxLength(40)]],
     ubicacion: ['', [Validators.required, Validators.maxLength(100)]],
@@ -114,12 +115,15 @@ export class CrearPartidoComponent {
     try {
       this.creatingMatch = true;
 
+      const nombrePartido =
+        this.form.controls.nombrePartido.value?.trim() ?? '';
       const equipoA = this.form.controls.equipoA.value?.trim() ?? '';
       const equipoB = this.form.controls.equipoB.value?.trim() ?? '';
       const ubicacion = this.form.controls.ubicacion.value?.trim() ?? '';
 
       const partidoId = await this.partidoService.crearPartido({
         matchDate: this.buildMatchDateTime(),
+        nombrePartido,
         equipoA,
         equipoB,
         ubicacion,
@@ -196,6 +200,7 @@ export class CrearPartidoComponent {
     this.form.reset({
       matchDate: '',
       matchTime: '',
+      nombrePartido: '',
       equipoA: '',
       equipoB: '',
       ubicacion: '',
@@ -208,9 +213,16 @@ export class CrearPartidoComponent {
   }
 
   private validateStep2(): boolean {
-    const { equipoA, equipoB, ubicacion, playerCount, durationMinutes } =
-      this.form.controls;
+    const {
+      nombrePartido,
+      equipoA,
+      equipoB,
+      ubicacion,
+      playerCount,
+      durationMinutes,
+    } = this.form.controls;
 
+    nombrePartido.markAsTouched();
     equipoA.markAsTouched();
     equipoB.markAsTouched();
     ubicacion.markAsTouched();
@@ -220,6 +232,7 @@ export class CrearPartidoComponent {
     this.clearControlError(equipoB, 'sameTeamName');
 
     if (
+      nombrePartido.invalid ||
       equipoA.invalid ||
       equipoB.invalid ||
       ubicacion.invalid ||

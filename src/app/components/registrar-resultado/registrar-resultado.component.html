@@ -1,0 +1,85 @@
+<ion-content class="registrar-resultado-page" [fullscreen]="true">
+  <section class="registrar-resultado-page__wrapper">
+    <header class="page-header">
+      <p class="page-header__eyebrow">Resultados</p>
+      <h1 class="page-header__title">Partidos finalizados</h1>
+      <p class="page-header__subtitle">
+        Selecciona un partido terminado para registrar el resultado.
+      </p>
+    </header>
+
+    <ng-container
+      *ngIf="finishedMatches$ | async as matches; else loadingState"
+    >
+      <ng-container *ngIf="matches.length > 0; else emptyState">
+        <div class="matches-list">
+          <article
+            class="match-item"
+            *ngFor="let match of matches; trackBy: trackByPartidoId"
+          >
+            <div class="match-item__top">
+              <div>
+                <span class="match-item__status">Finalizado</span>
+                <h2 class="match-item__title">{{ match.nombre }}</h2>
+              </div>
+            </div>
+
+            <div class="match-item__meta">
+              <div class="match-item__meta-item">
+                <span class="match-item__label">Equipos</span>
+                <strong class="match-item__value">
+                  {{ match.equipoA }} vs {{ match.equipoB }}
+                </strong>
+              </div>
+
+              <div class="match-item__meta-item">
+                <span class="match-item__label">Fecha</span>
+                <strong class="match-item__value">
+                  {{ match.fecha.toDate() | date: "dd/MM/yyyy" }} ·
+                  {{ match.fecha.toDate() | date: "HH:mm" }}
+                </strong>
+              </div>
+            </div>
+
+            <div class="match-item__footer">
+              <button
+                type="button"
+                class="match-item__button"
+                (click)="abrirModal(match)"
+              >
+                Registrar resultado
+              </button>
+            </div>
+          </article>
+        </div>
+      </ng-container>
+    </ng-container>
+
+    <ng-template #loadingState>
+      <div class="loading-state">
+        <ion-spinner name="crescent"></ion-spinner>
+        <p>Cargando partidos...</p>
+      </div>
+    </ng-template>
+
+    <ng-template #emptyState>
+      <article class="empty-card">
+        <div class="empty-card__icon">📭</div>
+        <h2 class="empty-card__title">No hay partidos finalizados</h2>
+        <p class="empty-card__text">
+          Cuando termine un partido, aparecerá aquí para que puedas registrar el
+          resultado.
+        </p>
+      </article>
+    </ng-template>
+  </section>
+
+  <app-registrar-resultado-modal
+    *ngIf="isModalOpen"
+    [isOpen]="isModalOpen"
+    [partido]="partidoSeleccionado"
+    [loading]="loadingSave"
+    (cancel)="cerrarModal()"
+    (confirm)="guardarResultado($event)"
+  ></app-registrar-resultado-modal>
+</ion-content>

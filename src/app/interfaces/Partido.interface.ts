@@ -46,6 +46,7 @@ export interface PartidoWrite {
 
 export interface CrearPartidoPayload {
   matchDate: string;
+  nombrePartido: string;
   equipoA: string;
   equipoB: string;
   playerCount: number;
@@ -65,4 +66,25 @@ export interface PartidoDetalleView {
 export interface UnirseAPartidoPayload {
   partidoId: string;
   equipoSeleccionado: 'A' | 'B';
+}
+
+export interface JugadorVista {
+  uid: string | null;
+  nombre: string;
+  fotoPerfilUrl: string | null;
+}
+
+export interface DetallesPartidoVm extends PartidoDetalleView {
+  esOrganizador: boolean;
+  nombreUsuarioActual: string | null;
+  uidUsuarioActual: string | null;
+  fotoUrlUsuarioActual: string | null;
+  estaEnEquipoA: boolean;
+  estaEnEquipoB: boolean;
+  estaEnPartido: boolean;
+  estaAntesDeEmpezar: boolean;
+  estaFinalizado: boolean;
+  jugadoresEquipoAVista: JugadorVista[];
+  jugadoresEquipoBVista: JugadorVista[];
+  jugadoresSinEquipoVista: JugadorVista[];
 }

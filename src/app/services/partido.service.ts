@@ -6,16 +6,20 @@ import {
   arrayRemove,
   arrayUnion,
   collection,
+  collectionData,
   doc,
+  orderBy,
+  query,
   serverTimestamp,
   setDoc,
   updateDoc,
 } from '@angular/fire/firestore';
-import { firstValueFrom } from 'rxjs';
-import { filter, take } from 'rxjs/operators';
+import { firstValueFrom, Observable } from 'rxjs';
+import { filter, map, take } from 'rxjs/operators';
 import { LoginService } from './login.service';
 import {
   CrearPartidoPayload,
+  Partido,
   PartidoWrite,
 } from '../interfaces/Partido.interface';
 
@@ -47,10 +51,11 @@ export class PartidoService {
     const equipoA = data.equipoA.trim();
     const equipoB = data.equipoB.trim();
     const ubicacion = data.ubicacion.trim();
+    const nombrePartido = data.nombrePartido.trim();
 
     const partidoData: PartidoWrite = {
       partidoId: partidoDocRef.id,
-      nombre: `${equipoA} vs ${equipoB}`,
+      nombre: nombrePartido,
       organizador: usuario.nombre,
       organizadorId: authUser.uid,
       fecha: Timestamp.fromDate(new Date(data.matchDate)),
@@ -75,19 +80,21 @@ export class PartidoService {
     return partidoDocRef.id;
   }
 
+  getPartidos(): Observable<Partido[]> {
+    const partidosRef = collection(this.firestore, 'partidos');
+    const q = query(partidosRef, orderBy('fecha', 'desc'));
+
+    return collectionData(q, { idField: 'partidoId' }).pipe(
+      map((partidos) => partidos as Partido[]),
+    );
+  }
+
   async unirseAPartido(partidoId: string): Promise<void> {
     const authUser = this.auth.currentUser;
 
     if (!authUser) {
       throw new Error('No hay usuario autenticado');
     }
-
-    const user = await firstValueFrom(
-      this.loginService.user$.pipe(
-        filter((u): u is NonNullable<typeof u> => !!u),
-        take(1),
-      ),
-    );
 
     const partidoRef = doc(this.firestore, `partidos/${partidoId}`);
 

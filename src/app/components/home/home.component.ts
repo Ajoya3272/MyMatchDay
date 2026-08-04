@@ -34,8 +34,12 @@ export class HomeComponent {
   private auth = inject(Auth);
   private firestore = inject(Firestore);
 
+  uidUsuarioActual: string | null = null;
+
   userMatches$: Observable<Partido[]> = authState(this.auth).pipe(
     switchMap((user) => {
+      this.uidUsuarioActual = user?.uid ?? null;
+
       if (!user) {
         return of([] as Partido[]);
       }

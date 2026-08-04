@@ -15,6 +15,8 @@ import {
 import { Observable, combineLatest, of } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import {
+  DetallesPartidoVm,
+  JugadorVista,
   Partido,
   PartidoDetalleView,
 } from '../../interfaces/Partido.interface';
@@ -22,27 +24,6 @@ import { UsuarioFirestore } from '../../interfaces/RegistroUsuario.interface';
 import { LoginService } from '../../services/login.service';
 import { UsuariosService } from '../../services/usuario.service';
 import { environment } from '../../../enviroments/enviroment';
-
-interface JugadorVista {
-  uid: string | null;
-  nombre: string;
-  fotoPerfilUrl: string | null;
-}
-
-interface DetallesPartidoVm extends PartidoDetalleView {
-  esOrganizador: boolean;
-  nombreUsuarioActual: string | null;
-  uidUsuarioActual: string | null;
-  fotoUrlUsuarioActual: string | null;
-  estaEnEquipoA: boolean;
-  estaEnEquipoB: boolean;
-  estaEnPartido: boolean;
-  estaAntesDeEmpezar: boolean;
-  estaFinalizado: boolean;
-  jugadoresEquipoAVista: JugadorVista[];
-  jugadoresEquipoBVista: JugadorVista[];
-  jugadoresSinEquipoVista: JugadorVista[];
-}
 
 @Component({
   selector: 'app-detalles-partido',
@@ -133,43 +114,41 @@ export class DetallesPartidoComponent {
       const jugadoresIds = partido.jugadoresId ?? [];
 
       const nombreUsuarioActual = currentUser?.nombre ?? null;
+      const uidUsuarioActual = authUser?.uid ?? null;
       const fotoUrlUsuarioActual = currentUser?.fotoPerfilUrl ?? null;
 
       const mapaUsuariosPorUid = new Map(
         usuariosParticipantes.map((usuario) => [usuario.uid, usuario]),
       );
 
-      const jugadoresVistaTotales: JugadorVista[] = jugadoresTotales.map(
-        (nombre, index) => {
-          const uid = jugadoresIds[index] ?? null;
-          const usuario = uid ? mapaUsuariosPorUid.get(uid) : null;
+      const jugadoresVistaTotales: JugadorVista[] = jugadoresIds.map((uid) => {
+        const usuario = mapaUsuariosPorUid.get(uid);
 
-          return {
-            uid,
-            nombre,
-            fotoPerfilUrl: usuario?.fotoPerfilUrl ?? null,
-          };
-        },
-      );
+        return {
+          uid,
+          nombre: usuario?.nombre ?? uid,
+          fotoPerfilUrl: usuario?.fotoPerfilUrl ?? null,
+        };
+      });
 
-      const mapaVistaPorNombre = new Map(
-        jugadoresVistaTotales.map((jugador) => [jugador.nombre, jugador]),
+      const mapaVistaPorUid = new Map(
+        jugadoresVistaTotales.map((jugador) => [jugador.uid, jugador]),
       );
 
       const jugadoresEquipoAVista: JugadorVista[] = jugadoresEquipoA.map(
-        (nombre) =>
-          mapaVistaPorNombre.get(nombre) ?? {
-            uid: null,
-            nombre,
+        (uid) =>
+          mapaVistaPorUid.get(uid) ?? {
+            uid,
+            nombre: uid,
             fotoPerfilUrl: null,
           },
       );
 
       const jugadoresEquipoBVista: JugadorVista[] = jugadoresEquipoB.map(
-        (nombre) =>
-          mapaVistaPorNombre.get(nombre) ?? {
-            uid: null,
-            nombre,
+        (uid) =>
+          mapaVistaPorUid.get(uid) ?? {
+            uid,
+            nombre: uid,
             fotoPerfilUrl: null,
           },
       );
@@ -179,27 +158,25 @@ export class DetallesPartidoComponent {
         ...jugadoresEquipoB,
       ]);
 
-      const jugadoresSinEquipo = jugadoresTotales.filter(
-        (jugador) => !jugadoresConEquipo.has(jugador),
+      const jugadoresSinEquipo = jugadoresIds.filter(
+        (uid) => !jugadoresConEquipo.has(uid),
       );
 
       const jugadoresSinEquipoVista: JugadorVista[] = jugadoresSinEquipo.map(
-        (nombre) =>
-          mapaVistaPorNombre.get(nombre) ?? {
-            uid: null,
-            nombre,
+        (uid) =>
+          mapaVistaPorUid.get(uid) ?? {
+            uid,
+            nombre: uid,
             fotoPerfilUrl: null,
           },
       );
 
       const estaEnEquipoA =
-        !!nombreUsuarioActual && jugadoresEquipoA.includes(nombreUsuarioActual);
-
+        !!uidUsuarioActual && jugadoresEquipoA.includes(uidUsuarioActual);
       const estaEnEquipoB =
-        !!nombreUsuarioActual && jugadoresEquipoB.includes(nombreUsuarioActual);
-
+        !!uidUsuarioActual && jugadoresEquipoB.includes(uidUsuarioActual);
       const estaEnPartido =
-        !!nombreUsuarioActual && jugadoresTotales.includes(nombreUsuarioActual);
+        !!uidUsuarioActual && jugadoresIds.includes(uidUsuarioActual);
 
       const esOrganizador =
         !!authUser && partido.organizadorId === authUser.uid;
@@ -220,12 +197,12 @@ export class DetallesPartidoComponent {
         jugadoresEquipoB,
         jugadoresSinEquipo,
         plazasLibres: Math.max(
-          partido.numeroJugadores - jugadoresTotales.length,
+          partido.numeroJugadores - jugadoresIds.length,
           0,
         ),
         esOrganizador,
         nombreUsuarioActual,
-        uidUsuarioActual: authUser?.uid ?? null,
+        uidUsuarioActual,
         fotoUrlUsuarioActual,
         estaEnEquipoA,
         estaEnEquipoB,
@@ -279,25 +256,26 @@ export class DetallesPartidoComponent {
     }
 
     const partidoRef = doc(this.firestore, `partidos/${partido.partidoId}`);
+    const uid = vm.uidUsuarioActual;
     const nombre = vm.nombreUsuarioActual;
 
     try {
       if (equipo === 'A') {
         await updateDoc(partidoRef, {
-          jugadoresId: arrayUnion(vm.uidUsuarioActual),
+          jugadoresId: arrayUnion(uid),
           participantes: arrayUnion(nombre),
-          jugadoresEquipoA: arrayUnion(nombre),
-          jugadoresEquipoB: arrayRemove(nombre),
+          jugadoresEquipoA: arrayUnion(uid),
+          jugadoresEquipoB: arrayRemove(uid),
           fechaActualizacion: serverTimestamp(),
         });
         return;
       }
 
       await updateDoc(partidoRef, {
-        jugadoresId: arrayUnion(vm.uidUsuarioActual),
+        jugadoresId: arrayUnion(uid),
         participantes: arrayUnion(nombre),
-        jugadoresEquipoB: arrayUnion(nombre),
-        jugadoresEquipoA: arrayRemove(nombre),
+        jugadoresEquipoB: arrayUnion(uid),
+        jugadoresEquipoA: arrayRemove(uid),
         fechaActualizacion: serverTimestamp(),
       });
     } catch (error) {

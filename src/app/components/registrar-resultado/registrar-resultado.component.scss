@@ -1,0 +1,165 @@
+:host {
+  display: block;
+}
+
+.registrar-resultado-page {
+  --background: var(--matchday-bg);
+  color: var(--matchday-text);
+}
+
+.registrar-resultado-page__wrapper {
+  padding: 92px 16px 48px;
+}
+
+.page-header {
+  margin-bottom: 18px;
+}
+
+.page-header__eyebrow {
+  margin: 0 0 6px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--matchday-green);
+}
+
+.page-header__title {
+  margin: 0;
+  font-size: 1.8rem;
+  line-height: 1.08;
+  font-weight: 800;
+  color: var(--matchday-text);
+}
+
+.page-header__subtitle {
+  margin: 10px 0 0;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: var(--matchday-text-muted);
+}
+
+.matches-list {
+  display: grid;
+  gap: 12px;
+}
+
+.match-item,
+.empty-card {
+  padding: 16px;
+  border-radius: 20px;
+  background: var(--matchday-surface);
+  border: 1px solid var(--matchday-border);
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.06);
+}
+
+.match-item__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.match-item__status {
+  display: inline-flex;
+  margin-bottom: 8px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #166534;
+  background: rgba(34, 197, 94, 0.12);
+}
+
+.match-item__title {
+  margin: 0;
+  font-size: 1.15rem;
+  line-height: 1.2;
+  font-weight: 800;
+}
+
+.match-item__meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.match-item__meta-item {
+  padding: 12px;
+  border-radius: 16px;
+  background: var(--matchday-surface-2);
+}
+
+.match-item__label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.78rem;
+  color: var(--matchday-text-muted);
+}
+
+.match-item__value {
+  font-size: 0.95rem;
+  color: var(--matchday-text);
+}
+
+.match-item__footer {
+  margin-top: 16px;
+}
+
+.match-item__button {
+  width: 100%;
+  min-height: 46px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--matchday-green);
+  color: #0f172a;
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.empty-card {
+  text-align: center;
+}
+
+.empty-card__icon {
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+
+.empty-card__title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.empty-card__text {
+  margin: 8px 0 0;
+  font-size: 0.92rem;
+  line-height: 1.45;
+  color: var(--matchday-text-muted);
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 180px;
+  gap: 12px;
+  color: var(--matchday-text-muted);
+}
+
+.loading-state ion-spinner {
+  width: 34px;
+  height: 34px;
+  color: var(--matchday-green);
+}
+
+@media (min-width: 768px) {
+  .registrar-resultado-page__wrapper {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 96px 20px 48px;
+  }
+}

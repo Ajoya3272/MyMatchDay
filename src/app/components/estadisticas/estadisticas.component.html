@@ -1,0 +1,36 @@
+<ion-content class="estadisticas-page" [fullscreen]="true">
+  <section class="estadisticas-page__wrapper">
+    <header class="estadisticas-header">
+      <p class="estadisticas-header__eyebrow">Estadísticas</p>
+      <h1 class="estadisticas-header__title">Tu rendimiento</h1>
+      <p class="estadisticas-header__subtitle">
+        Un resumen rápido de tus partidos, victorias y promedios.
+      </p>
+    </header>
+
+    <div class="stats-grid">
+      <article class="stat-card" *ngFor="let card of cards">
+        <div class="stat-card__head">
+          <span class="stat-card__title">{{ card.title }}</span>
+          <span
+            class="stat-card__trend"
+            [class.stat-card__trend--up]="card.trendClass === 'up'"
+            [class.stat-card__trend--down]="card.trendClass === 'down'"
+          >
+            {{ card.trend }}
+          </span>
+        </div>
+
+        <strong class="stat-card__value">{{ card.value }}</strong>
+        <p class="stat-card__subtitle">{{ card.subtitle }}</p>
+      </article>
+    </div>
+
+    <section class="stats-note">
+      <p>
+        * Goles y asistencias necesitan que esas estadísticas se guarden por
+        partido o por jugador para poder calcularlas de forma real.
+      </p>
+    </section>
+  </section>
+</ion-content>

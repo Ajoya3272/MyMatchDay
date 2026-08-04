@@ -70,6 +70,22 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'estadisticas',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./components/estadisticas/estadisticas.component').then(
+        (m) => m.EstadisticasComponent,
+      ),
+  },
+  {
+    path: 'registrar-resultado',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./components/registrar-resultado/registrar-resultado.component').then(
+        (m) => m.RegistrarResultadoComponent,
+      ),
+  },
+  {
     path: '**',
     redirectTo: 'login',
   },
