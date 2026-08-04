@@ -3,20 +3,27 @@
     <section class="resultado-modal__wrapper">
       <header class="resultado-modal__header">
         <p class="resultado-modal__eyebrow">Registrar resultado</p>
-        <h1 class="resultado-modal__title">{{ partido?.nombre }}</h1>
+        <h1 class="resultado-modal__title">
+          {{ partido?.nombre || partido?.equipoA + " vs " + partido?.equipoB }}
+        </h1>
+        <p class="resultado-modal__subtitle">
+          {{ partido?.equipoA }} vs {{ partido?.equipoB }}
+        </p>
       </header>
 
       <div class="resultado-modal__body">
         <section class="resultado-modal__card">
           <h2 class="resultado-modal__section-title">Marcador final</h2>
 
-          <div class="score-grid">
-            <label class="score-field">
+          <div class="score-row">
+            <label class="score-field score-field--left">
               <span>Goles {{ partido?.equipoA }}</span>
               <input type="number" min="0" [(ngModel)]="golesEquipoA" />
             </label>
 
-            <label class="score-field">
+            <div class="score-row__separator">—</div>
+
+            <label class="score-field score-field--right">
               <span>Goles {{ partido?.equipoB }}</span>
               <input type="number" min="0" [(ngModel)]="golesEquipoB" />
             </label>
@@ -24,54 +31,52 @@
         </section>
 
         <section class="resultado-modal__card">
-          <h2 class="resultado-modal__section-title">Duración real</h2>
-          <label class="duration-field">
-            <span>Minutos jugados</span>
-            <input type="number" min="1" [(ngModel)]="duracionRealMinutos" />
-          </label>
-        </section>
-
-        <section class="resultado-modal__card">
-          <h2 class="resultado-modal__section-title">Jugadores</h2>
+          <h2 class="resultado-modal__section-title">Participantes</h2>
           <p class="resultado-modal__helper">
-            Selecciona un jugador para asignar goles y asistencias.
+            Rellena los goles y asistencias de cada jugador.
           </p>
 
-          <div class="players-list">
-            <button
-              type="button"
-              class="player-chip"
-              *ngFor="let jugador of jugadores; trackBy: trackByJugadorId"
-              [class.player-chip--active]="
-                jugador.jugadorId === jugadorSeleccionadoId
+          <div class="stats-table">
+            <div class="stats-table__head">
+              <span>Participante</span>
+              <span>Goles</span>
+              <span>Asistencias</span>
+            </div>
+
+            <div
+              class="stats-table__row"
+              *ngFor="
+                let jugador of jugadoresConStats;
+                trackBy: trackByJugadorId
               "
-              (click)="seleccionarJugador(jugador)"
             >
-              {{ jugador.nombre }}
-            </button>
-          </div>
-
-          <div class="player-stats" *ngIf="jugadorSeleccionado">
-            <h3 class="player-stats__title">
-              {{ jugadorSeleccionado.nombre }}
-            </h3>
-
-            <div class="player-stats__grid">
-              <label class="player-stat-field">
-                <span>Goles</span>
-                <input
-                  type="number"
-                  min="0"
-                  [(ngModel)]="statsJugadorSeleccionado.goles"
+              <div class="stats-table__player">
+                <img
+                  *ngIf="jugador.fotoPerfilUrl; else avatarFallback"
+                  class="stats-table__avatar-image"
+                  [src]="jugador.fotoPerfilUrl"
+                  [alt]="jugador.nombre"
                 />
+                <ng-template #avatarFallback>
+                  <span class="stats-table__avatar">
+                    {{ (jugador.nombre.charAt(0) || "?").toUpperCase() }}
+                  </span>
+                </ng-template>
+
+                <strong class="stats-table__name">
+                  {{ jugador.nombre }}
+                </strong>
+              </div>
+
+              <label class="stats-table__field">
+                <input type="number" min="0" [(ngModel)]="jugador.goles" />
               </label>
 
-              <label class="player-stat-field">
-                <span>Asistencias</span>
+              <label class="stats-table__field">
                 <input
                   type="number"
                   min="0"
-                  [(ngModel)]="statsJugadorSeleccionado.asistencias"
+                  [(ngModel)]="jugador.asistencias"
                 />
               </label>
             </div>

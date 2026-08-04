@@ -11,11 +11,14 @@ import { FormsModule } from '@angular/forms';
 import { IonContent } from '@ionic/angular/standalone';
 import { Partido } from '../../interfaces/Partido.interface';
 import {
-  EquipoPartido,
-  EstadisticaJugadorTemporal,
   JugadorPartidoSelectable,
   ResultadoPartidoFirestoreWrite,
 } from '../../interfaces/Registro-resultado.interface';
+
+interface JugadorConStats extends JugadorPartidoSelectable {
+  goles: number;
+  asistencias: number;
+}
 
 @Component({
   selector: 'app-registrar-resultado-modal',
@@ -28,49 +31,26 @@ export class RegistrarResultadoModalComponent implements OnChanges {
   @Input() isOpen = false;
   @Input() loading = false;
   @Input() partido: Partido | null = null;
+  @Input() jugadores: JugadorPartidoSelectable[] = [];
 
   @Output() cancel = new EventEmitter<void>();
   @Output() confirm = new EventEmitter<ResultadoPartidoFirestoreWrite>();
 
   golesEquipoA = 0;
   golesEquipoB = 0;
-  duracionRealMinutos = 0;
-
-  jugadores: JugadorPartidoSelectable[] = [];
-  jugadorSeleccionadoId: string | null = null;
-  statsJugadorSeleccionado: EstadisticaJugadorTemporal = {
-    jugadorId: '',
-    goles: 0,
-    asistencias: 0,
-    minutosJugados: 0,
-  };
+  jugadoresConStats: JugadorConStats[] = [];
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['partido'] && this.partido) {
-      this.cargarDatosPartido();
-    }
-
-    if (changes['isOpen'] && this.isOpen && this.partido) {
+    if (
+      (changes['partido'] || changes['jugadores'] || changes['isOpen']) &&
+      this.partido
+    ) {
       this.cargarDatosPartido();
     }
   }
 
-  get jugadorSeleccionado(): JugadorPartidoSelectable | null {
-    return (
-      this.jugadores.find((j) => j.jugadorId === this.jugadorSeleccionadoId) ??
-      null
-    );
-  }
-
-  seleccionarJugador(jugador: JugadorPartidoSelectable): void {
-    this.jugadorSeleccionadoId = jugador.jugadorId;
-    this.statsJugadorSeleccionado = {
-      jugadorId: jugador.jugadorId,
-      goles: 0,
-      asistencias: 0,
-      minutosJugados:
-        this.duracionRealMinutos || this.partido?.duracionMinutos || 0,
-    };
+  get jugadorSeleccionado(): JugadorConStats | null {
+    return this.jugadoresConStats.length ? this.jugadoresConStats[0] : null;
   }
 
   cerrar(): void {
@@ -95,24 +75,15 @@ export class RegistrarResultadoModalComponent implements OnChanges {
       partidoId: this.partido.partidoId,
       golesEquipoA: Number(this.golesEquipoA) || 0,
       golesEquipoB: Number(this.golesEquipoB) || 0,
-      duracionRealMinutos: Number(this.duracionRealMinutos) || 0,
+      duracionRealMinutos: this.partido.duracionMinutos ?? 0,
       ganador,
-      jugadores: this.jugadores.map((jugador) => ({
+      jugadores: this.jugadoresConStats.map((jugador) => ({
         jugadorId: jugador.jugadorId,
         nombreJugador: jugador.nombre,
         equipo: jugador.equipo,
-        goles:
-          jugador.jugadorId === this.jugadorSeleccionadoId
-            ? Number(this.statsJugadorSeleccionado.goles) || 0
-            : 0,
-        asistencias:
-          jugador.jugadorId === this.jugadorSeleccionadoId
-            ? Number(this.statsJugadorSeleccionado.asistencias) || 0
-            : 0,
-        minutosJugados:
-          jugador.jugadorId === this.jugadorSeleccionadoId
-            ? Number(this.statsJugadorSeleccionado.minutosJugados) || 0
-            : undefined,
+        goles: Number(jugador.goles) || 0,
+        asistencias: Number(jugador.asistencias) || 0,
+        minutosJugados: this.partido?.duracionMinutos ?? 0,
       })),
       fechaRegistro: this.partido.fecha,
       fechaCreacion: this.partido.fecha as any,
@@ -122,42 +93,18 @@ export class RegistrarResultadoModalComponent implements OnChanges {
     this.confirm.emit(payload);
   }
 
-  trackByJugadorId(index: number, jugador: JugadorPartidoSelectable): string {
+  trackByJugadorId(index: number, jugador: JugadorConStats): string {
     return jugador.jugadorId;
   }
 
   private cargarDatosPartido(): void {
     this.golesEquipoA = this.partido?.golesEquipoA ?? 0;
     this.golesEquipoB = this.partido?.golesEquipoB ?? 0;
-    this.duracionRealMinutos = this.partido?.duracionMinutos ?? 0;
 
-    const equipoA = this.partido?.jugadoresEquipoA ?? [];
-    const equipoB = this.partido?.jugadoresEquipoB ?? [];
-
-    this.jugadores = [
-      ...equipoA.map((nombreOrId) => ({
-        jugadorId: nombreOrId,
-        nombre: nombreOrId,
-        equipo: 'A' as EquipoPartido,
-      })),
-      ...equipoB.map((nombreOrId) => ({
-        jugadorId: nombreOrId,
-        nombre: nombreOrId,
-        equipo: 'B' as EquipoPartido,
-      })),
-    ];
-
-    this.jugadorSeleccionadoId = this.jugadores[0]?.jugadorId ?? null;
-    this.resetStatsSeleccionado();
-  }
-
-  private resetStatsSeleccionado(): void {
-    this.statsJugadorSeleccionado = {
-      jugadorId: this.jugadorSeleccionadoId ?? '',
+    this.jugadoresConStats = (this.jugadores ?? []).map((jugador) => ({
+      ...jugador,
       goles: 0,
       asistencias: 0,
-      minutosJugados:
-        this.duracionRealMinutos || this.partido?.duracionMinutos || 0,
-    };
+    }));
   }
 }

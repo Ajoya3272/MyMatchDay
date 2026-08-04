@@ -15,6 +15,11 @@ import {
   UnirseAPartidoPayload,
 } from '../interfaces/Partido.interface';
 
+type ParticipantePartido = {
+  uid: string;
+  nombre: string;
+};
+
 @Injectable({
   providedIn: 'root',
 })
@@ -55,7 +60,6 @@ export class InvitacionService {
 
     const partido = partidoSnapshot.data() as Partido;
 
-    const participantesActuales = partido.participantes ?? [];
     const jugadoresActuales = partido.jugadoresId ?? [];
 
     if (jugadoresActuales.includes(authUser.uid)) {
@@ -71,9 +75,14 @@ export class InvitacionService {
         ? 'jugadoresEquipoA'
         : 'jugadoresEquipoB';
 
+    const participante: ParticipantePartido = {
+      uid: authUser.uid,
+      nombre: usuario.nombre,
+    };
+
     await updateDoc(partidoRef, {
       jugadoresId: arrayUnion(authUser.uid),
-      participantes: arrayUnion(authUser.uid),
+      participantes: arrayUnion(participante),
       [equipoField]: arrayUnion(authUser.uid),
       fechaActualizacion: serverTimestamp(),
     });

@@ -20,7 +20,9 @@
             <div class="match-item__top">
               <div>
                 <span class="match-item__status">Finalizado</span>
-                <h2 class="match-item__title">{{ match.nombre }}</h2>
+                <h2 class="match-item__title">
+                  {{ getTituloPartido(match) }}
+                </h2>
               </div>
             </div>
 
@@ -67,8 +69,8 @@
         <div class="empty-card__icon">📭</div>
         <h2 class="empty-card__title">No hay partidos finalizados</h2>
         <p class="empty-card__text">
-          Cuando termine un partido, aparecerá aquí para que puedas registrar el
-          resultado.
+          Cuando termine un partido que hayas organizado, aparecerá aquí para
+          que puedas registrar el resultado.
         </p>
       </article>
     </ng-template>
@@ -78,6 +80,7 @@
     *ngIf="isModalOpen"
     [isOpen]="isModalOpen"
     [partido]="partidoSeleccionado"
+    [jugadores]="jugadoresDelPartido"
     [loading]="loadingSave"
     (cancel)="cerrarModal()"
     (confirm)="guardarResultado($event)"

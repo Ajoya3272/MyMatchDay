@@ -42,6 +42,7 @@ export interface JugadorPartidoSelectable {
   jugadorId: string;
   nombre: string;
   equipo: EquipoPartido;
+  fotoPerfilUrl?: string | null;
 }
 
 export interface EstadisticaJugadorTemporal {
