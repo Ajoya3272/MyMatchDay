@@ -1,11 +1,26 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, Input, ViewChild, inject } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  Input,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+  inject,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Firestore, deleteDoc, doc } from '@angular/fire/firestore';
 import { Partido } from '../../interfaces/Partido.interface';
 import { ModalBorrarPartidoComponent } from '../modal-borrar-partido/modal-borrar-partido.component';
 
 type EstadoPartidoVista = 'pending' | 'progress' | 'finished';
+
+type BannerTipo = 'inicio' | 'fin';
+
+interface BannerActivo {
+  tipo: BannerTipo;
+  until: number;
+}
 
 export interface PartidoCarrusel extends Partido {
   estadoClase?: EstadoPartidoVista;
@@ -19,9 +34,12 @@ export interface PartidoCarrusel extends Partido {
   standalone: true,
   imports: [CommonModule, RouterLink, ModalBorrarPartidoComponent],
 })
-export class CarruselComponent {
+export class CarruselComponent implements OnInit, OnDestroy {
   private firestore = inject(Firestore);
   private _matches: PartidoCarrusel[] = [];
+  private refreshTimer?: ReturnType<typeof setInterval>;
+  private timers = new Map<string, ReturnType<typeof setTimeout>>();
+  private banners = new Map<string, BannerActivo>();
 
   @ViewChild('matchesCarousel')
   matchesCarousel?: ElementRef<HTMLDivElement>;
@@ -36,6 +54,8 @@ export class CarruselComponent {
   @Input({ required: true })
   set matches(value: PartidoCarrusel[] | null | undefined) {
     this._matches = value ?? [];
+    this.recalcularBanners();
+
     this.activeMatchIndex = 0;
 
     const el = this.matchesCarousel?.nativeElement;
@@ -50,6 +70,95 @@ export class CarruselComponent {
 
   get matchesVisibles(): PartidoCarrusel[] {
     return this._matches.filter((match) => !this.isFinished(match));
+  }
+
+  ngOnInit(): void {
+    this.refreshTimer = setInterval(() => {
+      this.recalcularBanners();
+    }, 1000);
+  }
+
+  ngOnDestroy(): void {
+    if (this.refreshTimer) {
+      clearInterval(this.refreshTimer);
+    }
+
+    for (const timer of this.timers.values()) {
+      clearTimeout(timer);
+    }
+
+    this.timers.clear();
+    this.banners.clear();
+  }
+
+  private recalcularBanners(): void {
+    const now = Date.now();
+
+    for (const match of this._matches) {
+      const inicio = match.fecha?.toDate?.();
+      if (!inicio) {
+        continue;
+      }
+
+      const start = inicio.getTime();
+      const end = start + (match.duracionMinutos ?? 0) * 60_000;
+
+      if (now >= start && now < start + 20_000) {
+        this.activarBanner(match.partidoId, 'inicio', start + 20_000 - now);
+        continue;
+      }
+
+      if (now >= end && now < end + 20_000) {
+        this.activarBanner(match.partidoId, 'fin', end + 20_000 - now);
+        continue;
+      }
+
+      if (now >= end + 20_000) {
+        this.banners.delete(match.partidoId);
+      }
+    }
+  }
+
+  private activarBanner(
+    partidoId: string,
+    tipo: BannerTipo,
+    duracionMs: number,
+  ): void {
+    const actual = this.banners.get(partidoId);
+
+    if (actual?.tipo === tipo && actual.until > Date.now()) {
+      return;
+    }
+
+    this.banners.set(partidoId, {
+      tipo,
+      until: Date.now() + duracionMs,
+    });
+
+    const timerPrevio = this.timers.get(partidoId);
+    if (timerPrevio) {
+      clearTimeout(timerPrevio);
+    }
+
+    const timer = setTimeout(() => {
+      const current = this.banners.get(partidoId);
+      if (current?.tipo === tipo) {
+        this.banners.delete(partidoId);
+      }
+      this.timers.delete(partidoId);
+    }, duracionMs);
+
+    this.timers.set(partidoId, timer);
+  }
+
+  esBannerInicio(match: PartidoCarrusel): boolean {
+    const banner = this.banners.get(match.partidoId);
+    return banner?.tipo === 'inicio' && Date.now() < banner.until;
+  }
+
+  esBannerFin(match: PartidoCarrusel): boolean {
+    const banner = this.banners.get(match.partidoId);
+    return banner?.tipo === 'fin' && Date.now() < banner.until;
   }
 
   onCarouselScroll(): void {
@@ -73,37 +182,50 @@ export class CarruselComponent {
   }
 
   getEstadoClase(match: PartidoCarrusel): EstadoPartidoVista {
-    if (match.estadoClase) {
-      return match.estadoClase;
+    const inicio = match.fecha?.toDate?.();
+
+    if (!inicio) {
+      return match.estadoClase ?? 'pending';
     }
 
-    if (match.estado === 'en progreso') {
+    const ahora = new Date();
+    const fin = new Date(
+      inicio.getTime() + (match.duracionMinutos ?? 0) * 60_000,
+    );
+
+    if (ahora < inicio) {
+      return 'pending';
+    }
+
+    if (ahora >= inicio && ahora < fin) {
       return 'progress';
     }
 
-    if (match.estado === 'finalizado') {
-      return 'finished';
+    return 'finished';
+  }
+
+  getEstadoTexto(match: PartidoCarrusel): string {
+    const estado = this.getEstadoClase(match);
+
+    if (estado === 'progress') {
+      return 'En juego';
     }
 
-    return 'pending';
+    if (estado === 'finished') {
+      return 'Finalizado';
+    }
+
+    return 'Pendiente';
   }
 
   isPending(match: PartidoCarrusel): boolean {
-    const estado = (match.estado ?? '').toLowerCase().trim();
-    return estado === 'pendiente' || this.getEstadoClase(match) === 'pending';
+    return this.getEstadoClase(match) === 'pending';
   }
 
   isFinished(match: PartidoCarrusel): boolean {
-    const estado = (match.estado ?? '').toLowerCase().trim();
-
-    return [
-      'finished',
-      'finalizado',
-      'terminado',
-      'completado',
-      'cerrado',
-      'acabado',
-    ].includes(estado);
+    return (
+      this.getEstadoClase(match) === 'finished' && !this.esBannerFin(match)
+    );
   }
 
   puedeBorrar(match: PartidoCarrusel): boolean {

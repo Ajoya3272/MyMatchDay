@@ -40,10 +40,10 @@
   color: #ffffff;
   box-shadow: 0 16px 40px rgba(15, 23, 42, 0.18);
   transition:
-    background-color 300ms cubic-bezier(0.16, 1, 0.3, 1),
-    color 220ms cubic-bezier(0.16, 1, 0.3, 1),
-    box-shadow 300ms cubic-bezier(0.16, 1, 0.3, 1),
-    transform 220ms cubic-bezier(0.16, 1, 0.3, 1);
+    background-color 700ms ease-in-out,
+    color 700ms ease-in-out,
+    box-shadow 700ms ease-in-out,
+    transform 700ms ease-in-out;
 }
 
 .match-card--pending {
@@ -82,9 +82,10 @@
   font-weight: 800;
   letter-spacing: 0.01em;
   transition:
-    background-color 220ms cubic-bezier(0.16, 1, 0.3, 1),
-    color 220ms cubic-bezier(0.16, 1, 0.3, 1),
-    box-shadow 220ms cubic-bezier(0.16, 1, 0.3, 1);
+    background-color 700ms ease-in-out,
+    color 700ms ease-in-out,
+    box-shadow 700ms ease-in-out,
+    transform 700ms ease-in-out;
 }
 
 .match-card--pending .match-card__status {
@@ -108,7 +109,7 @@
   font-size: 1.3rem;
   line-height: 1.1;
   font-weight: 800;
-  transition: color 220ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: color 700ms ease-in-out;
 }
 
 .match-card__teams {
@@ -117,7 +118,7 @@
   line-height: 1.15;
   font-weight: 700;
   color: rgba(255, 255, 255, 0.78);
-  transition: color 220ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: color 700ms ease-in-out;
 }
 
 .match-card--progress .match-card__teams {
@@ -136,8 +137,10 @@
   border-radius: 16px;
   background-color: rgba(255, 255, 255, 0.08);
   transition:
-    background-color 220ms cubic-bezier(0.16, 1, 0.3, 1),
-    color 220ms cubic-bezier(0.16, 1, 0.3, 1);
+    background-color 700ms ease-in-out,
+    color 700ms ease-in-out,
+    opacity 700ms ease-in-out,
+    transform 700ms ease-in-out;
 }
 
 .match-card--progress .match-card__meta-item {
@@ -153,7 +156,7 @@
   margin-bottom: 6px;
   font-size: 0.78rem;
   color: rgba(255, 255, 255, 0.68);
-  transition: color 220ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: color 700ms ease-in-out;
 }
 
 .match-card--progress .match-card__meta-label {
@@ -163,7 +166,7 @@
 .match-card__meta-value {
   font-size: 0.92rem;
   color: inherit;
-  transition: color 220ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: color 700ms ease-in-out;
 }
 
 .match-card__actions {
@@ -189,10 +192,10 @@
   text-align: center;
   white-space: nowrap;
   transition:
-    background-color 220ms cubic-bezier(0.16, 1, 0.3, 1),
-    color 220ms cubic-bezier(0.16, 1, 0.3, 1),
-    transform 180ms cubic-bezier(0.16, 1, 0.3, 1),
-    opacity 180ms cubic-bezier(0.16, 1, 0.3, 1);
+    background-color 700ms ease-in-out,
+    color 700ms ease-in-out,
+    transform 180ms ease,
+    opacity 180ms ease;
 }
 
 .match-card__cta--danger {
@@ -246,6 +249,64 @@
   transform: scale(1.15);
 }
 
+.match-card__start {
+  min-height: 240px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 18px;
+  overflow: hidden;
+  position: relative;
+  padding: 22px 18px;
+}
+
+.match-card__start-ribbon {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  height: 54px;
+  display: flex;
+  align-items: center;
+}
+
+.match-card__start-ribbon-text {
+  display: inline-block;
+  white-space: nowrap;
+  font-size: 1.6rem;
+  font-weight: 900;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #fff;
+  animation: ribbon-move 4.5s linear infinite;
+  will-change: transform;
+}
+
+.match-card__start-main {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.match-card__start-title {
+  margin: 0;
+  font-size: 1.5rem;
+  line-height: 1.05;
+  font-weight: 900;
+  color: #ffffff;
+}
+
+.match-card__start-teams {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.match-card__start--fin .match-card__start-ribbon-text {
+  animation: ribbon-move 4.5s linear infinite;
+}
+
 @media (max-width: 420px) {
   .match-card__actions {
     flex-wrap: nowrap;
@@ -268,5 +329,18 @@
   .match-card__cta,
   .match-card__dot {
     transition: none;
+  }
+
+  .match-card__start-ribbon-text {
+    animation: none;
+  }
+}
+
+@keyframes ribbon-move {
+  0% {
+    transform: translateX(120%);
+  }
+  100% {
+    transform: translateX(-120%);
   }
 }

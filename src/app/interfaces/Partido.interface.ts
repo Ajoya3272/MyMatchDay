@@ -19,6 +19,7 @@ export interface Partido {
   enlaceInvitacion?: string;
   jugadoresEquipoA?: string[];
   jugadoresEquipoB?: string[];
+  inicioAnimacionCarruselAt?: Timestamp;
 }
 
 export interface PartidoWrite {
@@ -40,6 +41,7 @@ export interface PartidoWrite {
   enlaceInvitacion?: string;
   jugadoresEquipoA?: string[];
   jugadoresEquipoB?: string[];
+  inicioAnimacionCarruselAt?: Timestamp;
   fechaCreacion: ReturnType<typeof serverTimestamp>;
   fechaActualizacion: ReturnType<typeof serverTimestamp>;
 }

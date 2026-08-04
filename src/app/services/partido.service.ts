@@ -132,4 +132,23 @@ export class PartidoService {
       fechaActualizacion: serverTimestamp(),
     });
   }
+
+  async iniciarPartido(partidoId: string): Promise<void> {
+    const partidoRef = doc(this.firestore, `partidos/${partidoId}`);
+
+    await updateDoc(partidoRef, {
+      estado: 'en progreso',
+      inicioAnimacionCarruselAt: serverTimestamp(),
+      fechaActualizacion: serverTimestamp(),
+    });
+  }
+
+  async finalizarPartido(partidoId: string): Promise<void> {
+    const partidoRef = doc(this.firestore, `partidos/${partidoId}`);
+
+    await updateDoc(partidoRef, {
+      estado: 'finalizado',
+      fechaActualizacion: serverTimestamp(),
+    });
+  }
 }

@@ -1,76 +1,133 @@
 <div class="matches-carousel-shell">
-  <div #matchesCarousel class="matches-carousel" (scroll)="onCarouselScroll()">
+  <ng-container *ngIf="matchesVisibles.length > 0; else emptyNextMatch">
     <div
-      class="match-slide"
-      *ngFor="let match of matchesVisibles; trackBy: trackByPartidoId"
+      #matchesCarousel
+      class="matches-carousel"
+      (scroll)="onCarouselScroll()"
     >
-      <article
-        class="match-card"
-        [ngClass]="'match-card--' + getEstadoClase(match)"
+      <div
+        class="match-slide"
+        *ngFor="let match of matchesVisibles; trackBy: trackByPartidoId"
       >
-        <div class="match-card__top">
-          <span class="match-card__status">
-            {{ match.estadoTexto || match.estado }}
-          </span>
+        <article
+          class="match-card"
+          [ngClass]="'match-card--' + getEstadoClase(match)"
+          [class.match-card--banner-inicio]="esBannerInicio(match)"
+          [class.match-card--banner-fin]="esBannerFin(match)"
+        >
+          <ng-container *ngIf="esBannerInicio(match); else maybeBannerFin">
+            <div class="match-card__start">
+              <div class="match-card__start-ribbon">
+                <span class="match-card__start-ribbon-text">
+                  ⚽ Empieza el partido ⚽
+                </span>
+              </div>
 
-          <h3 class="match-card__title">
-            {{ match.nombre }}
-          </h3>
+              <div class="match-card__start-main">
+                <h3 class="match-card__start-title">{{ match.nombre }}</h3>
+                <p class="match-card__start-teams">
+                  {{ match.equipoA }} vs {{ match.equipoB }}
+                </p>
+              </div>
+            </div>
+          </ng-container>
 
-          <p class="match-card__teams">
-            {{ match.equipoA }} vs {{ match.equipoB }}
-          </p>
-        </div>
+          <ng-template #maybeBannerFin>
+            <ng-container *ngIf="esBannerFin(match); else cardNormal">
+              <div class="match-card__start match-card__start--fin">
+                <div class="match-card__start-ribbon">
+                  <span class="match-card__start-ribbon-text">
+                    ⚽ Fin del partido ⚽
+                  </span>
+                </div>
 
-        <div class="match-card__meta">
-          <div class="match-card__meta-item">
-            <span class="match-card__meta-label">Cuándo</span>
-            <strong class="match-card__meta-value">
-              {{ match.fecha.toDate() | date: "dd/MM/yyyy" }} ·
-              {{ match.fecha.toDate() | date: "HH:mm" }}
-            </strong>
-          </div>
+                <div class="match-card__start-main">
+                  <h3 class="match-card__start-title">{{ match.nombre }}</h3>
+                  <p class="match-card__start-teams">
+                    {{ match.equipoA }} vs {{ match.equipoB }}
+                  </p>
+                </div>
+              </div>
+            </ng-container>
+          </ng-template>
 
-          <div class="match-card__meta-item">
-            <span class="match-card__meta-label">Ubicación</span>
-            <strong class="match-card__meta-value">
-              {{ match.ubicacion || "Por confirmar" }}
-            </strong>
-          </div>
-        </div>
+          <ng-template #cardNormal>
+            <div class="match-card__top">
+              <span class="match-card__status">
+                {{ getEstadoTexto(match) }}
+              </span>
 
-        <div class="match-card__actions">
-          <button
-            class="match-card__cta"
-            type="button"
-            [routerLink]="['/detalles-partido']"
-            [queryParams]="{ partidoId: match.partidoId }"
-            [disabled]="deletingMatchId === match.partidoId"
-          >
-            Ver detalles
-          </button>
+              <h3 class="match-card__title">
+                {{ match.nombre }}
+              </h3>
 
-          <button
-            *ngIf="puedeBorrar(match)"
-            class="match-card__cta match-card__cta--danger"
-            type="button"
-            [disabled]="deletingMatchId === match.partidoId"
-            (click)="openDeleteModal(match)"
-          >
-            Cancelar partido
-          </button>
-        </div>
+              <p class="match-card__teams">
+                {{ match.equipoA }} vs {{ match.equipoB }}
+              </p>
+            </div>
 
-        <div class="match-card__dots" *ngIf="matchesVisibles.length > 1">
-          <span
-            class="match-card__dot"
-            *ngFor="let _ of matchesVisibles; let i = index"
-            [class.match-card__dot--active]="i === activeMatchIndex"
-          ></span>
-        </div>
-      </article>
+            <div class="match-card__meta">
+              <div class="match-card__meta-item">
+                <span class="match-card__meta-label">Cuándo</span>
+                <strong class="match-card__meta-value">
+                  {{ match.fecha.toDate() | date: "dd/MM/yyyy" }} ·
+                  {{ match.fecha.toDate() | date: "HH:mm" }}
+                </strong>
+              </div>
+
+              <div class="match-card__meta-item">
+                <span class="match-card__meta-label">Ubicación</span>
+                <strong class="match-card__meta-value">
+                  {{ match.ubicacion || "Por confirmar" }}
+                </strong>
+              </div>
+            </div>
+
+            <div class="match-card__actions">
+              <button
+                class="match-card__cta"
+                type="button"
+                [routerLink]="['/detalles-partido']"
+                [queryParams]="{ partidoId: match.partidoId }"
+                [disabled]="deletingMatchId === match.partidoId"
+              >
+                Ver detalles
+              </button>
+
+              <button
+                *ngIf="puedeBorrar(match)"
+                class="match-card__cta match-card__cta--danger"
+                type="button"
+                [disabled]="deletingMatchId === match.partidoId"
+                (click)="openDeleteModal(match)"
+              >
+                Cancelar partido
+              </button>
+            </div>
+
+            <div class="match-card__dots" *ngIf="matchesVisibles.length > 1">
+              <span
+                class="match-card__dot"
+                *ngFor="let _ of matchesVisibles; let i = index"
+                [class.match-card__dot--active]="i === activeMatchIndex"
+              ></span>
+            </div>
+          </ng-template>
+        </article>
+      </div>
     </div>
-  </div>
+  </ng-container>
+
+  <ng-template #emptyNextMatch>
+    <article class="match-card match-card--empty">
+      <h3 class="match-card__title">No tienes ningún partido pendiente</h3>
+      <p class="match-card__place">Organiza uno e invita a tus amigos.</p>
+
+      <button class="match-card__cta" type="button" routerLink="/crear-partido">
+        Crear partido
+      </button>
+    </article>
+  </ng-template>
 </div>
 
 <app-modal-borrar-partido
