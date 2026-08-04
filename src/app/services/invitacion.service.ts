@@ -4,7 +4,6 @@ import {
   Firestore,
   arrayUnion,
   doc,
-  docData,
   getDoc,
   serverTimestamp,
   updateDoc,
@@ -55,15 +54,15 @@ export class InvitacionService {
     }
 
     const partido = partidoSnapshot.data() as Partido;
-    const jugadoresActuales = partido.participantes ?? [];
 
-    if (jugadoresActuales.includes(usuario.nombre)) {
+    const participantesActuales = partido.participantes ?? [];
+    const jugadoresActuales = partido.jugadoresId ?? [];
+
+    if (jugadoresActuales.includes(authUser.uid)) {
       return;
     }
 
-    const totalActual = jugadoresActuales.length;
-
-    if (totalActual >= partido.numeroJugadores) {
+    if (jugadoresActuales.length >= partido.numeroJugadores) {
       throw new Error('El partido ya está completo');
     }
 
@@ -74,8 +73,8 @@ export class InvitacionService {
 
     await updateDoc(partidoRef, {
       jugadoresId: arrayUnion(authUser.uid),
-      participantes: arrayUnion(usuario.nombre),
-      [equipoField]: arrayUnion(usuario.nombre),
+      participantes: arrayUnion(authUser.uid),
+      [equipoField]: arrayUnion(authUser.uid),
       fechaActualizacion: serverTimestamp(),
     });
   }

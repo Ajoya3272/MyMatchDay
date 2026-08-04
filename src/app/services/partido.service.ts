@@ -3,6 +3,8 @@ import { Auth } from '@angular/fire/auth';
 import {
   Firestore,
   Timestamp,
+  arrayRemove,
+  arrayUnion,
   collection,
   doc,
   serverTimestamp,
@@ -71,6 +73,45 @@ export class PartidoService {
     await setDoc(partidoDocRef, partidoData);
 
     return partidoDocRef.id;
+  }
+
+  async unirseAPartido(partidoId: string): Promise<void> {
+    const authUser = this.auth.currentUser;
+
+    if (!authUser) {
+      throw new Error('No hay usuario autenticado');
+    }
+
+    const user = await firstValueFrom(
+      this.loginService.user$.pipe(
+        filter((u): u is NonNullable<typeof u> => !!u),
+        take(1),
+      ),
+    );
+
+    const partidoRef = doc(this.firestore, `partidos/${partidoId}`);
+
+    await updateDoc(partidoRef, {
+      participantes: arrayUnion(authUser.uid),
+      jugadoresId: arrayUnion(authUser.uid),
+      fechaActualizacion: serverTimestamp(),
+    });
+  }
+
+  async salirDePartido(partidoId: string): Promise<void> {
+    const authUser = this.auth.currentUser;
+
+    if (!authUser) {
+      throw new Error('No hay usuario autenticado');
+    }
+
+    const partidoRef = doc(this.firestore, `partidos/${partidoId}`);
+
+    await updateDoc(partidoRef, {
+      participantes: arrayRemove(authUser.uid),
+      jugadoresId: arrayRemove(authUser.uid),
+      fechaActualizacion: serverTimestamp(),
+    });
   }
 
   async guardarEnlaceInvitacion(

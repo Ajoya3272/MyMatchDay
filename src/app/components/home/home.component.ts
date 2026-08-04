@@ -10,7 +10,7 @@ import {
   query,
   where,
 } from '@angular/fire/firestore';
-import { Observable, of } from 'rxjs';
+import { Observable, of, combineLatest } from 'rxjs';
 import { map, shareReplay, switchMap } from 'rxjs/operators';
 import { CarruselComponent } from '../carrusel/carrusel.component';
 import { Partido } from '../../interfaces/Partido.interface';
@@ -41,14 +41,31 @@ export class HomeComponent {
       }
 
       const partidosRef = collection(this.firestore, 'partidos');
-      const partidosQuery = query(
+
+      const creadosQuery = query(
         partidosRef,
         where('organizadorId', '==', user.uid),
       );
 
-      return collectionData(partidosQuery, {
-        idField: 'partidoId',
-      }).pipe(map((partidos) => partidos as Partido[]));
+      const unidosQuery = query(
+        partidosRef,
+        where('jugadoresId', 'array-contains', user.uid),
+      );
+
+      return combineLatest([
+        collectionData(creadosQuery, { idField: 'partidoId' }),
+        collectionData(unidosQuery, { idField: 'partidoId' }),
+      ]).pipe(
+        map(([creados, unidos]) => {
+          const todos = [...(creados as Partido[]), ...(unidos as Partido[])];
+
+          return todos.filter(
+            (partido, index, array) =>
+              array.findIndex((p) => p.partidoId === partido.partidoId) ===
+              index,
+          );
+        }),
+      );
     }),
     shareReplay({ bufferSize: 1, refCount: true }),
   );
