@@ -1,9 +1,10 @@
 ion-content.home-page {
-  --background: #ffffff;
+  --background: var(--matchday-bg);
+  color: var(--matchday-text);
 }
 
 .home-page {
-  color: var(--matchday-black);
+  color: var(--matchday-text);
 }
 
 .home-page__next-match {
@@ -28,13 +29,13 @@ ion-content.home-page {
   margin: 0;
   font-size: 1.1rem;
   font-weight: 800;
-  color: var(--matchday-black);
+  color: var(--matchday-text);
 }
 
 .home-page__section-heading p {
   margin: 6px 0 0;
   font-size: 0.9rem;
-  color: #6b7280;
+  color: var(--matchday-text-muted);
 }
 
 .home-page__quick-grid {
@@ -44,22 +45,23 @@ ion-content.home-page {
 }
 
 .quick-card {
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--matchday-border);
   border-radius: 20px;
-  background: #ffffff;
+  background: var(--matchday-surface);
   padding: 16px;
   text-align: left;
   display: flex;
   flex-direction: column;
   gap: 10px;
   box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+  color: var(--matchday-text);
 }
 
 .quick-card__icon {
   width: 40px;
   height: 40px;
   border-radius: 14px;
-  background: #f3f4f6;
+  background: var(--matchday-surface-2);
   display: grid;
   place-items: center;
   font-size: 1rem;
@@ -68,13 +70,13 @@ ion-content.home-page {
 .quick-card__title {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--matchday-black);
+  color: var(--matchday-text);
 }
 
 .quick-card__text {
   font-size: 0.82rem;
   line-height: 1.4;
-  color: #6b7280;
+  color: var(--matchday-text-muted);
 }
 
 .match-card {
@@ -136,22 +138,23 @@ ion-content.home-page {
 .stat-card {
   padding: 18px 16px;
   border-radius: 20px;
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
+  background: var(--matchday-surface);
+  border: 1px solid var(--matchday-border);
+  color: var(--matchday-text);
 }
 
 .stat-card__label {
   display: block;
   margin-bottom: 8px;
   font-size: 0.82rem;
-  color: #6b7280;
+  color: var(--matchday-text-muted);
 }
 
 .stat-card__value {
   font-size: 1.6rem;
   line-height: 1;
   font-weight: 800;
-  color: var(--matchday-black);
+  color: var(--matchday-text);
 }
 
 .activity-list {
@@ -166,8 +169,9 @@ ion-content.home-page {
   gap: 12px;
   padding: 16px;
   border-radius: 18px;
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
+  background: var(--matchday-surface);
+  border: 1px solid var(--matchday-border);
+  color: var(--matchday-text);
 }
 
 .activity-item__dot {
@@ -183,12 +187,12 @@ ion-content.home-page {
   margin: 0;
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--matchday-black);
+  color: var(--matchday-text);
 }
 
 .activity-item p {
   margin: 6px 0 0;
   font-size: 0.84rem;
   line-height: 1.45;
-  color: #6b7280;
+  color: var(--matchday-text-muted);
 }

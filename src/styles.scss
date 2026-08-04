@@ -20,8 +20,22 @@ $football-app-theme: mat.define-light-theme(
 
 @include mat.all-component-themes($football-app-theme);
 
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap");
-:root {
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap");
+
+:root,
+[data-theme="light"] {
+  color-scheme: light;
+
+  --ion-background-color: #f5f7fb;
+  --ion-text-color: #111827;
+
+  --matchday-bg: #f5f7fb;
+  --matchday-surface: #ffffff;
+  --matchday-surface-2: #f8fafc;
+  --matchday-text: #111827;
+  --matchday-text-muted: #6b7280;
+  --matchday-border: rgba(17, 24, 39, 0.08);
+
   --matchday-green: #22c55e;
   --matchday-black: #111827;
 
@@ -33,15 +47,63 @@ $football-app-theme: mat.define-light-theme(
 
   --matchday-finished: #273355;
   --matchday-finished-soft: rgba(107, 114, 128, 0.12);
+
+  --matchday-card-bg: #111827;
+  --matchday-card-text: #ffffff;
+  --matchday-card-muted: rgba(255, 255, 255, 0.78);
+
+  --matchday-modal-bg: #ffffff;
+  --matchday-modal-text: #111827;
+  --matchday-modal-muted: #6b7280;
+  --matchday-modal-overlay: rgba(15, 23, 42, 0.32);
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --ion-background-color: #0b1220;
+  --ion-text-color: #e5e7eb;
+
+  --matchday-bg: #0b1220;
+  --matchday-surface: #111827;
+  --matchday-surface-2: #172033;
+  --matchday-text: #e5e7eb;
+  --matchday-text-muted: #9ca3af;
+  --matchday-border: rgba(255, 255, 255, 0.08);
+
+  --matchday-green: #22c55e;
+  --matchday-black: #0b1220;
+
+  --matchday-pending: #111827;
+  --matchday-pending-soft: rgba(255, 255, 255, 0.08);
+
+  --matchday-progress: #60a5fa;
+  --matchday-progress-soft: rgba(96, 165, 250, 0.18);
+
+  --matchday-finished: #273355;
+  --matchday-finished-soft: rgba(255, 255, 255, 0.08);
+
+  --matchday-card-bg: #111827;
+  --matchday-card-text: #ffffff;
+  --matchday-card-muted: rgba(255, 255, 255, 0.78);
+
+  --matchday-modal-bg: #111827;
+  --matchday-modal-text: #e5e7eb;
+  --matchday-modal-muted: #9ca3af;
+  --matchday-modal-overlay: rgba(2, 6, 23, 0.62);
 }
 
 html,
 body {
+  height: 100%;
+}
+
+body {
   margin: 0;
   padding: 0;
   font-family: "Inter", "Segoe UI", sans-serif;
-  background: #f5f7fb;
-  color: var(--matchday-black);
+  background: var(--matchday-bg);
+  color: var(--matchday-text);
 }
 
 * {
@@ -53,12 +115,7 @@ ion-menu {
   --max-width: 380px;
 }
 
-html,
-body {
-  height: 100%;
-}
-
-body {
-  margin: 0;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
+ion-content {
+  --background: var(--matchday-bg);
+  color: var(--matchday-text);
 }

@@ -1,5 +1,6 @@
 ion-content.detalles-page {
-  --background: #ffffff;
+  --background: var(--matchday-bg);
+  color: var(--matchday-text);
 }
 
 .detalles-page__wrapper {
@@ -11,8 +12,8 @@ ion-content.detalles-page {
 
 .partido-panel {
   border-radius: 24px;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
+  background: var(--matchday-surface);
+  border: 1px solid var(--matchday-border);
   padding: 18px;
   box-shadow: 0 10px 28px rgba(15, 23, 42, 0.06);
 }
@@ -29,13 +30,13 @@ ion-content.detalles-page {
   margin: 0;
   font-size: 1.05rem;
   font-weight: 800;
-  color: var(--matchday-black);
+  color: var(--matchday-text);
 }
 
 .partido-panel__heading p {
   margin: 6px 0 0;
   font-size: 0.88rem;
-  color: #6b7280;
+  color: var(--matchday-text-muted);
 }
 
 .partido-summary {
@@ -47,13 +48,13 @@ ion-content.detalles-page {
   font-size: 1.45rem;
   line-height: 1.08;
   font-weight: 800;
-  color: var(--matchday-black);
+  color: var(--matchday-text);
 }
 
 .partido-summary__organizador {
   margin: 8px 0 0;
   font-size: 0.92rem;
-  color: #6b7280;
+  color: var(--matchday-text-muted);
 }
 
 .partido-grid {
@@ -64,8 +65,8 @@ ion-content.detalles-page {
 
 .info-card {
   border-radius: 18px;
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
+  background: var(--matchday-surface-2);
+  border: 1px solid var(--matchday-border);
   padding: 14px;
 }
 
@@ -73,13 +74,13 @@ ion-content.detalles-page {
   display: block;
   margin-bottom: 6px;
   font-size: 0.78rem;
-  color: #6b7280;
+  color: var(--matchday-text-muted);
 }
 
 .info-card__value {
   font-size: 0.95rem;
   line-height: 1.35;
-  color: var(--matchday-black);
+  color: var(--matchday-text);
 }
 
 .players-list {
@@ -94,8 +95,8 @@ ion-content.detalles-page {
   gap: 12px;
   padding: 12px 14px;
   border-radius: 18px;
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
+  background: var(--matchday-surface-2);
+  border: 1px solid var(--matchday-border);
 }
 
 .player-row--compact {
@@ -133,7 +134,7 @@ ion-content.detalles-page {
 
 .player-row__content strong {
   display: block;
-  color: var(--matchday-black);
+  color: var(--matchday-text);
   font-size: 0.94rem;
 }
 
@@ -145,8 +146,8 @@ ion-content.detalles-page {
 
 .team-card {
   border-radius: 20px;
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
+  background: var(--matchday-surface-2);
+  border: 1px solid var(--matchday-border);
   padding: 14px;
 }
 
@@ -162,18 +163,18 @@ ion-content.detalles-page {
   margin: 0;
   font-size: 1rem;
   font-weight: 800;
-  color: var(--matchday-black);
+  color: var(--matchday-text);
 }
 
 .team-card__header span {
   font-size: 0.82rem;
-  color: #6b7280;
+  color: var(--matchday-text-muted);
 }
 
 .team-card__empty {
   padding: 10px 0 2px;
   font-size: 0.88rem;
-  color: #6b7280;
+  color: var(--matchday-text-muted);
 }
 
 .team-join-btn {
@@ -214,7 +215,7 @@ ion-content.detalles-page {
   padding: 0 18px;
   border: none;
   border-radius: 16px;
-  background: #22c55e;
+  background: var(--matchday-green);
   color: #0f172a;
   font-size: 0.95rem;
   font-weight: 800;

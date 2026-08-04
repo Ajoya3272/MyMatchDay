@@ -4,11 +4,12 @@
 }
 
 ion-content.menu-lateral {
-  --background: #f6f7fb;
+  --background: var(--matchday-bg);
   --padding-top: 20px;
   --padding-bottom: 24px;
   --padding-start: 16px;
   --padding-end: 16px;
+  color: var(--matchday-text);
 }
 
 .menu-lateral__top {
@@ -25,7 +26,7 @@ ion-content.menu-lateral {
   width: 48px;
   height: 48px;
   border-radius: 16px;
-  background: #22c55e;
+  background: var(--matchday-green);
   color: #0f172a;
   display: grid;
   place-items: center;
@@ -44,7 +45,7 @@ ion-content.menu-lateral {
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #6b7280;
+  color: var(--matchday-text-muted);
 }
 
 .menu-lateral__title {
@@ -52,14 +53,14 @@ ion-content.menu-lateral {
   font-size: 1.9rem;
   line-height: 1;
   font-weight: 800;
-  color: #111827;
+  color: var(--matchday-text);
 }
 
 .menu-lateral__subtitle {
   margin: 8px 0 0;
   font-size: 0.98rem;
   line-height: 1.45;
-  color: #4b5563;
+  color: var(--matchday-text-muted);
 }
 
 .menu-lateral__list {
@@ -72,40 +73,42 @@ ion-content.menu-lateral {
 }
 
 .menu-lateral__item {
-  --background: #ffffff;
+  --background: var(--matchday-surface);
   --border-radius: 22px;
   --padding-start: 14px;
   --padding-end: 14px;
   --inner-padding-end: 0;
   --min-height: 78px;
-  --color: #111827;
+  --color: var(--matchday-text);
   margin-bottom: 12px;
   box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+  border: 1px solid var(--matchday-border);
 }
 
 .menu-lateral__item-icon {
   width: 42px;
   height: 42px;
   border-radius: 14px;
-  background: #eef2f7;
+  background: var(--matchday-surface-2);
   display: grid;
   place-items: center;
   margin-right: 12px;
   font-size: 1.1rem;
+  color: var(--matchday-text);
 }
 
 .menu-lateral__item ion-label h3 {
   margin: 0 0 4px;
   font-size: 1rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--matchday-text);
 }
 
 .menu-lateral__item ion-label p {
   margin: 0;
   font-size: 0.88rem;
   line-height: 1.35;
-  color: #6b7280;
+  color: var(--matchday-text-muted);
 }
 
 .menu-lateral__bottom {
@@ -115,7 +118,7 @@ ion-content.menu-lateral {
 .menu-lateral__mock-card {
   padding: 20px;
   border-radius: 24px;
-  background: #111827;
+  background: var(--matchday-black);
   color: #ffffff;
 }
 

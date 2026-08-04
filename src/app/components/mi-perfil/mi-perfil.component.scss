@@ -3,11 +3,12 @@
 }
 
 ion-content.mi-perfil-page {
-  --background: #f5f7fb;
+  --background: var(--matchday-bg);
+  color: var(--matchday-text);
 }
 
 .mi-perfil-page {
-  color: var(--matchday-black);
+  color: var(--matchday-text);
 }
 
 .mi-perfil-page__wrapper {
@@ -16,10 +17,11 @@ ion-content.mi-perfil-page {
 
 .perfil-card {
   overflow: hidden;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
+  background: var(--matchday-surface);
+  border: 1px solid var(--matchday-border);
   border-radius: 24px;
   box-shadow: 0 12px 30px rgba(16, 24, 40, 0.08);
+  color: var(--matchday-text);
 }
 
 .perfil-card__header {
@@ -57,7 +59,7 @@ ion-content.mi-perfil-page {
 .perfil-card__avatar--image {
   display: block;
   object-fit: cover;
-  background: #d1d5db;
+  background: var(--matchday-surface-2);
 }
 
 .perfil-card__avatar-action {
@@ -70,7 +72,7 @@ ion-content.mi-perfil-page {
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: #3b82f6;
+  background: var(--matchday-green);
   color: #ffffff;
   box-shadow: 0 8px 18px rgba(15, 23, 42, 0.24);
   cursor: pointer;
@@ -114,8 +116,8 @@ ion-content.mi-perfil-page {
   flex-direction: column;
   gap: 6px;
   padding: 14px 16px;
-  background: #f9fafb;
-  border: 1px solid #edf0f3;
+  background: var(--matchday-surface-2);
+  border: 1px solid var(--matchday-border);
   border-radius: 18px;
 }
 
@@ -124,13 +126,13 @@ ion-content.mi-perfil-page {
   font-weight: 700;
   letter-spacing: 0.02em;
   text-transform: uppercase;
-  color: #6b7280;
+  color: var(--matchday-text-muted);
 }
 
 .perfil-item__value {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--matchday-black);
+  color: var(--matchday-text);
   line-height: 1.35;
   word-break: break-word;
 }

@@ -6,6 +6,8 @@ import { IonApp, IonMenu, IonRouterOutlet } from '@ionic/angular/standalone';
 import { HeaderComponent } from './shared/header/header.component';
 import { MenuLateralComponent } from './shared/menu-lateral/menu-lateral.component';
 
+type ThemeMode = 'light' | 'dark';
+
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
@@ -21,8 +23,10 @@ import { MenuLateralComponent } from './shared/menu-lateral/menu-lateral.compone
 })
 export class AppComponent {
   hideLayout = false;
+  private readonly themeStorageKey = 'theme';
 
   constructor(private router: Router) {
+    this.initializeTheme();
     this.updateLayout(this.router.url);
 
     this.router.events
@@ -34,6 +38,26 @@ export class AppComponent {
       .subscribe((event) => {
         this.updateLayout(event.urlAfterRedirects);
       });
+  }
+
+  private initializeTheme(): void {
+    const savedTheme = localStorage.getItem(
+      this.themeStorageKey,
+    ) as ThemeMode | null;
+
+    if (savedTheme === 'dark' || savedTheme === 'light') {
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      return;
+    }
+
+    const systemTheme: ThemeMode = window.matchMedia(
+      '(prefers-color-scheme: dark)',
+    ).matches
+      ? 'dark'
+      : 'light';
+
+    document.documentElement.setAttribute('data-theme', systemTheme);
+    localStorage.setItem(this.themeStorageKey, systemTheme);
   }
 
   private updateLayout(url: string): void {

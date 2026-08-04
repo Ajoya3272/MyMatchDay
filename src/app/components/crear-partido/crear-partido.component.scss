@@ -1,9 +1,10 @@
 ion-content.create-match-page {
-  --background: #ffffff;
+  --background: var(--matchday-bg);
+  color: var(--matchday-text);
 }
 
 .create-match-page {
-  color: #111827;
+  color: var(--matchday-text);
 }
 
 .create-match-page__wrapper {
@@ -25,7 +26,7 @@ ion-content.create-match-page {
 
 .create-match-page__title {
   margin: 0;
-  color: #111827;
+  color: var(--matchday-text);
   font-size: 1.8rem;
   font-weight: 800;
   line-height: 1.08;
@@ -33,7 +34,7 @@ ion-content.create-match-page {
 
 .create-match-page__subtitle {
   margin: 10px 0 0;
-  color: #6b7280;
+  color: var(--matchday-text-muted);
   font-size: 0.95rem;
   line-height: 1.5;
 }
@@ -51,12 +52,12 @@ ion-content.create-match-page {
 }
 
 .create-match-page__steps span {
-  color: #9ca3af;
+  color: var(--matchday-text-muted);
   font-weight: 700;
 }
 
 .create-match-page__steps span.active {
-  color: #111827;
+  color: var(--matchday-text);
 }
 
 .create-match-page__steps span.completed {
@@ -64,7 +65,7 @@ ion-content.create-match-page {
 }
 
 .create-match-page__progress-bar {
-  --background: #e5e7eb;
+  --background: rgba(148, 163, 184, 0.25);
   --progress-background: #3b82f6;
   min-height: 4px;
   border-radius: 999px;
@@ -78,10 +79,10 @@ ion-content.create-match-page {
 .create-match-card {
   overflow: hidden;
   padding: 20px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--matchday-border);
   border-radius: 24px;
-  background: #ffffff;
-  color: #111827;
+  background: var(--matchday-surface);
+  color: var(--matchday-text);
   box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
 }
 
@@ -130,7 +131,7 @@ ion-content.create-match-page {
 
 .create-match-card__section h2 {
   margin: 0;
-  color: #111827;
+  color: var(--matchday-text);
   font-size: 1.3rem;
   font-weight: 800;
   line-height: 1.1;
@@ -138,7 +139,7 @@ ion-content.create-match-page {
 
 .create-match-card__section p {
   margin: 8px 0 18px;
-  color: #6b7280;
+  color: var(--matchday-text-muted);
   font-size: 0.92rem;
 }
 
@@ -150,9 +151,9 @@ ion-content.create-match-page {
 
 .datetime-block {
   padding: 16px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--matchday-border);
   border-radius: 20px;
-  background: #ffffff;
+  background: var(--matchday-surface);
 }
 
 .datetime-field {
@@ -170,10 +171,10 @@ ion-content.create-match-page {
   min-height: 52px;
   justify-content: flex-start;
   padding: 0 14px;
-  border: 1px solid #d1d5db;
+  border: 1px solid rgba(148, 163, 184, 0.35);
   border-radius: 16px;
-  background: #ffffff;
-  color: #111827;
+  background: var(--matchday-surface);
+  color: var(--matchday-text);
   font-size: 0.95rem;
   font-weight: 600;
 }
@@ -183,15 +184,15 @@ ion-content.create-match-page {
   --height: auto;
   --max-height: 90vh;
   --border-radius: 24px;
-  --background: #ffffff;
+  --background: var(--matchday-surface);
 }
 
 .match-datetime-modal::part(content) {
-  background: #ffffff;
+  background: var(--matchday-surface);
 }
 
 .match-datetime-modal__content {
-  --background: #ffffff;
+  --background: var(--matchday-surface);
 }
 
 .create-match-datetime {
@@ -199,11 +200,11 @@ ion-content.create-match-page {
   padding: 16px 0 0;
   border: 0;
   border-radius: 0;
-  background: #ffffff;
-  color: #111827;
-  --background: #ffffff;
+  background: var(--matchday-surface);
+  color: var(--matchday-text);
+  --background: var(--matchday-surface);
   --background-rgb: 255, 255, 255;
-  --title-color: #111827;
+  --title-color: var(--matchday-text);
   --ion-color-primary: var(--matchday-green);
   --ion-color-primary-rgb: 34, 197, 94;
   --day-highlight-background: #dcfce7;
@@ -212,7 +213,7 @@ ion-content.create-match-page {
 }
 
 .create-match-datetime::part(calendar-day) {
-  color: #111827;
+  color: var(--matchday-text);
   border-radius: 999px;
 }
 
@@ -228,11 +229,11 @@ ion-content.create-match-page {
 }
 
 .create-match-datetime::part(calendar-day disabled) {
-  color: #d1d5db;
+  color: var(--matchday-text-muted);
 }
 
 .create-match-datetime::part(month-year-button) {
-  color: #111827;
+  color: var(--matchday-text);
   font-weight: 700;
 }
 
@@ -248,7 +249,7 @@ ion-content.create-match-page {
 }
 
 .field-label {
-  color: #374151;
+  color: var(--matchday-text);
   font-size: 0.85rem;
   font-weight: 700;
 }
@@ -257,16 +258,16 @@ ion-content.create-match-page {
   width: 100%;
   min-height: 48px;
   padding: 0 14px;
-  border: 1px solid #d1d5db;
+  border: 1px solid rgba(148, 163, 184, 0.35);
   border-radius: 16px;
   outline: none;
-  background: #ffffff;
-  color: #111827;
+  background: var(--matchday-surface);
+  color: var(--matchday-text);
   font-size: 0.95rem;
 }
 
 .field-input::placeholder {
-  color: #9ca3af;
+  color: var(--matchday-text-muted);
 }
 
 .field-input:focus {
@@ -280,10 +281,10 @@ ion-content.create-match-page {
   position: relative;
   min-height: 52px;
   padding: 0 14px;
-  border: 1px solid #d1d5db;
+  border: 1px solid rgba(148, 163, 184, 0.35);
   border-radius: 16px;
-  background: #ffffff;
-  color: #111827;
+  background: var(--matchday-surface);
+  color: var(--matchday-text);
   font-size: 0.95rem;
   font-weight: 700;
   line-height: 1;
@@ -308,22 +309,22 @@ ion-content.create-match-page {
 }
 
 .field-input--time::-webkit-datetime-edit {
-  color: #111827;
+  color: var(--matchday-text);
   font-weight: 700;
 }
 
 .field-input--time::-webkit-datetime-edit-fields-wrapper {
-  color: #111827;
+  color: var(--matchday-text);
 }
 
 .field-input--time::-webkit-datetime-edit-text {
-  color: #6b7280;
+  color: var(--matchday-text-muted);
   padding-inline: 2px;
 }
 
 .field-input--time::-webkit-datetime-edit-hour-field,
 .field-input--time::-webkit-datetime-edit-minute-field {
-  color: #111827;
+  color: var(--matchday-text);
   border-radius: 8px;
   transition:
     background-color 180ms ease,
@@ -371,8 +372,8 @@ ion-content.create-match-page {
   margin-top: 16px;
   padding: 14px;
   border-radius: 16px;
-  background: #f3f4f6;
-  color: #111827;
+  background: var(--matchday-surface-2);
+  color: var(--matchday-text);
   font-size: 0.88rem;
   line-height: 1.45;
   overflow-wrap: anywhere;
@@ -403,8 +404,8 @@ ion-content.create-match-page {
 }
 
 .secondary-action {
-  background: #f3f4f6;
-  color: #111827;
+  background: var(--matchday-surface-2);
+  color: var(--matchday-text);
 }
 
 .secondary-action--home {
