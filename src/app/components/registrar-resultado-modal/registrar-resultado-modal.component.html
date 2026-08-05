@@ -13,17 +13,13 @@
 
       <div class="resultado-modal__body">
         <section class="resultado-modal__card">
-          <h2 class="resultado-modal__section-title">Marcador final</h2>
-
-          <div class="score-row">
-            <label class="score-field score-field--left">
+          <div class="score-grid">
+            <label class="score-field score-field--team">
               <span>Goles {{ partido?.equipoA }}</span>
               <input type="number" min="0" [(ngModel)]="golesEquipoA" />
             </label>
 
-            <div class="score-row__separator">—</div>
-
-            <label class="score-field score-field--right">
+            <label class="score-field score-field--team">
               <span>Goles {{ partido?.equipoB }}</span>
               <input type="number" min="0" [(ngModel)]="golesEquipoB" />
             </label>
@@ -36,49 +32,107 @@
             Rellena los goles y asistencias de cada jugador.
           </p>
 
-          <div class="stats-table">
-            <div class="stats-table__head">
-              <span>Participante</span>
-              <span>Goles</span>
-              <span>Asistencias</span>
-            </div>
+          <div *ngIf="errorValidacion" class="resultado-modal__error">
+            {{ errorValidacion }}
+          </div>
 
-            <div
-              class="stats-table__row"
-              *ngFor="
-                let jugador of jugadoresConStats;
-                trackBy: trackByJugadorId
-              "
-            >
-              <div class="stats-table__player">
-                <img
-                  *ngIf="jugador.fotoPerfilUrl; else avatarFallback"
-                  class="stats-table__avatar-image"
-                  [src]="jugador.fotoPerfilUrl"
-                  [alt]="jugador.nombre"
-                />
-                <ng-template #avatarFallback>
-                  <span class="stats-table__avatar">
-                    {{ (jugador.nombre.charAt(0) || "?").toUpperCase() }}
-                  </span>
-                </ng-template>
+          <div class="team-section">
+            <h3 class="team-section__title">Equipo {{ partido?.equipoA }}</h3>
 
-                <strong class="stats-table__name">
-                  {{ jugador.nombre }}
-                </strong>
+            <div class="stats-table">
+              <div class="stats-table__head">
+                <span>Participante</span>
+                <span>Goles</span>
+                <span>Asistencias</span>
               </div>
 
-              <label class="stats-table__field">
-                <input type="number" min="0" [(ngModel)]="jugador.goles" />
-              </label>
+              <div
+                class="stats-table__row"
+                *ngFor="
+                  let jugador of jugadoresEquipoA;
+                  trackBy: trackByJugadorId
+                "
+              >
+                <div class="stats-table__player">
+                  <img
+                    *ngIf="jugador.fotoPerfilUrl; else avatarFallbackA"
+                    class="stats-table__avatar-image"
+                    [src]="jugador.fotoPerfilUrl"
+                    [alt]="jugador.nombre"
+                  />
+                  <ng-template #avatarFallbackA>
+                    <span class="stats-table__avatar">
+                      {{ (jugador.nombre.charAt(0) || "?").toUpperCase() }}
+                    </span>
+                  </ng-template>
 
-              <label class="stats-table__field">
-                <input
-                  type="number"
-                  min="0"
-                  [(ngModel)]="jugador.asistencias"
-                />
-              </label>
+                  <strong class="stats-table__name">
+                    {{ jugador.nombre }}
+                  </strong>
+                </div>
+
+                <label class="stats-table__field">
+                  <input type="number" min="0" [(ngModel)]="jugador.goles" />
+                </label>
+
+                <label class="stats-table__field stats-table__field--assists">
+                  <input
+                    type="number"
+                    min="0"
+                    [(ngModel)]="jugador.asistencias"
+                  />
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="team-section">
+            <h3 class="team-section__title">Equipo {{ partido?.equipoB }}</h3>
+
+            <div class="stats-table">
+              <div class="stats-table__head">
+                <span>Participante</span>
+                <span>Goles</span>
+                <span>Asistencias</span>
+              </div>
+
+              <div
+                class="stats-table__row"
+                *ngFor="
+                  let jugador of jugadoresEquipoB;
+                  trackBy: trackByJugadorId
+                "
+              >
+                <div class="stats-table__player">
+                  <img
+                    *ngIf="jugador.fotoPerfilUrl; else avatarFallbackB"
+                    class="stats-table__avatar-image"
+                    [src]="jugador.fotoPerfilUrl"
+                    [alt]="jugador.nombre"
+                  />
+                  <ng-template #avatarFallbackB>
+                    <span class="stats-table__avatar">
+                      {{ (jugador.nombre.charAt(0) || "?").toUpperCase() }}
+                    </span>
+                  </ng-template>
+
+                  <strong class="stats-table__name">
+                    {{ jugador.nombre }}
+                  </strong>
+                </div>
+
+                <label class="stats-table__field">
+                  <input type="number" min="0" [(ngModel)]="jugador.goles" />
+                </label>
+
+                <label class="stats-table__field stats-table__field--assists">
+                  <input
+                    type="number"
+                    min="0"
+                    [(ngModel)]="jugador.asistencias"
+                  />
+                </label>
+              </div>
             </div>
           </div>
         </section>

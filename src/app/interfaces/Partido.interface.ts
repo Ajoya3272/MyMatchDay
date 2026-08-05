@@ -1,4 +1,4 @@
-import { Timestamp, serverTimestamp } from '@angular/fire/firestore';
+import { Timestamp } from '@angular/fire/firestore';
 
 export interface Partido {
   partidoId: string;
@@ -20,6 +20,8 @@ export interface Partido {
   jugadoresEquipoA?: string[];
   jugadoresEquipoB?: string[];
   inicioAnimacionCarruselAt?: Timestamp;
+  fechaCreacion?: Timestamp | null;
+  fechaActualizacion?: Timestamp | null;
 }
 
 export interface PartidoWrite {
@@ -42,8 +44,8 @@ export interface PartidoWrite {
   jugadoresEquipoA?: string[];
   jugadoresEquipoB?: string[];
   inicioAnimacionCarruselAt?: Timestamp;
-  fechaCreacion: ReturnType<typeof serverTimestamp>;
-  fechaActualizacion: ReturnType<typeof serverTimestamp>;
+  fechaCreacion: unknown;
+  fechaActualizacion: unknown;
 }
 
 export interface CrearPartidoPayload {

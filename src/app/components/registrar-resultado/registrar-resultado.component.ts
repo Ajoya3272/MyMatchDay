@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { IonContent, IonSpinner } from '@ionic/angular/standalone';
 import { Auth, authState } from '@angular/fire/auth';
 import { Observable, of, firstValueFrom } from 'rxjs';
@@ -14,7 +14,6 @@ import { PartidoService } from '../../services/partido.service';
 import { RegistrarResultadoModalComponent } from '../registrar-resultado-modal/registrar-resultado-modal.component';
 import { RegistrarResultadoService } from '../../services/registrar-resultado.service';
 import { UsuariosService } from '../../services/usuario.service';
-import { UsuarioFirestore } from '../../interfaces/RegistroUsuario.interface';
 
 type UsuarioLigero = {
   uid: string;
@@ -37,6 +36,7 @@ type UsuarioLigero = {
 })
 export class RegistrarResultadoComponent implements OnInit {
   private auth = inject(Auth);
+  private router = inject(Router);
 
   finishedMatches$!: Observable<Partido[]>;
 
@@ -54,6 +54,8 @@ export class RegistrarResultadoComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.cerrarYLimpiarModal();
+
     this.finishedMatches$ = authState(this.auth).pipe(
       switchMap((user) => {
         if (!user) {
@@ -88,6 +90,7 @@ export class RegistrarResultadoComponent implements OnInit {
     try {
       this.jugadoresDelPartido = await this.cargarJugadoresDelPartido(partido);
     } catch (error) {
+      console.error('[REGISTRAR-RESULTADO] Error cargando jugadores:', error);
       this.jugadoresDelPartido = [];
     } finally {
       this.loadingJugadores = false;
@@ -95,6 +98,11 @@ export class RegistrarResultadoComponent implements OnInit {
   }
 
   cerrarModal(): void {
+    if (this.loadingSave) return;
+    this.cerrarYLimpiarModal();
+  }
+
+  private cerrarYLimpiarModal(): void {
     this.isModalOpen = false;
     this.partidoSeleccionado = null;
     this.jugadoresDelPartido = [];
@@ -104,15 +112,21 @@ export class RegistrarResultadoComponent implements OnInit {
   async guardarResultado(
     resultado: ResultadoPartidoFirestoreWrite,
   ): Promise<void> {
-    if (!this.partidoSeleccionado) return;
+    if (!this.partidoSeleccionado || this.loadingSave) return;
 
     try {
       this.loadingSave = true;
+
       await this.registrarResultadoService.guardarResultado(
         this.partidoSeleccionado,
         resultado,
       );
-      this.cerrarModal();
+
+      this.cerrarYLimpiarModal();
+
+      await this.router.navigateByUrl('/home');
+    } catch (error) {
+      console.error('[REGISTRAR-RESULTADO] Error guardando resultado:', error);
     } finally {
       this.loadingSave = false;
     }
@@ -123,12 +137,16 @@ export class RegistrarResultadoComponent implements OnInit {
   }
 
   private debeMostrar(partido: Partido): boolean {
+    if (partido.estado === 'finalizado') return false;
+
     const fin = this.obtenerFechaFin(partido);
     if (!fin) return false;
 
     const ahora = Date.now();
+    const finTimestamp = fin.getTime();
     const ventana24h = 24 * 60 * 60 * 1000;
-    return ahora - fin.getTime() <= ventana24h;
+
+    return ahora >= finTimestamp && ahora - finTimestamp <= ventana24h;
   }
 
   private ordenarPartidos(a: Partido, b: Partido): number {

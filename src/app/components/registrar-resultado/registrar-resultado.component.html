@@ -81,7 +81,7 @@
     [isOpen]="isModalOpen"
     [partido]="partidoSeleccionado"
     [jugadores]="jugadoresDelPartido"
-    [loading]="loadingSave"
+    [loading]="loadingSave || loadingJugadores"
     (cancel)="cerrarModal()"
     (confirm)="guardarResultado($event)"
   ></app-registrar-resultado-modal>
