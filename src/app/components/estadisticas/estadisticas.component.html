@@ -1,36 +1,73 @@
-<ion-content class="estadisticas-page" [fullscreen]="true">
-  <section class="estadisticas-page__wrapper">
-    <header class="estadisticas-header">
-      <p class="estadisticas-header__eyebrow">Estadísticas</p>
-      <h1 class="estadisticas-header__title">Tu rendimiento</h1>
-      <p class="estadisticas-header__subtitle">
-        Un resumen rápido de tus partidos, victorias y promedios.
-      </p>
-    </header>
-
-    <div class="stats-grid">
-      <article class="stat-card" *ngFor="let card of cards">
-        <div class="stat-card__head">
-          <span class="stat-card__title">{{ card.title }}</span>
-          <span
-            class="stat-card__trend"
-            [class.stat-card__trend--up]="card.trendClass === 'up'"
-            [class.stat-card__trend--down]="card.trendClass === 'down'"
-          >
-            {{ card.trend }}
-          </span>
-        </div>
-
-        <strong class="stat-card__value">{{ card.value }}</strong>
-        <p class="stat-card__subtitle">{{ card.subtitle }}</p>
-      </article>
+<ion-content class="estadisticas-page">
+  <div class="estadisticas-page__container">
+    <div class="estadisticas-page__loading" *ngIf="cargando">
+      <div class="spinner"></div>
+      <p>Cargando tus estadísticas...</p>
     </div>
 
-    <section class="stats-note">
-      <p>
-        * Goles y asistencias necesitan que esas estadísticas se guarden por
-        partido o por jugador para poder calcularlas de forma real.
-      </p>
-    </section>
-  </section>
+    <div class="estadisticas-page__empty" *ngIf="!cargando && sinDatos">
+      <span class="estadisticas-page__empty-icon">⚽</span>
+      <h2>Todavía no tienes estadísticas</h2>
+      <p>Registra el resultado de un partido y aparecerán aquí.</p>
+    </div>
+
+    <ng-container *ngIf="!cargando && !sinDatos">
+      <section class="hero-stat">
+        <span class="hero-stat__label">Goles totales</span>
+        <strong class="hero-stat__value">{{ totalGoles }}</strong>
+        <div class="hero-stat__row">
+          <span class="hero-stat__pill">⚽ {{ totalPartidos }} partidos</span>
+          <span class="hero-stat__pill"
+            >🏆 {{ porcentajeVictorias }}% victorias</span
+          >
+        </div>
+      </section>
+
+      <section class="estadisticas-chart">
+        <div class="estadisticas-chart__heading">
+          <h2>Goles por semana</h2>
+          <p>Últimas {{ semanasGoles.length }} semanas</p>
+        </div>
+
+        <div class="estadisticas-chart__bars">
+          <div
+            class="estadisticas-chart__bar-wrapper"
+            *ngFor="let semana of semanasGoles"
+          >
+            <span
+              class="estadisticas-chart__bar-value"
+              [class.estadisticas-chart__bar-value--active]="semana.goles > 0"
+            >
+              {{ semana.goles }}
+            </span>
+            <div class="estadisticas-chart__bar-track">
+              <div
+                class="estadisticas-chart__bar-fill"
+                [class.estadisticas-chart__bar-fill--filled]="semana.goles > 0"
+                [style.height.%]="semana.porcentajeAltura"
+              ></div>
+            </div>
+            <span class="estadisticas-chart__bar-label">{{
+              semana.label
+            }}</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="estadisticas-grid">
+        <article
+          class="estadistica-card"
+          *ngFor="let card of cards"
+          [attr.data-accent]="card.accent"
+        >
+          <div class="estadistica-card__icon">{{ card.icon }}</div>
+          <div class="estadistica-card__body">
+            <strong class="estadistica-card__value">{{ card.value }}</strong>
+            <span class="estadistica-card__title">{{ card.title }}</span>
+            <span class="estadistica-card__subtitle">{{ card.subtitle }}</span>
+          </div>
+        </article>
+      </section>
+    </ng-container>
+  </div>
 </ion-content>

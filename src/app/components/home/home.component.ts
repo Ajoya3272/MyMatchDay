@@ -20,45 +20,17 @@ import { Observable, of, combineLatest } from 'rxjs';
 import { catchError, map, shareReplay, switchMap } from 'rxjs/operators';
 import { CarruselComponent } from '../carrusel/carrusel.component';
 import { Partido } from '../../interfaces/Partido.interface';
-
-type EstadoPartido = 'pendiente' | 'en progreso' | 'finalizado';
+import {
+  ActividadItemView,
+  EstadisticaConFechaDoc,
+  EstadisticaJugadorPartidoDoc,
+  EstadisticasUsuarioView,
+  EstadoPartido,
+  PartidoHomeView,
+} from '../../interfaces/EstadisticasJugador.interface';
 
 const VENTANA_ACTIVIDAD_MS = 3 * 24 * 60 * 60 * 1000;
 const VENTANA_SEMANA_MS = 7 * 24 * 60 * 60 * 1000;
-
-export interface PartidoHomeView extends Partido {
-  estadoCalculado: EstadoPartido;
-  estadoTexto: string;
-  estadoClase: 'pending' | 'progress' | 'finished';
-}
-
-export interface EstadisticasUsuarioView {
-  partidosJugados: number;
-  victorias: number;
-  goles: number;
-  asistencias: number;
-}
-
-interface EstadisticaJugadorPartidoDoc {
-  equipo?: 'A' | 'B';
-  goles?: number;
-  asistencias?: number;
-  victoria?: boolean;
-  empate?: boolean;
-  derrota?: boolean;
-}
-
-interface EstadisticaConFechaDoc {
-  jugadorId?: string;
-  goles?: number;
-  fechaCreacion?: Timestamp;
-}
-
-export interface ActividadItemView {
-  id: string;
-  titulo: string;
-  texto: string;
-}
 
 @Component({
   selector: 'app-home',

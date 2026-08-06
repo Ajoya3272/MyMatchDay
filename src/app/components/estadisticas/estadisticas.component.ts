@@ -1,24 +1,57 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnInit, inject } from '@angular/core';
 import { IonContent } from '@ionic/angular/standalone';
+import { Auth, authState } from '@angular/fire/auth';
+import {
+  Firestore,
+  Timestamp,
+  collectionData,
+  collectionGroup,
+  orderBy,
+  query,
+  where,
+} from '@angular/fire/firestore';
+import { Observable, of } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
 import { Partido } from '../../interfaces/Partido.interface';
 
 type MetricKey =
   | 'played'
   | 'won'
+  | 'drawn'
+  | 'lost'
   | 'goals'
+  | 'goalsAvg'
   | 'assists'
-  | 'matchesPerMonth'
-  | 'avgDuration';
+  | 'assistsAvg';
 
 interface EstadisticaCard {
   key: MetricKey;
+  icon: string;
   title: string;
   value: string;
   subtitle: string;
-  trend?: string;
-  trendClass?: 'up' | 'down' | 'neutral';
+  accent: 'green' | 'blue' | 'amber' | 'red' | 'purple';
 }
+
+interface EstadisticaJugadorPartidoDoc {
+  jugadorId?: string;
+  goles?: number;
+  asistencias?: number;
+  victoria?: boolean;
+  empate?: boolean;
+  derrota?: boolean;
+  fechaCreacion?: Timestamp;
+}
+
+interface SemanaGoles {
+  label: string;
+  goles: number;
+  porcentajeAltura: number;
+}
+
+const MS_SEMANA = 7 * 24 * 60 * 60 * 1000;
+const NUM_SEMANAS_GRAFICA = 6;
 
 @Component({
   selector: 'app-estadisticas',
@@ -27,215 +60,204 @@ interface EstadisticaCard {
   standalone: true,
   imports: [CommonModule, IonContent],
 })
-export class EstadisticasComponent implements OnChanges {
+export class EstadisticasComponent implements OnInit {
+  private auth = inject(Auth);
+  private firestore = inject(Firestore);
+
   @Input() partidos: Partido[] = [];
-  @Input() uid = '';
 
   cards: EstadisticaCard[] = [];
+  semanasGoles: SemanaGoles[] = [];
+  totalGoles = 0;
+  totalPartidos = 0;
+  porcentajeVictorias = 0;
+  cargando = true;
+  sinDatos = false;
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['partidos'] || changes['uid']) {
-      this.buildCards();
-    }
+  ngOnInit(): void {
+    this.cargarEstadisticas();
   }
 
-  private buildCards(): void {
-    const partidos = this.partidos ?? [];
-    const jugados = this.getPartidosJugados(partidos);
-    const ganados = this.getVictorias(partidos);
-    const goles = this.getGoles(partidos);
-    const asistencias = this.getAsistencias(partidos);
-    const mediaMes = this.getMediaPartidosPorMes(partidos);
-    const mediaDuracion = this.getMediaDuracion(partidos);
+  private cargarEstadisticas(): void {
+    this.cargando = true;
+    this.sinDatos = false;
 
-    this.cards = [
+    authState(this.auth)
+      .pipe(
+        switchMap((user) => {
+          if (!user) {
+            return of([] as EstadisticaJugadorPartidoDoc[]);
+          }
+
+          return this.obtenerEstadisticasJugador(user.uid);
+        }),
+      )
+      .subscribe((docs) => {
+        this.cargando = false;
+
+        if (!docs.length) {
+          this.cards = [];
+          this.semanasGoles = [];
+          this.sinDatos = true;
+          return;
+        }
+
+        this.sinDatos = false;
+        this.cards = this.construirCards(docs);
+        this.semanasGoles = this.construirGraficaSemanal(docs);
+      });
+  }
+
+  private obtenerEstadisticasJugador(
+    uid: string,
+  ): Observable<EstadisticaJugadorPartidoDoc[]> {
+    const estadisticasRef = collectionGroup(this.firestore, 'estadisticas');
+
+    const estadisticasQuery = query(
+      estadisticasRef,
+      where('jugadorId', '==', uid),
+      orderBy('fechaCreacion', 'desc'),
+    );
+
+    return collectionData(estadisticasQuery).pipe(
+      map((docs) => docs as EstadisticaJugadorPartidoDoc[]),
+      catchError((error) => {
+        console.error('[ESTADISTICAS] Error cargando estadísticas:', error);
+        return of([]);
+      }),
+    );
+  }
+
+  private construirCards(
+    docs: EstadisticaJugadorPartidoDoc[],
+  ): EstadisticaCard[] {
+    const jugados = docs.length;
+    const goles = docs.reduce((acc, d) => acc + (Number(d.goles) || 0), 0);
+    const asistencias = docs.reduce(
+      (acc, d) => acc + (Number(d.asistencias) || 0),
+      0,
+    );
+    const victorias = docs.filter((d) => d.victoria).length;
+    const empates = docs.filter((d) => d.empate).length;
+    const derrotas = docs.filter((d) => d.derrota).length;
+
+    const golesMedia = jugados ? goles / jugados : 0;
+    const asistenciasMedia = jugados ? asistencias / jugados : 0;
+    const porcentajeVictorias = jugados
+      ? Math.round((victorias / jugados) * 100)
+      : 0;
+
+    this.totalGoles = goles;
+    this.totalPartidos = jugados;
+    this.porcentajeVictorias = porcentajeVictorias;
+
+    return [
       {
         key: 'played',
+        icon: '⚽',
         title: 'Partidos jugados',
         value: String(jugados),
-        subtitle: 'Total de partidos en tu historial',
-        trend: this.getTrendText(jugados),
-        trendClass: 'neutral',
+        subtitle: 'Total en tu historial',
+        accent: 'blue',
       },
       {
         key: 'won',
+        icon: '🏆',
         title: 'Partidos ganados',
-        value: String(ganados),
-        subtitle: 'Victorias registradas',
-        trend: jugados > 0 ? `${Math.round((ganados / jugados) * 100)}%` : '0%',
-        trendClass: ganados >= Math.ceil(jugados / 2) ? 'up' : 'neutral',
+        value: String(victorias),
+        subtitle: `${porcentajeVictorias}% de victorias`,
+        accent: 'green',
+      },
+      {
+        key: 'drawn',
+        icon: '🤝',
+        title: 'Empates',
+        value: String(empates),
+        subtitle: jugados
+          ? `${Math.round((empates / jugados) * 100)}% de tus partidos`
+          : 'Sin datos',
+        accent: 'amber',
+      },
+      {
+        key: 'lost',
+        icon: '📉',
+        title: 'Derrotas',
+        value: String(derrotas),
+        subtitle: jugados
+          ? `${Math.round((derrotas / jugados) * 100)}% de tus partidos`
+          : 'Sin datos',
+        accent: 'red',
       },
       {
         key: 'goals',
-        title: 'Goles',
+        icon: '🥅',
+        title: 'Goles totales',
         value: String(goles),
-        subtitle: 'Goles a favor',
-        trend: this.getAveragePerMatch(goles, jugados),
-        trendClass: 'up',
+        subtitle: 'Marcados por ti',
+        accent: 'green',
+      },
+      {
+        key: 'goalsAvg',
+        icon: '📊',
+        title: 'Media de goles',
+        value: golesMedia.toFixed(2),
+        subtitle: 'Por partido jugado',
+        accent: 'blue',
       },
       {
         key: 'assists',
-        title: 'Asistencias',
+        icon: '🎯',
+        title: 'Asistencias totales',
         value: String(asistencias),
-        subtitle: 'Pases de gol',
-        trend: this.getAveragePerMatch(asistencias, jugados),
-        trendClass: 'up',
+        subtitle: 'Pases de gol dados',
+        accent: 'purple',
       },
       {
-        key: 'matchesPerMonth',
-        title: 'Media de partidos / mes',
-        value: mediaMes.toFixed(1),
-        subtitle: 'Ritmo de juego mensual',
-        trend: 'Promedio',
-        trendClass: 'neutral',
-      },
-      {
-        key: 'avgDuration',
-        title: 'Media de duración',
-        value: `${mediaDuracion.toFixed(0)} min`,
-        subtitle: 'Duración media de tus partidos',
-        trend: 'Tiempo',
-        trendClass: 'neutral',
+        key: 'assistsAvg',
+        icon: '📈',
+        title: 'Media de asistencias',
+        value: asistenciasMedia.toFixed(2),
+        subtitle: 'Por partido jugado',
+        accent: 'purple',
       },
     ];
   }
 
-  private getPartidosJugados(partidos: Partido[]): number {
-    return partidos.filter((partido) => this.isUserInMatch(partido)).length;
-  }
+  private construirGraficaSemanal(
+    docs: EstadisticaJugadorPartidoDoc[],
+  ): SemanaGoles[] {
+    const ahora = Date.now();
+    const golesPorSemana = new Array(NUM_SEMANAS_GRAFICA).fill(0) as number[];
 
-  private getVictorias(partidos: Partido[]): number {
-    return partidos.filter((partido) => this.isVictory(partido)).length;
-  }
+    for (const doc of docs) {
+      const fecha = doc.fechaCreacion?.toDate?.();
+      if (!fecha) continue;
 
-  private isVictory(partido: Partido): boolean {
-    const golesA = partido.golesEquipoA ?? 0;
-    const golesB = partido.golesEquipoB ?? 0;
+      const diferencia = ahora - fecha.getTime();
+      if (diferencia < 0) continue;
 
-    if (golesA === golesB) {
-      return false;
+      const indiceDesdeHoy = Math.floor(diferencia / MS_SEMANA);
+      if (indiceDesdeHoy >= NUM_SEMANAS_GRAFICA) continue;
+
+      const indiceCronologico = NUM_SEMANAS_GRAFICA - 1 - indiceDesdeHoy;
+      golesPorSemana[indiceCronologico] += Number(doc.goles) || 0;
     }
 
-    const equipoUsuario = this.getUserTeam(partido);
+    const maximo = Math.max(...golesPorSemana, 1);
 
-    if (equipoUsuario === 'A') {
-      return golesA > golesB;
-    }
+    return golesPorSemana.map((goles, index) => {
+      const semanasAtras = NUM_SEMANAS_GRAFICA - 1 - index;
+      const label =
+        semanasAtras === 0 ? 'Esta sem.' : `Hace ${semanasAtras} sem.`;
 
-    if (equipoUsuario === 'B') {
-      return golesB > golesA;
-    }
-
-    return false;
-  }
-
-  private isUserInMatch(partido: Partido): boolean {
-    return this.getUserTeam(partido) !== null;
-  }
-
-  private getUserTeam(partido: Partido): 'A' | 'B' | null {
-    if (!this.uid) {
-      return null;
-    }
-
-    if ((partido.jugadoresEquipoA ?? []).includes(this.uid)) {
-      return 'A';
-    }
-
-    if ((partido.jugadoresEquipoB ?? []).includes(this.uid)) {
-      return 'B';
-    }
-
-    return null;
-  }
-
-  private getGoles(partidos: Partido[]): number {
-    return partidos.reduce((acc, partido) => {
-      if (!this.isUserInMatch(partido)) {
-        return acc;
-      }
-
-      const equipoUsuario = this.getUserTeam(partido);
-
-      if (equipoUsuario === 'A') {
-        return acc + (partido.golesEquipoA ?? 0);
-      }
-
-      if (equipoUsuario === 'B') {
-        return acc + (partido.golesEquipoB ?? 0);
-      }
-
-      return acc;
-    }, 0);
-  }
-
-  private getAsistencias(partidos: Partido[]): number {
-    return partidos.reduce((acc, partido) => {
-      const partidoAsistencias = (
-        partido as Partido & { asistencias?: Record<string, number> }
-      ).asistencias;
-      if (!partidoAsistencias || !this.uid) {
-        return acc;
-      }
-
-      return acc + (partidoAsistencias[this.uid] ?? 0);
-    }, 0);
-  }
-
-  private getMediaPartidosPorMes(partidos: Partido[]): number {
-    const partidosUsuario = partidos.filter((partido) =>
-      this.isUserInMatch(partido),
-    );
-
-    if (!partidosUsuario.length) {
-      return 0;
-    }
-
-    const fechas = partidosUsuario
-      .map((p) => p.fecha?.toDate?.())
-      .filter((d): d is Date => !!d);
-
-    if (!fechas.length) {
-      return 0;
-    }
-
-    const minDate = new Date(Math.min(...fechas.map((d) => d.getTime())));
-    const maxDate = new Date(Math.max(...fechas.map((d) => d.getTime())));
-
-    const months =
-      (maxDate.getFullYear() - minDate.getFullYear()) * 12 +
-      (maxDate.getMonth() - minDate.getMonth()) +
-      1;
-
-    return partidosUsuario.length / Math.max(months, 1);
-  }
-
-  private getMediaDuracion(partidos: Partido[]): number {
-    const partidosUsuario = partidos.filter((partido) =>
-      this.isUserInMatch(partido),
-    );
-
-    if (!partidosUsuario.length) {
-      return 0;
-    }
-
-    const total = partidosUsuario.reduce(
-      (acc, partido) => acc + (partido.duracionMinutos ?? 0),
-      0,
-    );
-
-    return total / partidosUsuario.length;
-  }
-
-  private getAveragePerMatch(total: number, matches: number): string {
-    if (!matches) {
-      return '0.0 por partido';
-    }
-
-    return `${(total / matches).toFixed(1)} por partido`;
-  }
-
-  private getTrendText(value: number): string {
-    return value > 0 ? 'Activo' : 'Sin datos';
+      return {
+        label,
+        goles,
+        porcentajeAltura: Math.max(
+          Math.round((goles / maximo) * 100),
+          goles > 0 ? 10 : 0,
+        ),
+      };
+    });
   }
 }
