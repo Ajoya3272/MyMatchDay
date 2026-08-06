@@ -105,30 +105,29 @@
       <p>Lo último que ha pasado en tu grupo.</p>
     </div>
 
-    <div class="activity-list">
-      <article class="activity-item">
-        <span class="activity-item__dot"></span>
-        <div>
-          <h3>Ganaste 4-3 contra Los Primos</h3>
-          <p>Marcaste 1 gol y diste 1 asistencia.</p>
-        </div>
-      </article>
+    <ng-container *ngIf="activityItems$ | async as activityItems">
+      <div
+        class="activity-list"
+        *ngIf="activityItems.length > 0; else emptyActivity"
+      >
+        <article class="activity-item" *ngFor="let item of activityItems">
+          <span class="activity-item__dot"></span>
+          <div>
+            <h3>{{ item.titulo }}</h3>
+            <p>{{ item.texto }}</p>
+          </div>
+        </article>
+      </div>
 
-      <article class="activity-item">
-        <span class="activity-item__dot"></span>
-        <div>
-          <h3>Juan confirmó asistencia</h3>
-          <p>Ya sois 8 jugadores para el partido de hoy.</p>
-        </div>
-      </article>
-
-      <article class="activity-item">
-        <span class="activity-item__dot"></span>
-        <div>
-          <h3>Nuevo enlace creado</h3>
-          <p>La invitación ya está lista para compartir.</p>
-        </div>
-      </article>
-    </div>
+      <ng-template #emptyActivity>
+        <article class="activity-item activity-item--empty">
+          <span class="activity-item__dot"></span>
+          <div>
+            <h3>No hay ninguna novedad</h3>
+            <p>Anímate a organizar un partido y aparecerá aquí.</p>
+          </div>
+        </article>
+      </ng-template>
+    </ng-container>
   </section>
 </ion-content>
