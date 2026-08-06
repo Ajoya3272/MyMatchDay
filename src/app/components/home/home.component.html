@@ -76,25 +76,25 @@
       <p>Tus datos más importantes.</p>
     </div>
 
-    <div class="stats-grid">
+    <div class="stats-grid" *ngIf="stats$ | async as stats">
       <article class="stat-card">
         <span class="stat-card__label">Partidos</span>
-        <strong class="stat-card__value">24</strong>
+        <strong class="stat-card__value">{{ stats.partidosJugados }}</strong>
       </article>
 
       <article class="stat-card">
         <span class="stat-card__label">Victorias</span>
-        <strong class="stat-card__value">13</strong>
+        <strong class="stat-card__value">{{ stats.victorias }}</strong>
       </article>
 
       <article class="stat-card">
         <span class="stat-card__label">Goles</span>
-        <strong class="stat-card__value">9</strong>
+        <strong class="stat-card__value">{{ stats.goles }}</strong>
       </article>
 
       <article class="stat-card">
         <span class="stat-card__label">Asistencias</span>
-        <strong class="stat-card__value">6</strong>
+        <strong class="stat-card__value">{{ stats.asistencias }}</strong>
       </article>
     </div>
   </section>

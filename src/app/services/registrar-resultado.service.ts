@@ -4,6 +4,7 @@ import {
   doc,
   serverTimestamp,
   writeBatch,
+  increment,
 } from '@angular/fire/firestore';
 import { Partido } from '../interfaces/Partido.interface';
 import {
@@ -85,6 +86,14 @@ export class RegistrarResultadoService {
         jugador.jugadorId,
       );
 
+      const resumenRef = doc(
+        this.firestore,
+        'usuarios',
+        jugador.jugadorId,
+        'resumen',
+        'estadisticas',
+      );
+
       batch.set(statRef, {
         partidoId: partido.partidoId,
         resultadoId: resultado.resultadoId,
@@ -103,6 +112,18 @@ export class RegistrarResultadoService {
         fechaCreacion: serverTimestamp(),
         fechaActualizacion: serverTimestamp(),
       });
+
+      batch.set(
+        resumenRef,
+        {
+          partidosJugados: increment(1),
+          victorias: increment(victoria ? 1 : 0),
+          goles: increment(Number(jugador.goles) || 0),
+          asistencias: increment(Number(jugador.asistencias) || 0),
+          fechaActualizacion: serverTimestamp(),
+        },
+        { merge: true },
+      );
     }
 
     await batch.commit();

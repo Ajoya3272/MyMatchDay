@@ -7,6 +7,8 @@ import {
   Firestore,
   collection,
   collectionData,
+  doc,
+  docData,
   query,
   where,
 } from '@angular/fire/firestore';
@@ -21,6 +23,13 @@ export interface PartidoHomeView extends Partido {
   estadoCalculado: EstadoPartido;
   estadoTexto: string;
   estadoClase: 'pending' | 'progress' | 'finished';
+}
+
+export interface EstadisticasUsuarioView {
+  partidosJugados: number;
+  victorias: number;
+  goles: number;
+  asistencias: number;
 }
 
 @Component({
@@ -81,6 +90,27 @@ export class HomeComponent {
         .filter((partido) => this.debeMostrarEnCarrusel(partido))
         .sort((a, b) => this.ordenarPartidosCarrusel(a, b)),
     ),
+    shareReplay({ bufferSize: 1, refCount: true }),
+  );
+
+  stats$: Observable<EstadisticasUsuarioView> = authState(this.auth).pipe(
+    switchMap((user) => {
+      if (!user) {
+        return of(this.estadisticasVacias());
+      }
+
+      const resumenRef = doc(
+        this.firestore,
+        'usuarios',
+        user.uid,
+        'resumen',
+        'estadisticas',
+      );
+
+      return docData(resumenRef).pipe(
+        map((data) => this.normalizarEstadisticas(data)),
+      );
+    }),
     shareReplay({ bufferSize: 1, refCount: true }),
   );
 
@@ -183,5 +213,25 @@ export class HomeComponent {
     }
 
     return 'pending';
+  }
+
+  private normalizarEstadisticas(data: unknown): EstadisticasUsuarioView {
+    const d = (data ?? {}) as Partial<EstadisticasUsuarioView>;
+
+    return {
+      partidosJugados: Number(d.partidosJugados) || 0,
+      victorias: Number(d.victorias) || 0,
+      goles: Number(d.goles) || 0,
+      asistencias: Number(d.asistencias) || 0,
+    };
+  }
+
+  private estadisticasVacias(): EstadisticasUsuarioView {
+    return {
+      partidosJugados: 0,
+      victorias: 0,
+      goles: 0,
+      asistencias: 0,
+    };
   }
 }
