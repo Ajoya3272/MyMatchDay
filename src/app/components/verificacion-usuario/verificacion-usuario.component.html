@@ -21,7 +21,11 @@
           <p>Tu cuenta ya está activada.</p>
           <p>Ya puedes iniciar sesión para continuar.</p>
 
-          <ion-button expand="block" class="register-btn" (click)="irALogin()">
+          <ion-button
+            expand="block"
+            class="register-btn register-btn--success"
+            (click)="irALogin()"
+          >
             Ir a iniciar sesión
           </ion-button>
         </div>
@@ -45,13 +49,9 @@
             <ion-note color="danger">{{ errorMessage }}</ion-note>
           }
 
-          <ion-button
-            expand="block"
-            class="register-btn register-btn--success"
-            (click)="irALogin()"
-          >
-            Ir a iniciar sesión
-          </ion-button>
+          <div class="login-block">
+            <a routerLink="/login" class="login-link">Ir a iniciar sesión</a>
+          </div>
         </div>
       }
     </section>
