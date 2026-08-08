@@ -27,23 +27,19 @@ export class InvitacionComponent implements OnInit {
 
   slug = '';
   partidoId = '';
-
   matchName = 'Partido';
   organizerName = 'Organizador';
-
   partido: Partido | null = null;
 
   loading = true;
   joining = false;
-
   showTeamModal = false;
   selectedTeam: EquipoSeleccionado | null = null;
-
   joinError = '';
+  partidoCompleto = false;
 
   async ngOnInit(): Promise<void> {
     this.slug = this.route.snapshot.paramMap.get('slug') ?? '';
-
     this.partidoId = this.slug;
 
     if (!this.partidoId) {
@@ -64,9 +60,9 @@ export class InvitacionComponent implements OnInit {
       this.partido = partido;
       this.matchName = partido.nombre;
       this.organizerName = partido.organizador;
+      this.partidoCompleto = this.esPartidoCompleto(partido);
     } catch (error: unknown) {
       console.error('[INVITACION] Error al cargar la invitación:', error);
-
       this.joinError = 'No se ha podido cargar la información del partido.';
     } finally {
       this.loading = false;
@@ -78,7 +74,7 @@ export class InvitacionComponent implements OnInit {
   }
 
   openTeamModal(): void {
-    if (!this.partido || this.joining || this.loading) {
+    if (!this.partido || this.joining || this.loading || this.partidoCompleto) {
       return;
     }
 
@@ -119,17 +115,51 @@ export class InvitacionComponent implements OnInit {
       this.showTeamModal = false;
 
       await this.router.navigate(['/detalles-partido'], {
-        queryParams: {
-          partidoId: this.partido.partidoId,
-        },
+        queryParams: { partidoId: this.partido.partidoId },
       });
     } catch (error: unknown) {
       console.error('[INVITACION] Error al unirse al partido:', error);
+
+      if (this.esErrorDePartidoCompleto(error)) {
+        this.partidoCompleto = true;
+        this.showTeamModal = false;
+        this.selectedTeam = null;
+        this.joinError =
+          'No puedes unirte porque los equipos ya están completos.';
+        return;
+      }
 
       this.joinError = this.obtenerMensajeDeError(error);
     } finally {
       this.joining = false;
     }
+  }
+
+  private esPartidoCompleto(partido: Partido): boolean {
+    const max = Number((partido as { playerCount?: unknown }).playerCount ?? 0);
+    const actual = Number(
+      (partido as { jugadores?: unknown[] }).jugadores?.length ??
+        (partido as { participantes?: unknown[] }).participantes?.length ??
+        0,
+    );
+
+    return max > 0 && actual >= max;
+  }
+
+  private esErrorDePartidoCompleto(error: unknown): boolean {
+    const code = this.obtenerCodigoDeError(error);
+    const message = this.obtenerTextoDeError(error).toLowerCase();
+
+    return (
+      code === 'MAX_PLAYERS_REACHED' ||
+      code === 'PARTIDO_COMPLETO' ||
+      code === 'resource-exhausted' ||
+      message.includes('ya está completo') ||
+      message.includes('ya esta completo') ||
+      message.includes('partido lleno') ||
+      message.includes('máximo de jugadores') ||
+      message.includes('maximo de jugadores')
+    );
   }
 
   private obtenerMensajeDeError(error: unknown): string {
@@ -178,7 +208,6 @@ export class InvitacionComponent implements OnInit {
   private obtenerCodigoDeError(error: unknown): string {
     if (typeof error === 'object' && error !== null && 'code' in error) {
       const errorConCodigo = error as ErrorConCodigo;
-
       return String(errorConCodigo.code ?? '');
     }
 
@@ -196,7 +225,6 @@ export class InvitacionComponent implements OnInit {
 
     if (typeof error === 'object' && error !== null && 'message' in error) {
       const errorConMensaje = error as ErrorConCodigo;
-
       return String(errorConMensaje.message ?? '');
     }
 

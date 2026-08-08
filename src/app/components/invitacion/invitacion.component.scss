@@ -52,9 +52,22 @@ ion-content.invitacion-page {
   font-size: 1.08rem;
 }
 
+.invitacion-card__error {
+  margin: 16px 0 0;
+  padding: 12px 14px;
+  border: 1px solid #fecaca;
+  border-radius: 12px;
+  background: #fef2f2;
+  color: #b91c1c;
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
 .invitacion-card__actions {
   display: flex;
   gap: 10px;
+  margin-top: 18px;
 }
 
 .invitacion-card__button {
@@ -127,6 +140,19 @@ ion-content.invitacion-page {
   margin: 0 0 18px;
   color: var(--matchday-modal-muted);
   font-size: 0.96rem;
+  text-align: center;
+}
+
+.team-modal__error {
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  border: 1px solid #fecaca;
+  border-radius: 12px;
+  background: #fef2f2;
+  color: #b91c1c;
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.4;
   text-align: center;
 }
 
