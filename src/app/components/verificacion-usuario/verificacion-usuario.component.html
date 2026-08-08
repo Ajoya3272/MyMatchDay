@@ -9,22 +9,17 @@
         <h1>Verifica tu cuenta</h1>
       </div>
 
-      @if (loading) {
-        <div class="verify-block">
-          <ion-spinner name="crescent"></ion-spinner>
-          <p>Verificando tu cuenta...</p>
-        </div>
-      } @else if (verificado) {
+      @if (verificado) {
         <div class="verify-block">
           <ion-icon
             name="checkmark-circle-outline"
             class="status-icon success"
           ></ion-icon>
 
-          <ion-note color="success">Correo verificado correctamente.</ion-note>
+          <ion-note color="success">Cuenta verificada con éxito.</ion-note>
 
           <p>Tu cuenta ya está activada.</p>
-          <p>Te redirigimos al inicio de sesión para continuar.</p>
+          <p>Ya puedes iniciar sesión para continuar.</p>
 
           <ion-button expand="block" class="register-btn" (click)="irALogin()">
             Ir a iniciar sesión

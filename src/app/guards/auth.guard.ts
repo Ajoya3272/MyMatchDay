@@ -32,6 +32,12 @@ export const publicGuard: CanActivateFn = (route) => {
   const vieneDeVerificacion = route.queryParamMap.get('verified') === '1';
 
   if (vieneDeVerificacion) {
+    /*
+     * Al llegar desde el flujo de verificación de email, cualquier
+     * sesión que ya hubiera cacheada en este navegador pertenece a
+     * otra cuenta probada antes. La cerramos para forzar login
+     * manual con las credenciales reales.
+     */
     return signOut(auth).then(() => true);
   }
 

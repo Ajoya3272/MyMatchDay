@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { Auth, applyActionCode } from '@angular/fire/auth';
 import {
   IonButton,
   IonContent,
@@ -35,7 +34,6 @@ import {
 export class VerificacionUsuarioComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-  private auth = inject(Auth);
 
   loading = false;
   verificado = false;
@@ -51,38 +49,11 @@ export class VerificacionUsuarioComponent implements OnInit {
     });
   }
 
-  async ngOnInit(): Promise<void> {
+  ngOnInit(): void {
     this.email = this.route.snapshot.queryParamMap.get('email') ?? '';
 
-    const mode = this.route.snapshot.queryParamMap.get('mode');
-    const oobCode = this.route.snapshot.queryParamMap.get('oobCode');
-
-    if (mode === 'verifyEmail' && oobCode) {
-      await this.verificarCorreo(oobCode);
-    }
-  }
-
-  private async verificarCorreo(oobCode: string): Promise<void> {
-    try {
-      this.loading = true;
-      this.errorMessage = '';
-
-      await applyActionCode(this.auth, oobCode);
-
-      this.verificado = true;
-
-      setTimeout(() => {
-        this.router.navigate(['/login'], {
-          queryParams: { verified: '1' },
-        });
-      }, 1500);
-    } catch (error) {
-      console.error('Error verificando correo', error);
-      this.errorMessage =
-        'El enlace de verificación no es válido, ha expirado o ya fue utilizado.';
-    } finally {
-      this.loading = false;
-    }
+    const referrer = document.referrer ?? '';
+    this.verificado = referrer.includes('firebaseapp.com');
   }
 
   irALogin() {
