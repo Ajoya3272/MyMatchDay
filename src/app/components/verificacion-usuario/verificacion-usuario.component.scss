@@ -92,10 +92,19 @@
 }
 
 .register-btn--success {
-  --background: linear-gradient(135deg, #22c55e, #16a34a);
-  --background-hover: #16a34a;
-  --background-activated: #15803d;
+  --background: var(--matchday-green);
+  --background-hover: var(--matchday-green);
+  --background-activated: var(--matchday-green);
   --color: #ffffff;
   --box-shadow: none;
   font-weight: 700;
+  opacity: 1;
+
+  &:hover {
+    filter: brightness(0.92);
+  }
+
+  &:active {
+    filter: brightness(0.85);
+  }
 }
