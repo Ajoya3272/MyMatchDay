@@ -45,9 +45,13 @@
             <ion-note color="danger">{{ errorMessage }}</ion-note>
           }
 
-          <div class="login-block">
-            <a routerLink="/login" class="login-link">Ir a iniciar sesión</a>
-          </div>
+          <ion-button
+            expand="block"
+            class="register-btn register-btn--success"
+            (click)="irALogin()"
+          >
+            Ir a iniciar sesión
+          </ion-button>
         </div>
       }
     </section>
