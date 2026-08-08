@@ -6,7 +6,7 @@ import {
   Router,
   UrlSegment,
 } from '@angular/router';
-import { Auth, authState } from '@angular/fire/auth';
+import { Auth, authState, signOut } from '@angular/fire/auth';
 import { map, take } from 'rxjs';
 
 export const authGuard: CanActivateFn = (_route, state) => {
@@ -25,9 +25,15 @@ export const authGuard: CanActivateFn = (_route, state) => {
   );
 };
 
-export const publicGuard: CanActivateFn = () => {
+export const publicGuard: CanActivateFn = (route) => {
   const auth = inject(Auth);
   const router = inject(Router);
+
+  const vieneDeVerificacion = route.queryParamMap.get('verified') === '1';
+
+  if (vieneDeVerificacion) {
+    return signOut(auth).then(() => true);
+  }
 
   return authState(auth).pipe(
     take(1),

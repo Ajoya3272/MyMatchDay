@@ -8,8 +8,13 @@ import {
   serverTimestamp,
 } from '@angular/fire/firestore';
 import { Observable, firstValueFrom, of, shareReplay, switchMap } from 'rxjs';
+
 import { cloudinary } from '../../enviroments/enviroment';
 import { UsuarioFirestore } from '../interfaces/RegistroUsuario.interface';
+
+type DatosPerfilActualizables = Partial<
+  Pick<UsuarioFirestore, 'nombre' | 'provincia' | 'localidad'>
+>;
 
 @Injectable({
   providedIn: 'root',
@@ -28,6 +33,7 @@ export class MiPerfilService {
       }
 
       const userDocRef = doc(this.firestore, `usuarios/${user.uid}`);
+
       return docData(userDocRef) as Observable<UsuarioFirestore>;
     }),
     shareReplay({ bufferSize: 1, refCount: true }),
@@ -36,6 +42,21 @@ export class MiPerfilService {
   async obtenerUidActual(): Promise<string | null> {
     const currentUser = await firstValueFrom(authState(this.auth));
     return currentUser?.uid ?? null;
+  }
+
+  async actualizarDatosPerfil(datos: DatosPerfilActualizables): Promise<void> {
+    const uid = await this.obtenerUidActual();
+
+    if (!uid) {
+      throw new Error('No hay usuario autenticado');
+    }
+
+    const userDocRef = doc(this.firestore, `usuarios/${uid}`);
+
+    await updateDoc(userDocRef, {
+      ...datos,
+      fechaActualizacion: serverTimestamp(),
+    });
   }
 
   async subirFotoPerfil(file: File): Promise<string> {

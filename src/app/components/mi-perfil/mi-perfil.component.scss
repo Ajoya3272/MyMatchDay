@@ -44,13 +44,17 @@ ion-content.mi-perfil-page {
   width: 64px;
   height: 64px;
   min-width: 64px;
-  border-radius: 50%;
+
   display: grid;
   place-items: center;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.1);
+
   border: 2px solid rgba(255, 255, 255, 0.16);
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.1);
   color: #ffffff;
+
   font-size: 1.5rem;
   font-weight: 800;
   text-transform: uppercase;
@@ -66,19 +70,39 @@ ion-content.mi-perfil-page {
   position: absolute;
   right: -4px;
   bottom: -4px;
+
   width: 28px;
   height: 28px;
-  border: 0;
-  border-radius: 50%;
+
   display: grid;
   place-items: center;
+
+  border: 0;
+  border-radius: 50%;
+
   background: var(--matchday-green);
   color: #ffffff;
+
   box-shadow: 0 8px 18px rgba(15, 23, 42, 0.24);
+
   cursor: pointer;
   font-size: 1rem;
   font-weight: 900;
   line-height: 1;
+
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.perfil-card__avatar-action:hover:not(:disabled) {
+  transform: scale(1.08);
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.32);
+}
+
+.perfil-card__avatar-action:active:not(:disabled) {
+  transform: scale(0.96);
 }
 
 .perfil-card__avatar-action:disabled {
@@ -93,15 +117,20 @@ ion-content.mi-perfil-page {
 
 .perfil-card__identity h1 {
   margin: 0;
+
   font-size: 1.35rem;
   font-weight: 800;
   line-height: 1.15;
+
+  word-break: break-word;
 }
 
 .perfil-card__identity p {
   margin: 6px 0 0;
-  font-size: 0.95rem;
+
   color: rgba(255, 255, 255, 0.72);
+  font-size: 0.95rem;
+
   word-break: break-word;
 }
 
@@ -115,27 +144,255 @@ ion-content.mi-perfil-page {
   display: flex;
   flex-direction: column;
   gap: 6px;
+
+  min-width: 0;
   padding: 14px 16px;
+
   background: var(--matchday-surface-2);
   border: 1px solid var(--matchday-border);
   border-radius: 18px;
 }
 
 .perfil-item__label {
+  color: var(--matchday-text-muted);
+
   font-size: 0.8rem;
   font-weight: 700;
   letter-spacing: 0.02em;
   text-transform: uppercase;
-  color: var(--matchday-text-muted);
 }
 
 .perfil-item__value {
+  min-width: 0;
+
+  color: var(--matchday-text);
   font-size: 1rem;
   font-weight: 700;
-  color: var(--matchday-text);
   line-height: 1.35;
+
   word-break: break-word;
 }
+
+/* Fila del valor y botón de edición */
+
+.perfil-item__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+
+  min-width: 0;
+}
+
+.perfil-item__row .perfil-item__value {
+  min-width: 0;
+  flex: 1;
+}
+
+/* Botón del lápiz */
+
+.perfil-item__edit-button {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+
+  background: transparent;
+  color: var(--matchday-green);
+
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.perfil-item__edit-button:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--matchday-black);
+  transform: scale(1.08);
+}
+
+.perfil-item__edit-button:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.perfil-item__edit-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Contenedor de edición */
+
+.perfil-item__edit {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  width: 100%;
+  min-width: 0;
+}
+
+/*
+ * Permite que el select se reduzca y muestre
+ * los botones sin desbordarse.
+ */
+
+.perfil-item__edit--select {
+  gap: 4px;
+}
+
+.perfil-item__edit--select .perfil-item__input {
+  min-width: 0;
+  flex: 1;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Input y select */
+
+.perfil-item__input {
+  min-width: 0;
+  flex: 1;
+
+  height: 38px;
+  padding: 0 9px;
+
+  border: 1px solid var(--matchday-border);
+  border-radius: 10px;
+
+  outline: none;
+  background: var(--matchday-surface);
+  color: var(--matchday-text);
+
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.perfil-item__input::placeholder {
+  color: var(--matchday-text-muted);
+}
+
+.perfil-item__input:focus {
+  border-color: var(--matchday-green);
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.16);
+}
+
+.perfil-item__input:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+select.perfil-item__input {
+  cursor: pointer;
+}
+
+select.perfil-item__input:disabled {
+  cursor: not-allowed;
+}
+
+/* Texto de carga de provincias y localidades */
+
+.perfil-item__loading {
+  display: flex;
+  align-items: center;
+
+  min-width: 0;
+  min-height: 38px;
+  flex: 1;
+
+  color: var(--matchday-text-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* Botones guardar y cancelar */
+
+.perfil-item__save,
+.perfil-item__cancel {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+
+  color: #ffffff;
+  cursor: pointer;
+
+  font-size: 0.9rem;
+  font-weight: 800;
+  line-height: 1;
+
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.perfil-item__save {
+  background: var(--matchday-green);
+}
+
+.perfil-item__cancel {
+  background: var(--matchday-black);
+}
+
+.perfil-item__save:hover:not(:disabled),
+.perfil-item__cancel:hover:not(:disabled) {
+  transform: scale(1.08);
+  box-shadow: 0 5px 12px rgba(15, 23, 42, 0.2);
+}
+
+.perfil-item__save:active:not(:disabled),
+.perfil-item__cancel:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.perfil-item__save:disabled,
+.perfil-item__cancel:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Estados de foco accesibles */
+
+.perfil-card__avatar-action:focus-visible,
+.perfil-item__edit-button:focus-visible,
+.perfil-item__save:focus-visible,
+.perfil-item__cancel:focus-visible {
+  outline: 3px solid rgba(34, 197, 94, 0.35);
+  outline-offset: 2px;
+}
+
+.perfil-item__input:focus-visible {
+  outline: none;
+}
+
+/* Tablet y escritorio */
 
 @media (min-width: 768px) {
   .mi-perfil-page__wrapper {
@@ -155,14 +412,16 @@ ion-content.mi-perfil-page {
   }
 }
 
+/* Pantallas pequeñas */
+
 @media (max-width: 374px) {
   .mi-perfil-page__wrapper {
     padding: 88px 12px 28px;
   }
 
   .perfil-card__header {
-    padding: 20px 16px;
     gap: 12px;
+    padding: 20px 16px;
   }
 
   .perfil-card__avatar-wrap,
@@ -182,5 +441,49 @@ ion-content.mi-perfil-page {
 
   .perfil-item {
     padding: 12px 14px;
+  }
+
+  .perfil-item__edit {
+    gap: 3px;
+  }
+
+  .perfil-item__input {
+    height: 36px;
+    padding: 0 7px;
+    font-size: 0.84rem;
+  }
+
+  .perfil-item__edit-button,
+  .perfil-item__save,
+  .perfil-item__cancel {
+    width: 26px;
+    height: 26px;
+    min-width: 26px;
+  }
+
+  .perfil-item__edit-button {
+    font-size: 1rem;
+  }
+
+  .perfil-item__save,
+  .perfil-item__cancel {
+    font-size: 0.82rem;
+  }
+
+  .perfil-item__loading {
+    min-height: 36px;
+    font-size: 0.78rem;
+  }
+}
+
+/* Dispositivos sin hover */
+
+@media (hover: none) {
+  .perfil-card__avatar-action:hover:not(:disabled),
+  .perfil-item__edit-button:hover:not(:disabled),
+  .perfil-item__save:hover:not(:disabled),
+  .perfil-item__cancel:hover:not(:disabled) {
+    transform: none;
+    box-shadow: none;
   }
 }

@@ -1,5 +1,5 @@
 <ion-content class="mi-perfil-page">
-  <app-spinner *ngIf="subiendoFoto" texto="Subiendo foto..."></app-spinner>
+  <app-spinner *ngIf="subiendoFoto || guardandoCampo"></app-spinner>
 
   <input
     #fileInput
@@ -14,6 +14,7 @@
     *ngIf="usuario$ | async as usuario; else estadoCarga"
   >
     <section class="perfil-card">
+      <!-- Cabecera del perfil -->
       <div class="perfil-card__header">
         <div class="perfil-card__avatar-wrap">
           <div
@@ -37,7 +38,7 @@
             class="perfil-card__avatar-action"
             type="button"
             aria-label="Cambiar foto de perfil"
-            [disabled]="subiendoFoto"
+            [disabled]="subiendoFoto || guardandoCampo"
             (click)="cambiarFotoPerfil()"
           >
             {{ subiendoFoto ? "..." : "+" }}
@@ -45,37 +46,266 @@
         </div>
 
         <div class="perfil-card__identity">
-          <h1>{{ usuario.nombre }}</h1>
-          <p>{{ usuario.email }}</p>
+          <h1>
+            {{ usuario.nombre || "Usuario" }}
+          </h1>
+
+          <p>
+            {{ usuario.email }}
+          </p>
         </div>
       </div>
 
+      <!-- Información del perfil -->
       <div class="perfil-card__info">
+        <!-- Nombre -->
         <article class="perfil-item">
-          <span class="perfil-item__label">Nombre</span>
-          <strong class="perfil-item__value">{{ usuario.nombre }}</strong>
+          <span class="perfil-item__label"> Nombre </span>
+
+          <ng-container *ngIf="campoEditando === 'nombre'; else nombreVista">
+            <div class="perfil-item__edit">
+              <input
+                class="perfil-item__input"
+                type="text"
+                maxlength="100"
+                [(ngModel)]="valorEditando"
+                [ngModelOptions]="{
+                  standalone: true,
+                }"
+                [disabled]="guardandoCampo"
+                (keyup.enter)="guardarCampo('nombre')"
+                (keyup.escape)="cancelarEdicion()"
+                autofocus
+              />
+
+              <button
+                type="button"
+                class="perfil-item__save"
+                aria-label="Guardar nombre"
+                [disabled]="guardandoCampo || !valorEditando.trim()"
+                (click)="guardarCampo('nombre')"
+              >
+                ✓
+              </button>
+
+              <button
+                type="button"
+                class="perfil-item__cancel"
+                aria-label="Cancelar edición"
+                [disabled]="guardandoCampo"
+                (click)="cancelarEdicion()"
+              >
+                ×
+              </button>
+            </div>
+          </ng-container>
+
+          <ng-template #nombreVista>
+            <div class="perfil-item__row">
+              <strong class="perfil-item__value">
+                {{ usuario.nombre || "Sin especificar" }}
+              </strong>
+
+              <button
+                type="button"
+                class="perfil-item__edit-button"
+                aria-label="Editar nombre"
+                [disabled]="guardandoCampo || subiendoFoto"
+                (click)="editarCampo('nombre', usuario)"
+              >
+                <span aria-hidden="true">✎</span>
+              </button>
+            </div>
+          </ng-template>
         </article>
 
+        <!-- Correo electrónico -->
         <article class="perfil-item">
-          <span class="perfil-item__label">Correo electrónico</span>
-          <strong class="perfil-item__value">{{ usuario.email }}</strong>
+          <span class="perfil-item__label"> Correo electrónico </span>
+
+          <strong class="perfil-item__value">
+            {{ usuario.email }}
+          </strong>
         </article>
 
+        <!-- Sexo -->
         <article class="perfil-item">
-          <span class="perfil-item__label">Sexo</span>
-          <strong class="perfil-item__value">{{ usuario.sexo }}</strong>
+          <span class="perfil-item__label"> Sexo </span>
+
+          <strong class="perfil-item__value">
+            {{ usuario.sexo || "Sin especificar" }}
+          </strong>
         </article>
 
+        <!-- Fecha de nacimiento -->
         <article class="perfil-item">
-          <span class="perfil-item__label">Fecha de nacimiento</span>
+          <span class="perfil-item__label"> Fecha de nacimiento </span>
+
           <strong class="perfil-item__value">
             {{ usuario.fechaNacimiento.toDate() | date: "dd/MM/yyyy" }}
           </strong>
+        </article>
+
+        <!-- Provincia -->
+        <article class="perfil-item">
+          <span class="perfil-item__label"> Provincia </span>
+
+          <ng-container
+            *ngIf="campoEditando === 'provincia'; else provinciaVista"
+          >
+            <div class="perfil-item__edit perfil-item__edit--select">
+              <ng-container
+                *ngIf="!cargandoProvincias; else cargandoProvinciasTemplate"
+              >
+                <select
+                  class="perfil-item__input"
+                  [ngModel]="provinciaSeleccionadaId"
+                  [ngModelOptions]="{
+                    standalone: true,
+                  }"
+                  [disabled]="guardandoCampo"
+                  (ngModelChange)="seleccionarProvinciaPerfil($event)"
+                >
+                  <option value="">Selecciona una provincia</option>
+
+                  <option
+                    *ngFor="let provincia of provincias"
+                    [value]="provincia.provincia_id"
+                  >
+                    {{ provincia.nombre }}
+                  </option>
+                </select>
+              </ng-container>
+
+              <ng-template #cargandoProvinciasTemplate>
+                <span class="perfil-item__loading">
+                  Cargando provincias...
+                </span>
+              </ng-template>
+
+              <button
+                type="button"
+                class="perfil-item__save"
+                aria-label="Guardar provincia"
+                [disabled]="guardandoCampo || !provinciaSeleccionadaId"
+                (click)="guardarCampo('provincia')"
+              >
+                ✓
+              </button>
+
+              <button
+                type="button"
+                class="perfil-item__cancel"
+                aria-label="Cancelar edición"
+                [disabled]="guardandoCampo"
+                (click)="cancelarEdicion()"
+              >
+                ×
+              </button>
+            </div>
+          </ng-container>
+
+          <ng-template #provinciaVista>
+            <div class="perfil-item__row">
+              <strong class="perfil-item__value">
+                {{ usuario.provincia || "Sin especificar" }}
+              </strong>
+
+              <button
+                type="button"
+                class="perfil-item__edit-button"
+                aria-label="Editar provincia"
+                [disabled]="guardandoCampo || subiendoFoto"
+                (click)="editarCampo('provincia', usuario)"
+              >
+                <span aria-hidden="true">✎</span>
+              </button>
+            </div>
+          </ng-template>
+        </article>
+
+        <!-- Localidad -->
+        <article class="perfil-item">
+          <span class="perfil-item__label"> Localidad </span>
+
+          <ng-container
+            *ngIf="campoEditando === 'localidad'; else localidadVista"
+          >
+            <div class="perfil-item__edit perfil-item__edit--select">
+              <ng-container
+                *ngIf="!cargandoMunicipios; else cargandoMunicipiosTemplate"
+              >
+                <select
+                  class="perfil-item__input"
+                  [ngModel]="municipioSeleccionadoId"
+                  [ngModelOptions]="{
+                    standalone: true,
+                  }"
+                  [disabled]="guardandoCampo || !provinciaSeleccionadaId"
+                  (ngModelChange)="seleccionarLocalidadPerfil($event)"
+                >
+                  <option value="">Selecciona una localidad</option>
+
+                  <option
+                    *ngFor="let municipio of municipios"
+                    [value]="municipio.municipio_id"
+                  >
+                    {{ municipio.nombre }}
+                  </option>
+                </select>
+              </ng-container>
+
+              <ng-template #cargandoMunicipiosTemplate>
+                <span class="perfil-item__loading">
+                  Cargando localidades...
+                </span>
+              </ng-template>
+
+              <button
+                type="button"
+                class="perfil-item__save"
+                aria-label="Guardar localidad"
+                [disabled]="guardandoCampo || !municipioSeleccionadoId"
+                (click)="guardarCampo('localidad')"
+              >
+                ✓
+              </button>
+
+              <button
+                type="button"
+                class="perfil-item__cancel"
+                aria-label="Cancelar edición"
+                [disabled]="guardandoCampo"
+                (click)="cancelarEdicion()"
+              >
+                ×
+              </button>
+            </div>
+          </ng-container>
+
+          <ng-template #localidadVista>
+            <div class="perfil-item__row">
+              <strong class="perfil-item__value">
+                {{ usuario.localidad || "Sin especificar" }}
+              </strong>
+
+              <button
+                type="button"
+                class="perfil-item__edit-button"
+                aria-label="Editar localidad"
+                [disabled]="guardandoCampo || subiendoFoto"
+                (click)="editarCampo('localidad', usuario)"
+              >
+                <span aria-hidden="true">✎</span>
+              </button>
+            </div>
+          </ng-template>
         </article>
       </div>
     </section>
   </section>
 
+  <!-- Estado de carga -->
   <ng-template #estadoCarga>
     <section class="mi-perfil-page__wrapper">
       <section class="perfil-card">

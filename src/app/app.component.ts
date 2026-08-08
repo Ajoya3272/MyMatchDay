@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
+
 import { IonApp, IonMenu, IonRouterOutlet } from '@ionic/angular/standalone';
 
 import { HeaderComponent } from './shared/header/header.component';
@@ -23,10 +24,12 @@ type ThemeMode = 'light' | 'dark';
 })
 export class AppComponent {
   hideLayout = false;
+
   private readonly themeStorageKey = 'theme';
 
   constructor(private router: Router) {
     this.initializeTheme();
+
     this.updateLayout(this.router.url);
 
     this.router.events
@@ -47,6 +50,7 @@ export class AppComponent {
 
     if (savedTheme === 'dark' || savedTheme === 'light') {
       document.documentElement.setAttribute('data-theme', savedTheme);
+
       return;
     }
 
@@ -57,11 +61,14 @@ export class AppComponent {
       : 'light';
 
     document.documentElement.setAttribute('data-theme', systemTheme);
+
     localStorage.setItem(this.themeStorageKey, systemTheme);
   }
 
   private updateLayout(url: string): void {
     this.hideLayout =
-      url.startsWith('/login') || url.startsWith('/registro-usuario');
+      url.startsWith('/login') ||
+      url.startsWith('/registro-usuario') ||
+      url.startsWith('/verificacion-usuario');
   }
 }

@@ -6,6 +6,8 @@ export interface RegistroUsuarioPayload {
   password: string;
   sexo: 'hombre' | 'mujer';
   fechaNacimiento: string;
+  localidad: string;
+  provincia: string;
 }
 
 export interface UsuarioFirestore {
@@ -18,6 +20,8 @@ export interface UsuarioFirestore {
   fechaCreacion: Timestamp;
   fechaActualizacion: Timestamp;
   fotoPerfilUrl?: string;
+  provincia?: string;
+  localidad?: string;
 }
 
 export interface UsuarioFirestoreWrite {

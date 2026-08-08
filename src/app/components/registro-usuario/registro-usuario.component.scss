@@ -9,38 +9,45 @@
 }
 
 .register-shell {
-  height: 100dvh;
   min-height: 100dvh;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 10px;
+
+  padding: 16px 10px;
 }
 
 .register-card {
   width: min(100%, 420px);
+
+  padding: 18px 14px 16px;
+
   background: var(--matchday-surface);
   border: 1px solid var(--matchday-border);
   border-radius: 22px;
+
   box-shadow: 0 18px 40px rgba(17, 24, 39, 0.08);
-  padding: 18px 14px 16px;
+
   color: var(--matchday-text);
 }
 
 .brand-block {
-  text-align: center;
   margin-bottom: 14px;
+  text-align: center;
 
   h1 {
     margin: 0 0 8px;
+
+    color: var(--matchday-text);
     font-size: 1.65rem;
     font-weight: 800;
-    color: var(--matchday-text);
     letter-spacing: -0.03em;
   }
 
   p {
     margin: 0;
+
     color: var(--matchday-text-muted);
     font-size: 0.94rem;
     line-height: 1.4;
@@ -50,16 +57,20 @@
 .brand-logo {
   width: 56px;
   height: 56px;
-  margin: 0 auto 10px;
-  border-radius: 18px;
+
   display: grid;
   place-items: center;
+
+  margin: 0 auto 10px;
+
+  border-radius: 18px;
   background: var(--matchday-green);
+
   box-shadow: 0 12px 24px rgba(34, 197, 94, 0.22);
 
   ion-icon {
-    font-size: 1.8rem;
     color: #ffffff;
+    font-size: 1.8rem;
   }
 }
 
@@ -73,10 +84,11 @@
   gap: 6px;
 
   label {
+    padding-left: 2px;
+
+    color: var(--matchday-text);
     font-size: 0.94rem;
     font-weight: 700;
-    color: var(--matchday-text);
-    padding-left: 2px;
   }
 }
 
@@ -86,14 +98,17 @@
   --padding-start: 12px;
   --inner-padding-end: 8px;
   --min-height: 54px;
+
   border: 1px solid var(--matchday-border);
   border-radius: 16px;
+
   color: var(--matchday-text);
 
   ion-icon[slot="start"] {
+    margin-right: 8px;
+
     color: var(--matchday-text-muted);
     font-size: 1.05rem;
-    margin-right: 8px;
   }
 
   ion-input {
@@ -112,14 +127,17 @@
 .material-field {
   width: 100%;
   margin: 0;
+
   --mdc-outlined-text-field-container-shape: 16px;
   --mdc-outlined-text-field-outline-color: var(--matchday-border);
   --mdc-outlined-text-field-hover-outline-color: rgba(34, 197, 94, 0.24);
   --mdc-outlined-text-field-focus-outline-color: var(--matchday-green);
   --mdc-outlined-text-field-caret-color: var(--matchday-green);
+
   --mat-select-enabled-trigger-text-color: var(--matchday-text);
   --mat-select-placeholder-text-color: var(--matchday-text-muted);
   --mat-select-enabled-arrow-color: var(--matchday-text-muted);
+
   --mat-datepicker-toggle-icon-color: var(--matchday-text-muted);
   --mat-form-field-label-text-color: var(--matchday-text-muted);
   --mat-form-field-input-text-color: var(--matchday-text);
@@ -143,6 +161,7 @@
 
 .material-field ::ng-deep .mat-mdc-select-trigger {
   min-height: 24px;
+
   display: flex;
   align-items: center;
 }
@@ -151,14 +170,17 @@
 .material-field ::ng-deep .mat-mdc-input-element,
 .material-field ::ng-deep input.mat-mdc-input-element {
   color: var(--matchday-text) !important;
-  font-size: 0.98rem;
+
+  font-size: 0.95rem;
   caret-color: var(--matchday-green);
+
   -webkit-text-fill-color: var(--matchday-text) !important;
 }
 
 .material-field ::ng-deep .mat-mdc-input-element::placeholder {
   color: var(--matchday-text-muted) !important;
   opacity: 1;
+
   -webkit-text-fill-color: var(--matchday-text-muted) !important;
 }
 
@@ -174,13 +196,31 @@
 
 .material-field ::ng-deep .mat-datepicker-input {
   color: var(--matchday-text) !important;
+
   -webkit-text-fill-color: var(--matchday-text) !important;
 }
 
 .material-field ::ng-deep .mat-datepicker-input::placeholder {
   color: var(--matchday-text-muted) !important;
   opacity: 1;
+
   -webkit-text-fill-color: var(--matchday-text-muted) !important;
+}
+
+.material-field ::ng-deep .mat-mdc-select-panel {
+  background: var(--matchday-surface) !important;
+}
+
+.material-field ::ng-deep .mat-mdc-option {
+  color: var(--matchday-text) !important;
+}
+
+.material-field ::ng-deep .mat-mdc-option:hover {
+  background: rgba(34, 197, 94, 0.08) !important;
+}
+
+.material-field ::ng-deep .mat-mdc-option.mdc-list-item--selected {
+  background: rgba(34, 197, 94, 0.12) !important;
 }
 
 .error-slot {
@@ -195,21 +235,26 @@
 
 .global-error {
   min-height: auto;
+  margin-top: 2px;
 }
 
 .register-btn {
+  min-height: 50px;
   margin-top: 6px;
+
   --background: var(--matchday-green);
   --background-hover: #16a34a;
   --background-activated: #15803d;
   --color: #ffffff;
   --border-radius: 16px;
   --box-shadow: 0 10px 20px rgba(34, 197, 94, 0.2);
-  --transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease;
-  min-height: 50px;
+
+  color: #ffffff;
   font-weight: 800;
   letter-spacing: 0.01em;
+
   transform: translateY(0) scale(1);
+
   transition:
     transform 180ms ease,
     filter 180ms ease,
@@ -239,16 +284,20 @@
 
 .password-item {
   .password-toggle {
-    border: 0;
-    background: transparent;
-    padding: 0;
     width: 36px;
     height: 36px;
+
     display: grid;
     place-items: center;
-    cursor: pointer;
-    color: var(--matchday-text-muted);
     flex-shrink: 0;
+
+    padding: 0;
+    border: 0;
+
+    background: transparent;
+    color: var(--matchday-text-muted);
+
+    cursor: pointer;
   }
 
   .toggle-eye-icon {
@@ -267,20 +316,22 @@
 }
 
 .login-block {
-  margin-top: 6px;
-  text-align: center;
-  color: var(--matchday-text-muted);
-  font-size: 0.92rem;
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   gap: 6px;
-  flex-wrap: wrap;
+
+  margin-top: 6px;
+
+  color: var(--matchday-text-muted);
+  font-size: 0.92rem;
+  text-align: center;
 }
 
 .login-link {
   color: var(--matchday-green);
-  text-decoration: none;
   font-weight: 700;
+  text-decoration: none;
 }
 
 @keyframes eyeTogglePop {
@@ -288,10 +339,12 @@
     transform: scale(1) rotate(0);
     opacity: 1;
   }
+
   40% {
     transform: scale(0.72) rotate(-10deg);
     opacity: 0.4;
   }
+
   100% {
     transform: scale(1) rotate(0);
     opacity: 1;
@@ -300,7 +353,10 @@
 
 @media (max-width: 480px) {
   .register-shell {
-    padding: 10px;
+    min-height: 100dvh;
+    align-items: flex-start;
+
+    padding: 18px 10px 28px;
   }
 
   .register-card {
@@ -324,8 +380,8 @@
 }
 
 ::ng-deep .matchday-select-panel {
-  border-radius: 16px !important;
   overflow: hidden;
+  border-radius: 16px !important;
 }
 
 ::ng-deep .matchday-select-panel .mat-mdc-option.mdc-list-item--selected {
@@ -334,8 +390,10 @@
 
 ::ng-deep .matchday-datepicker-panel .mat-datepicker-content,
 ::ng-deep .mat-datepicker-content {
-  border-radius: 20px !important;
   overflow: hidden;
+
+  border-radius: 20px !important;
+
   background: var(--matchday-surface);
   color: var(--matchday-text);
 }
