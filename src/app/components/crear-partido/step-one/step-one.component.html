@@ -1,0 +1,151 @@
+<div class="step-one">
+  <div class="step-one__header">
+    <h2>Selecciona la pista</h2>
+
+    <p>Busca por provincia y localidad para ver las pistas disponibles.</p>
+  </div>
+
+  <div class="field-block">
+    <label class="field-label" for="stepOneProvincia"> Provincia </label>
+
+    <select
+      id="stepOneProvincia"
+      class="field-input"
+      [ngModel]="provinciaSeleccionadaId"
+      [ngModelOptions]="{ standalone: true }"
+      (ngModelChange)="seleccionarProvincia($event)"
+    >
+      <option value="">Selecciona una provincia</option>
+
+      <option
+        *ngFor="let provincia of provincias"
+        [value]="provincia.provincia_id"
+      >
+        {{ provincia.nombre }}
+      </option>
+    </select>
+  </div>
+
+  <div class="field-block" *ngIf="provinciaSeleccionadaId">
+    <label class="field-label" for="stepOneMunicipio"> Municipio </label>
+
+    <ng-container *ngIf="!cargandoMunicipios; else cargandoMunicipiosTemplate">
+      <select
+        id="stepOneMunicipio"
+        class="field-input"
+        [ngModel]="municipioSeleccionadoId"
+        [ngModelOptions]="{ standalone: true }"
+        (ngModelChange)="seleccionarMunicipio($event)"
+      >
+        <option value="">Selecciona un municipio</option>
+
+        <option
+          *ngFor="let municipio of municipios"
+          [value]="municipio.municipio_id"
+        >
+          {{ municipio.nombre }}
+        </option>
+      </select>
+    </ng-container>
+
+    <ng-template #cargandoMunicipiosTemplate>
+      <p class="step-one__loading">Cargando municipios...</p>
+    </ng-template>
+  </div>
+
+  <div
+    class="step-one__results"
+    *ngIf="municipioSeleccionadoId && !cargandoPistas"
+  >
+    <p class="step-one__results-title" *ngIf="pistasEncontradas.length > 0">
+      Pistas encontradas
+    </p>
+
+    <div class="step-one__pista-list" *ngIf="pistasEncontradas.length > 0">
+      <button
+        *ngFor="let pista of pistasEncontradas"
+        type="button"
+        class="pista-card"
+        (click)="seleccionarPista(pista)"
+      >
+        <span class="pista-card__icon"> 🏟️ </span>
+
+        <span class="pista-card__body">
+          <strong>
+            {{ pista.nombre }}
+          </strong>
+
+          <span>
+            {{ pista.localidad }},
+            {{ pista.provincia }}
+          </span>
+        </span>
+      </button>
+    </div>
+
+    <p class="step-one__empty" *ngIf="pistasEncontradas.length === 0">
+      No hay pistas registradas en esa localidad.
+    </p>
+  </div>
+
+  <div
+    class="step-one__other"
+    *ngIf="municipioSeleccionadoId && !cargandoPistas && !otraUbicacionActiva"
+  >
+    <button
+      type="button"
+      class="other-location-button"
+      (click)="activarOtraUbicacion()"
+    >
+      <span class="other-location-button__icon"> ＋ </span>
+
+      <span class="other-location-button__content">
+        <strong> Otra ubicación </strong>
+
+        <small> Pista privada, urbanización u otro lugar </small>
+      </span>
+    </button>
+  </div>
+
+  <div class="other-location-form" *ngIf="otraUbicacionActiva">
+    <label class="field-label" for="stepOneOtraUbicacion">
+      Nombre de la ubicación
+    </label>
+
+    <input
+      id="stepOneOtraUbicacion"
+      class="field-input"
+      type="text"
+      [(ngModel)]="nombreOtraUbicacion"
+      [ngModelOptions]="{ standalone: true }"
+      maxlength="100"
+      placeholder="Ej: Pista de la urbanización Las Palmeras"
+    />
+
+    <span class="field-error" *ngIf="errorOtraUbicacion">
+      {{ errorOtraUbicacion }}
+    </span>
+
+    <div class="other-location-form__actions">
+      <button
+        type="button"
+        class="secondary-action"
+        (click)="cancelarOtraUbicacion()"
+      >
+        Cancelar
+      </button>
+
+      <button
+        type="button"
+        class="primary-action"
+        (click)="continuarConOtraUbicacion()"
+      >
+        Continuar
+      </button>
+    </div>
+  </div>
+
+  <p class="step-one__loading" *ngIf="cargandoPistas">
+    Cargando pistas disponibles...
+  </p>
+</div>

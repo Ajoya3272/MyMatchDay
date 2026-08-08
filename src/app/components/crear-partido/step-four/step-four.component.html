@@ -1,0 +1,53 @@
+<div class="step-four">
+  <div class="step-four__icon">✓</div>
+
+  <div class="step-four__header">
+    <p class="step-four__eyebrow">Invitación lista</p>
+
+    <h2>Partido creado</h2>
+
+    <p>
+      Ya tienes tu partido listo. Comparte este enlace con tus amigos para que
+      puedan unirse.
+    </p>
+  </div>
+
+  <div class="step-four__link-section">
+    <label class="step-four__link-label" for="inviteLink">
+      Enlace de invitación
+    </label>
+
+    <div class="step-four__link-box">
+      <span id="inviteLink" class="step-four__link">
+        {{ inviteLink }}
+      </span>
+    </div>
+  </div>
+
+  <div class="step-four__actions">
+    <button
+      type="button"
+      class="step-four__copy-button"
+      [class.step-four__copy-button--copied]="linkCopied"
+      [disabled]="!inviteLink"
+      (click)="copyInvite()"
+    >
+      <span class="step-four__copy-content">
+        <span class="step-four__copy-label" [class.is-hidden]="linkCopied">
+          Copiar enlace
+        </span>
+
+        <span
+          class="step-four__copy-label step-four__copy-label--success"
+          [class.is-visible]="linkCopied"
+        >
+          ¡Enlace copiado!
+        </span>
+      </span>
+    </button>
+
+    <button type="button" class="step-four__home-button" (click)="goHome()">
+      Volver al menú principal
+    </button>
+  </div>
+</div>

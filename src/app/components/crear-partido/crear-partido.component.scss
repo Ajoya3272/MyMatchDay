@@ -1,63 +1,81 @@
+:host {
+  display: block;
+  min-height: 100%;
+}
+
 ion-content.create-match-page {
   --background: var(--matchday-bg);
   color: var(--matchday-text);
 }
 
 .create-match-page {
+  min-height: 100%;
   color: var(--matchday-text);
 }
 
 .create-match-page__wrapper {
-  padding: 92px 16px 32px;
+  width: min(100%, 720px);
+  margin: 0 auto;
+  padding: 96px 16px 40px;
+  box-sizing: border-box;
 }
 
 .create-match-page__header {
-  margin-bottom: 20px;
+  margin-bottom: 26px;
 }
 
 .create-match-page__eyebrow {
   margin: 0 0 8px;
   color: var(--matchday-green);
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   font-weight: 800;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
 .create-match-page__title {
+  max-width: 600px;
   margin: 0;
   color: var(--matchday-text);
-  font-size: 1.8rem;
+  font-size: clamp(1.8rem, 5vw, 2.6rem);
   font-weight: 800;
-  line-height: 1.08;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
 }
 
 .create-match-page__subtitle {
-  margin: 10px 0 0;
+  max-width: 560px;
+  margin: 14px 0 0;
   color: var(--matchday-text-muted);
-  font-size: 0.95rem;
-  line-height: 1.5;
+  font-size: 0.98rem;
+  line-height: 1.55;
 }
 
 .create-match-page__progress {
-  margin-bottom: 20px;
+  margin-bottom: 22px;
 }
 
 .create-match-page__steps {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
   margin-bottom: 10px;
-  font-size: 0.72rem;
 }
 
 .create-match-page__steps span {
+  position: relative;
   color: var(--matchday-text-muted);
+  font-size: 0.75rem;
   font-weight: 700;
+  text-align: center;
+  transition:
+    color 180ms ease,
+    transform 180ms ease;
 }
 
 .create-match-page__steps span.active {
   color: var(--matchday-text);
+  transform: translateY(-1px);
 }
 
 .create-match-page__steps span.completed {
@@ -65,34 +83,35 @@ ion-content.create-match-page {
 }
 
 .create-match-page__progress-bar {
-  --background: rgba(148, 163, 184, 0.25);
-  --progress-background: #3b82f6;
-  min-height: 4px;
+  --background: rgba(148, 163, 184, 0.22);
+  --progress-background: var(--matchday-green);
+
+  display: block;
+  min-height: 5px;
+  overflow: hidden;
   border-radius: 999px;
 }
 
-.create-match-page__progress-bar.step-2,
-.create-match-page__progress-bar.step-3,
-.create-match-page__progress-bar.step-4 {
-  --progress-background: var(--matchday-green);
-}
-
 .create-match-card {
+  width: 100%;
   overflow: hidden;
-  padding: 20px;
   border: 1px solid var(--matchday-border);
-  border-radius: 24px;
+  border-radius: 28px;
   background: var(--matchday-surface);
   color: var(--matchday-text);
-  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+  box-shadow:
+    0 20px 50px rgba(15, 23, 42, 0.08),
+    0 2px 8px rgba(15, 23, 42, 0.03);
 }
 
 .step-shell {
   position: relative;
+  width: 100%;
   overflow: hidden;
 }
 
 .step-panel {
+  width: 100%;
   animation-duration: 260ms;
   animation-fill-mode: both;
   animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
@@ -109,7 +128,7 @@ ion-content.create-match-page {
 @keyframes slide-forward {
   from {
     opacity: 0;
-    transform: translateX(24px);
+    transform: translateX(22px);
   }
 
   to {
@@ -121,7 +140,7 @@ ion-content.create-match-page {
 @keyframes slide-backward {
   from {
     opacity: 0;
-    transform: translateX(-24px);
+    transform: translateX(-22px);
   }
 
   to {
@@ -130,516 +149,50 @@ ion-content.create-match-page {
   }
 }
 
-.create-match-card__section h2 {
-  margin: 0;
-  color: var(--matchday-text);
-  font-size: 1.3rem;
-  font-weight: 800;
-  line-height: 1.1;
-}
-
-.create-match-card__section p {
-  margin: 8px 0 18px;
-  color: var(--matchday-text-muted);
-  font-size: 0.92rem;
-}
-
-/* --- Paso 1: buscador de pistas --- */
-
-.pista-loading {
-  color: var(--matchday-text-muted);
-  font-size: 0.9rem;
-}
-
-.chip-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.chip {
-  min-height: 40px;
-  padding: 0 16px;
-  border: 1px solid rgba(148, 163, 184, 0.35);
-  border-radius: 999px;
-  background: var(--matchday-surface);
-  color: var(--matchday-text);
-  font-size: 0.88rem;
-  font-weight: 700;
-}
-
-.chip--active {
-  border-color: var(--matchday-green);
-  background: rgba(34, 197, 94, 0.12);
-  color: #166534;
-}
-
-.pista-results {
-  margin-top: 18px;
-}
-
-.pista-results__heading {
-  margin: 0 0 10px;
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: var(--matchday-text-muted);
-}
-
-.pista-results__empty {
-  font-size: 0.88rem;
-  color: var(--matchday-text-muted);
-}
-
-.pista-card-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.pista-card {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px;
-  border: 1px solid var(--matchday-border);
-  border-radius: 18px;
-  background: var(--matchday-surface-2);
-  text-align: left;
-}
-
-.pista-card__icon {
-  font-size: 1.3rem;
-}
-
-.pista-card__body {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.pista-card__body strong {
-  color: var(--matchday-text);
-  font-size: 0.95rem;
-}
-
-.pista-card__body span {
-  color: var(--matchday-text-muted);
-  font-size: 0.82rem;
-}
-
-/* --- Paso 2: calendario y franjas --- */
-
-.pista-selected-label {
-  margin: -10px 0 14px;
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--matchday-text);
-}
-
-.calendar-loading {
-  padding: 24px 0;
-  text-align: center;
-  color: var(--matchday-text-muted);
-  font-size: 0.9rem;
-}
-
-.franjas-list {
-  margin-top: 18px;
-}
-
-.franjas-list__heading {
-  margin: 0 0 10px;
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--matchday-text);
-}
-
-.franjas-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-}
-
-.franja-chip {
-  min-height: 44px;
-  border: 1px solid rgba(148, 163, 184, 0.35);
-  border-radius: 14px;
-  background: var(--matchday-surface);
-  color: var(--matchday-text);
-  font-size: 0.88rem;
-  font-weight: 700;
-}
-
-.franja-chip--active {
-  border-color: var(--matchday-green);
-  background: rgba(34, 197, 94, 0.14);
-  color: #166534;
-}
-
-.franja-chip--ocupada {
-  border-color: rgba(239, 68, 68, 0.35);
-  background: rgba(239, 68, 68, 0.08);
-  color: #b91c1c;
-  opacity: 0.7;
-}
-
-.resumen-horario {
-  margin: -10px 0 18px;
-  padding: 10px 12px;
-  border-radius: 12px;
-  background: rgba(34, 197, 94, 0.1);
-  color: #166534;
-  font-size: 0.82rem;
-  font-weight: 700;
-}
-
-.datetime-stack {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.datetime-block {
-  padding: 16px;
-  border: 1px solid var(--matchday-border);
-  border-radius: 20px;
-  background: var(--matchday-surface);
-}
-
-.datetime-field {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.match-datetime-button {
-  width: 100%;
-}
-
-.match-datetime-button::part(native) {
-  width: 100%;
-  min-height: 52px;
-  justify-content: flex-start;
-  padding: 0 14px;
-  border: 1px solid rgba(148, 163, 184, 0.35);
-  border-radius: 16px;
-  background: var(--matchday-surface);
-  color: var(--matchday-text);
-  font-size: 0.95rem;
-  font-weight: 600;
-}
-
-.match-datetime-modal {
-  --width: min(100% - 32px, 420px);
-  --height: auto;
-  --max-height: 90vh;
-  --border-radius: 24px;
-  --background: var(--matchday-surface);
-}
-
-.match-datetime-modal::part(content) {
-  background: var(--matchday-surface);
-}
-
-.match-datetime-modal__content {
-  --background: var(--matchday-surface);
-}
-
-.create-match-datetime {
-  width: 100%;
-  padding: 16px 0 0;
-  border: 0;
-  border-radius: 0;
-  background: var(--matchday-surface);
-  color: var(--matchday-text);
-  --background: var(--matchday-surface);
-  --background-rgb: 255, 255, 255;
-  --title-color: var(--matchday-text);
-  --ion-color-primary: var(--matchday-green);
-  --ion-color-primary-rgb: 34, 197, 94;
-  --day-highlight-background: #dcfce7;
-  --day-highlight-color: #166534;
-  --border-color: transparent;
-}
-
-.create-match-datetime::part(calendar-day) {
-  color: var(--matchday-text);
-  border-radius: 999px;
-}
-
-.create-match-datetime::part(calendar-day active) {
-  background: #dcfce7;
-  color: #166534;
-  font-weight: 800;
-}
-
-.create-match-datetime::part(calendar-day today) {
-  color: var(--matchday-green);
-  border: 1px solid var(--matchday-green);
-}
-
-.create-match-datetime::part(calendar-day disabled) {
-  color: var(--matchday-text-muted);
-}
-
-.create-match-datetime::part(month-year-button) {
-  color: var(--matchday-text);
-  font-weight: 700;
-}
-
-.field-block {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 16px;
-}
-
-.field-block--time {
-  margin-bottom: 0;
-}
-
-.field-label {
-  color: var(--matchday-text);
-  font-size: 0.85rem;
-  font-weight: 700;
-}
-
-.field-input {
-  width: 100%;
-  min-height: 48px;
-  padding: 0 14px;
-  border: 1px solid rgba(148, 163, 184, 0.35);
-  border-radius: 16px;
-  outline: none;
-  background: var(--matchday-surface);
-  color: var(--matchday-text);
-  font-size: 0.95rem;
-}
-
-.field-input::placeholder {
-  color: var(--matchday-text-muted);
-}
-
-.field-input:focus {
-  border-color: var(--matchday-green);
-  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.12);
-}
-
-.field-input--time {
-  appearance: none;
-  -webkit-appearance: none;
-  position: relative;
-  min-height: 52px;
-  padding: 0 14px;
-  border: 1px solid rgba(148, 163, 184, 0.35);
-  border-radius: 16px;
-  background: var(--matchday-surface);
-  color: var(--matchday-text);
-  font-size: 0.95rem;
-  font-weight: 700;
-  line-height: 1;
-  caret-color: var(--matchday-green);
-}
-
-.field-input--time:focus {
-  border-color: var(--matchday-green);
-  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.14);
-}
-
-.field-input--time::-webkit-calendar-picker-indicator {
-  opacity: 0.95;
-  cursor: pointer;
-  filter: invert(49%) sepia(79%) saturate(553%) hue-rotate(88deg)
-    brightness(92%) contrast(90%);
-}
-
-.field-input--time::-webkit-clear-button,
-.field-input--time::-webkit-inner-spin-button {
-  display: none;
-}
-
-.field-input--time::-webkit-datetime-edit {
-  color: var(--matchday-text);
-  font-weight: 700;
-}
-
-.field-input--time::-webkit-datetime-edit-fields-wrapper {
-  color: var(--matchday-text);
-}
-
-.field-input--time::-webkit-datetime-edit-text {
-  color: var(--matchday-text-muted);
-  padding-inline: 2px;
-}
-
-.field-input--time::-webkit-datetime-edit-hour-field,
-.field-input--time::-webkit-datetime-edit-minute-field {
-  color: var(--matchday-text);
-  border-radius: 8px;
-  transition:
-    background-color 180ms ease,
-    color 180ms ease;
-}
-
-.field-input--time::-webkit-datetime-edit-hour-field:focus,
-.field-input--time::-webkit-datetime-edit-minute-field:focus {
-  background: #dcfce7;
-  color: #166534;
-  outline: none;
-}
-
-.players-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.field-error {
+app-step-one,
+app-step-two,
+app-step-three,
+app-step-four {
   display: block;
-  margin-top: 8px;
-  color: #dc2626;
-  font-size: 0.82rem;
+  width: 100%;
 }
 
-.create-match-card__section--success {
-  text-align: left;
-}
-
-.success-icon {
-  display: grid;
-  width: 48px;
-  height: 48px;
-  margin-bottom: 14px;
-  border-radius: 16px;
-  place-items: center;
-  background: #ecfdf3;
-  color: #15803d;
-  font-size: 1.4rem;
-  font-weight: 900;
-}
-
-.invite-box {
-  margin-top: 16px;
-  padding: 14px;
-  border-radius: 16px;
-  background: var(--matchday-surface-2);
-  color: var(--matchday-text);
-  font-size: 0.88rem;
-  line-height: 1.45;
-  overflow-wrap: anywhere;
+.create-match-card__section {
+  width: 100%;
+  padding: 26px;
+  box-sizing: border-box;
 }
 
 .create-match-page__actions {
   display: flex;
-  gap: 8px;
-  margin-top: 20px;
-}
-
-.primary-action,
-.secondary-action {
-  min-height: 48px;
-  border: 0;
-  border-radius: 16px;
-  padding: 0 14px;
-  font-size: 0.9rem;
-  font-weight: 800;
-  white-space: nowrap;
-}
-
-.primary-action {
-  flex: 1;
-  background: var(--matchday-green);
-  color: #0f172a;
-  box-shadow: 0 10px 24px rgba(34, 197, 94, 0.22);
-}
-
-.primary-action:disabled {
-  opacity: 0.5;
-}
-
-.secondary-action {
-  background: var(--matchday-surface-2);
-  color: var(--matchday-text);
-}
-
-.secondary-action--home {
-  flex: 1.35;
-  padding-inline: 12px;
-}
-
-.copy-action {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  background: var(--matchday-green);
-  color: #0f172a;
-  box-shadow: 0 10px 24px rgba(34, 197, 94, 0.22);
-}
-
-.copy-action__content {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  min-height: 24px;
-}
-
-.copy-action__label {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  color: #0f172a;
-  text-align: center;
-  transition:
-    opacity 180ms ease,
-    transform 180ms ease;
-}
-
-.copy-action__label--success {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  opacity: 0;
-  transform: translateY(8px);
-}
-
-.copy-action__label.is-hidden {
-  opacity: 0;
-  transform: translateY(-8px);
-}
-
-.copy-action__label--success.is-visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.copy-action--copied {
-  background: var(--matchday-green);
-  color: #0f172a;
-  box-shadow: 0 10px 24px rgba(34, 197, 94, 0.22);
+  width: min(100%, 720px);
+  gap: 10px;
+  margin: 20px auto 0;
+  padding: 0 16px 30px;
+  box-sizing: border-box;
 }
 
 @media (max-width: 560px) {
-  .players-grid {
-    grid-template-columns: 1fr;
+  .create-match-page__wrapper {
+    width: 100%;
+    padding: 96px 12px 30px;
   }
 
-  .franjas-grid {
-    grid-template-columns: 1fr;
+  .create-match-card__section {
+    padding: 21px 16px;
+  }
+
+  .create-match-page__steps span {
+    font-size: 0.67rem;
   }
 
   .create-match-page__actions {
-    flex-wrap: wrap;
+    padding: 0 12px 24px;
   }
+}
 
-  .primary-action,
-  .secondary-action,
-  .secondary-action--home {
-    flex: 1 1 100%;
+@media (min-width: 561px) {
+  .create-match-page__wrapper {
+    padding-top: 96px;
   }
 }

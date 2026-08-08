@@ -1,0 +1,70 @@
+<div class="step-two">
+  <div class="step-two__header">
+    <h2>Elige día y hora</h2>
+
+    <p>
+      Los días en rojo están completos. Selecciona un día disponible para ver
+      las franjas horarias.
+    </p>
+
+    <p class="step-two__selected-location" *ngIf="pista">
+      <span> 🏟️ {{ pista.nombre }} </span>
+
+      <small *ngIf="pista.pistaId.startsWith('manual-')">
+        Ubicación manual
+      </small>
+    </p>
+  </div>
+
+  <div class="step-two__loading" *ngIf="cargandoDisponibilidad">
+    <span class="step-two__spinner"></span>
+
+    <p>Consultando disponibilidad...</p>
+  </div>
+
+  <ng-container *ngIf="!cargandoDisponibilidad">
+    <ion-datetime
+      class="step-two__calendar"
+      presentation="date"
+      locale="es-ES"
+      [isDateEnabled]="isDateEnabledFn"
+      [highlightedDates]="highlightedDatesFn"
+      (ionChange)="onFechaSeleccionada($event)"
+    ></ion-datetime>
+
+    <div class="step-two__slots" *ngIf="fechaSeleccionada">
+      <p class="step-two__slots-title">Horas disponibles</p>
+
+      <div class="step-two__slots-grid">
+        <button
+          *ngFor="let franja of franjasDelDia; trackBy: trackByHora"
+          type="button"
+          class="time-slot"
+          [class.time-slot--occupied]="franja.ocupada"
+          [class.time-slot--active]="franja.hora === horaSeleccionada"
+          [disabled]="franja.ocupada"
+          (pointerdown)="seleccionarHoraDesdePointer($event, franja)"
+        >
+          {{ franja.label }}
+        </button>
+      </div>
+    </div>
+  </ng-container>
+
+  <div class="step-two__actions">
+    <button type="button" class="secondary-action" (click)="volverAlPasoUno()">
+      Atrás
+    </button>
+
+    <button
+      type="button"
+      class="primary-action"
+      [disabled]="
+        !fechaSeleccionada || !horaSeleccionada || cargandoDisponibilidad
+      "
+      (click)="continuar()"
+    >
+      Continuar
+    </button>
+  </div>
+</div>

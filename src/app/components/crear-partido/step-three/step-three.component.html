@@ -1,0 +1,170 @@
+<div class="step-three">
+  <div class="step-three__header">
+    <h2>Datos del partido</h2>
+
+    <p>Completa la información básica para crear la convocatoria.</p>
+  </div>
+
+  <div class="step-three__summary" *ngIf="pista && horarioResumen">
+    <span class="step-three__summary-location"> 🏟️ {{ pista.nombre }} </span>
+
+    <span class="step-three__summary-schedule"> 📅 {{ horarioResumen }} </span>
+  </div>
+
+  <form
+    class="step-three__form"
+    [formGroup]="form"
+    (ngSubmit)="confirmarDatos()"
+  >
+    <div class="field-block">
+      <label class="field-label" for="stepThreeNombrePartido">
+        Nombre del partido
+      </label>
+
+      <input
+        id="stepThreeNombrePartido"
+        class="field-input"
+        type="text"
+        formControlName="nombrePartido"
+        maxlength="60"
+        placeholder="Ej: Ganadores vs Perdedores"
+      />
+
+      <span
+        class="field-error"
+        *ngIf="
+          nombrePartidoControl.touched &&
+          nombrePartidoControl.errors?.['required']
+        "
+      >
+        Escribe el nombre del partido.
+      </span>
+
+      <span
+        class="field-error"
+        *ngIf="
+          nombrePartidoControl.touched &&
+          nombrePartidoControl.errors?.['maxlength']
+        "
+      >
+        El nombre del partido no puede superar los 60 caracteres.
+      </span>
+    </div>
+
+    <div class="players-grid">
+      <div class="field-block">
+        <label class="field-label" for="stepThreeEquipoA">
+          Nombre del equipo A
+        </label>
+
+        <input
+          id="stepThreeEquipoA"
+          class="field-input"
+          type="text"
+          formControlName="equipoA"
+          maxlength="40"
+          placeholder="Ej: Solteros FC"
+        />
+
+        <span
+          class="field-error"
+          *ngIf="equipoAControl.touched && equipoAControl.errors?.['required']"
+        >
+          Escribe el nombre del equipo A.
+        </span>
+
+        <span
+          class="field-error"
+          *ngIf="equipoAControl.touched && equipoAControl.errors?.['maxlength']"
+        >
+          El nombre del equipo A no puede superar los 40 caracteres.
+        </span>
+      </div>
+
+      <div class="field-block">
+        <label class="field-label" for="stepThreeEquipoB">
+          Nombre del equipo B
+        </label>
+
+        <input
+          id="stepThreeEquipoB"
+          class="field-input"
+          type="text"
+          formControlName="equipoB"
+          maxlength="40"
+          placeholder="Ej: Casados FC"
+        />
+
+        <span
+          class="field-error"
+          *ngIf="equipoBControl.touched && equipoBControl.errors?.['required']"
+        >
+          Escribe el nombre del equipo B.
+        </span>
+
+        <span
+          class="field-error"
+          *ngIf="equipoBControl.touched && equipoBControl.errors?.['maxlength']"
+        >
+          El nombre del equipo B no puede superar los 40 caracteres.
+        </span>
+
+        <span
+          class="field-error"
+          *ngIf="
+            equipoBControl.touched && equipoBControl.errors?.['sameTeamName']
+          "
+        >
+          El equipo A y el equipo B no pueden llamarse igual.
+        </span>
+      </div>
+    </div>
+
+    <div class="field-block">
+      <label class="field-label" for="stepThreePlayerCount">
+        Número de jugadores
+      </label>
+
+      <input
+        id="stepThreePlayerCount"
+        class="field-input"
+        type="number"
+        min="2"
+        step="1"
+        formControlName="playerCount"
+        placeholder="Ej: 10"
+      />
+
+      <span
+        class="field-error"
+        *ngIf="
+          playerCountControl.touched && playerCountControl.errors?.['required']
+        "
+      >
+        Indica el número de jugadores.
+      </span>
+
+      <span
+        class="field-error"
+        *ngIf="playerCountControl.touched && playerCountControl.errors?.['min']"
+      >
+        Debe haber al menos 2 jugadores.
+      </span>
+    </div>
+
+    <div class="step-three__actions">
+      <button
+        type="button"
+        class="secondary-action"
+        [disabled]="creatingMatch"
+        (click)="volverAlCalendario()"
+      >
+        Atrás
+      </button>
+
+      <button type="submit" class="primary-action" [disabled]="creatingMatch">
+        {{ creatingMatch ? "Creando..." : "Crear partido" }}
+      </button>
+    </div>
+  </form>
+</div>

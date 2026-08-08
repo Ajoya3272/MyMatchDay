@@ -1,0 +1,202 @@
+:host {
+  display: block;
+  width: 100%;
+  color: var(--matchday-text);
+}
+
+.step-four {
+  display: flex;
+  width: 100%;
+  box-sizing: border-box;
+  flex-direction: column;
+  align-items: flex-start;
+  color: var(--matchday-text);
+}
+
+.step-four__icon {
+  display: grid;
+  width: 56px;
+  height: 56px;
+  margin-bottom: 18px;
+  place-items: center;
+  border-radius: 18px;
+  background: #ecfdf3;
+  color: #15803d;
+  font-size: 1.65rem;
+  font-weight: 900;
+  box-shadow: 0 8px 20px rgba(21, 128, 61, 0.12);
+}
+
+.step-four__header {
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+.step-four__eyebrow {
+  margin: 0 0 8px;
+  color: var(--matchday-green);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.step-four__header h2 {
+  margin: 0;
+  color: var(--matchday-text);
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+}
+
+.step-four__header p:last-child {
+  max-width: 520px;
+  margin: 11px 0 0;
+  color: var(--matchday-text-muted);
+  font-size: 0.94rem;
+  line-height: 1.5;
+}
+
+.step-four__link-section {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.step-four__link-label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--matchday-text);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.step-four__link-box {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 15px;
+  border: 1px solid var(--matchday-border);
+  border-radius: 16px;
+  background: var(--matchday-surface-2);
+}
+
+.step-four__link {
+  display: block;
+  color: var(--matchday-text);
+  font-size: 0.86rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.step-four__actions {
+  display: flex;
+  width: 100%;
+  gap: 10px;
+}
+
+.step-four__copy-button,
+.step-four__home-button {
+  min-height: 50px;
+  border: 0;
+  border-radius: 15px;
+  padding: 0 17px;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    opacity 180ms ease,
+    background 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.step-four__copy-button {
+  position: relative;
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--matchday-green);
+  color: #052e16;
+  box-shadow: 0 10px 24px rgba(34, 197, 94, 0.2);
+}
+
+.step-four__copy-button:hover:not(:disabled) {
+  background: #4ade80;
+  transform: translateY(-1px);
+}
+
+.step-four__copy-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
+.step-four__copy-button:focus-visible,
+.step-four__home-button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.14);
+}
+
+.step-four__copy-content {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 24px;
+}
+
+.step-four__copy-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  color: #052e16;
+  text-align: center;
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
+}
+
+.step-four__copy-label--success {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.step-four__copy-label.is-hidden {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+
+.step-four__copy-label--success.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.step-four__home-button {
+  flex: 1.2;
+  background: var(--matchday-surface-2);
+  color: var(--matchday-text);
+}
+
+.step-four__home-button:hover {
+  background: rgba(148, 163, 184, 0.18);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 560px) {
+  .step-four__actions {
+    flex-direction: column;
+  }
+
+  .step-four__copy-button,
+  .step-four__home-button {
+    width: 100%;
+    flex: 1 1 100%;
+  }
+}

@@ -2,14 +2,16 @@
   <app-spinner *ngIf="creatingMatch" texto="Creando partido..."></app-spinner>
 
   <section class="create-match-page__wrapper">
-    <div class="create-match-page__header">
+    <header class="create-match-page__header">
       <p class="create-match-page__eyebrow">Nuevo partido</p>
+
       <h1 class="create-match-page__title">Crea tu partido paso a paso</h1>
+
       <p class="create-match-page__subtitle">
         Elige la pista, la fecha y la hora, y genera un enlace para invitar a
         tus colegas.
       </p>
-    </div>
+    </header>
 
     <div class="create-match-page__progress">
       <div class="create-match-page__steps">
@@ -51,415 +53,47 @@
     <div class="create-match-card">
       <div class="step-shell">
         <div class="step-panel" [class]="stepAnimationClass">
-          <!-- Paso 1: selección de pista -->
           <ng-container *ngIf="currentStep === 1">
             <div class="create-match-card__section">
-              <h2>Selecciona la pista</h2>
-              <p>
-                Busca por provincia y localidad para ver las pistas disponibles.
-              </p>
-
-              <div class="field-block">
-                <label class="field-label" for="provinciaSelect"
-                  >Provincia</label
-                >
-                <select
-                  id="provinciaSelect"
-                  class="field-input"
-                  [ngModel]="provinciaSeleccionadaId"
-                  [ngModelOptions]="{ standalone: true }"
-                  (ngModelChange)="seleccionarProvincia($event)"
-                >
-                  <option value="">Selecciona una provincia</option>
-                  <option
-                    *ngFor="let provincia of provincias"
-                    [value]="provincia.provincia_id"
-                  >
-                    {{ provincia.nombre }}
-                  </option>
-                </select>
-              </div>
-
-              <div class="field-block" *ngIf="provinciaSeleccionadaId">
-                <label class="field-label" for="municipioSelect"
-                  >Municipio</label
-                >
-
-                <select
-                  *ngIf="!cargandoMunicipios; else cargandoMunicipiosTpl"
-                  id="municipioSelect"
-                  class="field-input"
-                  [ngModel]="municipioSeleccionadoId"
-                  [ngModelOptions]="{ standalone: true }"
-                  (ngModelChange)="seleccionarMunicipio($event)"
-                >
-                  <option value="">Selecciona un municipio</option>
-                  <option
-                    *ngFor="let municipio of municipios"
-                    [value]="municipio.municipio_id"
-                  >
-                    {{ municipio.nombre }}
-                  </option>
-                </select>
-
-                <ng-template #cargandoMunicipiosTpl>
-                  <p class="pista-loading">Cargando municipios...</p>
-                </ng-template>
-              </div>
-
-              <div
-                class="pista-results"
-                *ngIf="municipioSeleccionadoId && !cargandoPistas"
-              >
-                <p
-                  class="pista-results__heading"
-                  *ngIf="pistasEncontradas.length > 0"
-                >
-                  Pistas encontradas
-                </p>
-
-                <div
-                  class="pista-card-list"
-                  *ngIf="pistasEncontradas.length > 0"
-                >
-                  <button
-                    *ngFor="let pista of pistasEncontradas"
-                    type="button"
-                    class="pista-card"
-                    (click)="seleccionarPista(pista)"
-                  >
-                    <span class="pista-card__icon">🏟️</span>
-                    <span class="pista-card__body">
-                      <strong>{{ pista.nombre }}</strong>
-                      <span>{{ pista.localidad }}, {{ pista.provincia }}</span>
-                    </span>
-                  </button>
-                </div>
-
-                <p
-                  class="pista-results__empty"
-                  *ngIf="pistasEncontradas.length === 0"
-                >
-                  No hay pistas disponibles en esa localidad todavía.
-                </p>
-              </div>
-
-              <p class="pista-loading" *ngIf="cargandoPistas">
-                Cargando pistas disponibles...
-              </p>
+              <app-step-one
+                (pistaSeleccionadaChange)="onPistaSeleccionada($event)"
+              ></app-step-one>
             </div>
           </ng-container>
 
-          <!-- Paso 2: calendario y franjas horarias -->
           <ng-container *ngIf="currentStep === 2">
             <div class="create-match-card__section">
-              <h2>Elige día y hora</h2>
-              <p>
-                Los días en rojo están completos. Selecciona un día disponible
-                para ver las franjas horarias.
-              </p>
-
-              <p class="pista-selected-label" *ngIf="pistaSeleccionada">
-                🏟️ {{ pistaSeleccionada.nombre }}
-              </p>
-
-              <div class="calendar-loading" *ngIf="cargandoDisponibilidad">
-                <p>Consultando disponibilidad...</p>
-              </div>
-
-              <ng-container *ngIf="!cargandoDisponibilidad">
-                <ion-datetime
-                  class="create-match-datetime"
-                  presentation="date"
-                  locale="es-ES"
-                  [isDateEnabled]="isDateEnabledFn"
-                  [highlightedDates]="highlightedDatesFn"
-                  (ionChange)="onFechaSeleccionada($event)"
-                ></ion-datetime>
-
-                <div class="franjas-list" *ngIf="fechaSeleccionada">
-                  <p class="franjas-list__heading">Horas disponibles</p>
-
-                  <div class="franjas-grid">
-                    <button
-                      *ngFor="let franja of franjasDelDia"
-                      type="button"
-                      class="franja-chip"
-                      [class.franja-chip--ocupada]="franja.ocupada"
-                      [class.franja-chip--active]="
-                        franja.hora === horaSeleccionada
-                      "
-                      [disabled]="franja.ocupada"
-                      (click)="seleccionarHora(franja)"
-                    >
-                      {{ franja.label }}
-                    </button>
-                  </div>
-                </div>
-              </ng-container>
+              <app-step-two
+                [pista]="pistaSeleccionada"
+                (horarioSeleccionado)="onHorarioSeleccionado($event)"
+                (volver)="volverAPistas()"
+              ></app-step-two>
             </div>
           </ng-container>
 
-          <!-- Paso 3: datos del partido -->
           <ng-container *ngIf="currentStep === 3">
-            <form class="create-match-card__section" [formGroup]="form">
-              <h2>Datos del partido</h2>
-              <p>Completa la información básica para crear la convocatoria.</p>
-
-              <div
-                class="resumen-horario"
-                *ngIf="
-                  pistaSeleccionada && fechaSeleccionada && horaSeleccionada
-                "
-              >
-                🏟️ {{ pistaSeleccionada.nombre }} · 📅
-                {{ fechaSeleccionada | date: "dd/MM/yyyy" }} · 🕐
-                {{ horaSeleccionada }}:00 - {{ +horaSeleccionada + 1 }}:00
-              </div>
-
-              <div class="field-block">
-                <label class="field-label" for="nombrePartido">
-                  Nombre del partido
-                </label>
-
-                <input
-                  id="nombrePartido"
-                  class="field-input"
-                  type="text"
-                  formControlName="nombrePartido"
-                  placeholder="Ej: Ganadores vs Perdedores"
-                  maxlength="60"
-                />
-
-                <span
-                  class="field-error"
-                  *ngIf="
-                    form.controls.nombrePartido.touched &&
-                    form.controls.nombrePartido.errors?.['required']
-                  "
-                >
-                  Escribe el nombre del partido.
-                </span>
-
-                <span
-                  class="field-error"
-                  *ngIf="
-                    form.controls.nombrePartido.touched &&
-                    form.controls.nombrePartido.errors?.['maxlength']
-                  "
-                >
-                  El nombre del partido es demasiado largo.
-                </span>
-              </div>
-
-              <div class="players-grid">
-                <div class="field-block">
-                  <label class="field-label" for="equipoA">
-                    Nombre del equipo A
-                  </label>
-
-                  <input
-                    id="equipoA"
-                    class="field-input"
-                    type="text"
-                    formControlName="equipoA"
-                    placeholder="Ej: Solteros FC"
-                  />
-
-                  <span
-                    class="field-error"
-                    *ngIf="
-                      form.controls.equipoA.touched &&
-                      form.controls.equipoA.errors?.['required']
-                    "
-                  >
-                    Escribe el nombre del equipo A.
-                  </span>
-
-                  <span
-                    class="field-error"
-                    *ngIf="
-                      form.controls.equipoA.touched &&
-                      form.controls.equipoA.errors?.['maxlength']
-                    "
-                  >
-                    El nombre del equipo A es demasiado largo.
-                  </span>
-                </div>
-
-                <div class="field-block">
-                  <label class="field-label" for="equipoB">
-                    Nombre del equipo B
-                  </label>
-
-                  <input
-                    id="equipoB"
-                    class="field-input"
-                    type="text"
-                    formControlName="equipoB"
-                    placeholder="Ej: Casados FC"
-                  />
-
-                  <span
-                    class="field-error"
-                    *ngIf="
-                      form.controls.equipoB.touched &&
-                      form.controls.equipoB.errors?.['required']
-                    "
-                  >
-                    Escribe el nombre del equipo B.
-                  </span>
-
-                  <span
-                    class="field-error"
-                    *ngIf="
-                      form.controls.equipoB.touched &&
-                      form.controls.equipoB.errors?.['maxlength']
-                    "
-                  >
-                    El nombre del equipo B es demasiado largo.
-                  </span>
-
-                  <span
-                    class="field-error"
-                    *ngIf="
-                      form.controls.equipoB.touched &&
-                      form.controls.equipoB.errors?.['sameTeamName']
-                    "
-                  >
-                    El equipo A y el equipo B no pueden llamarse igual.
-                  </span>
-                </div>
-              </div>
-
-              <div class="field-block">
-                <label class="field-label" for="playerCount">
-                  Número de jugadores
-                </label>
-
-                <input
-                  id="playerCount"
-                  class="field-input"
-                  type="number"
-                  formControlName="playerCount"
-                  placeholder="Ej: 10"
-                />
-
-                <span
-                  class="field-error"
-                  *ngIf="
-                    form.controls.playerCount.touched &&
-                    form.controls.playerCount.errors?.['required']
-                  "
-                >
-                  Indica el número de jugadores.
-                </span>
-
-                <span
-                  class="field-error"
-                  *ngIf="
-                    form.controls.playerCount.touched &&
-                    form.controls.playerCount.errors?.['min']
-                  "
-                >
-                  Debe haber al menos 2 jugadores.
-                </span>
-              </div>
-            </form>
+            <div class="create-match-card__section">
+              <app-step-three
+                [pista]="pistaSeleccionada"
+                [fecha]="fechaSeleccionada"
+                [hora]="horaSeleccionada"
+                [creatingMatch]="creatingMatch"
+                (datosConfirmados)="onDatosPartidoConfirmados($event)"
+                (volver)="volverACalendario()"
+              ></app-step-three>
+            </div>
           </ng-container>
 
-          <!-- Paso 4: invitación -->
           <ng-container *ngIf="currentStep === 4">
-            <div
-              class="create-match-card__section create-match-card__section--success"
-            >
-              <div class="success-icon">✓</div>
-
-              <h2>Partido creado</h2>
-
-              <p>
-                Ya tienes tu partido listo. Este es el enlace que usarás para
-                invitar a tus amigos.
-              </p>
-
-              <div class="invite-box">
-                {{ inviteLink }}
-              </div>
+            <div class="create-match-card__section">
+              <app-step-four
+                [inviteLink]="inviteLink"
+                (volverAlInicio)="goHome()"
+              ></app-step-four>
             </div>
           </ng-container>
         </div>
       </div>
-    </div>
-
-    <div class="create-match-page__actions">
-      <button
-        *ngIf="currentStep === 2"
-        class="secondary-action"
-        type="button"
-        (click)="volverAPistas()"
-      >
-        Atrás
-      </button>
-
-      <button
-        *ngIf="currentStep === 2"
-        class="primary-action"
-        type="button"
-        [disabled]="!fechaSeleccionada || !horaSeleccionada"
-        (click)="continuarDesdeHorario()"
-      >
-        Continuar
-      </button>
-
-      <button
-        *ngIf="currentStep === 3"
-        class="secondary-action"
-        type="button"
-        [disabled]="creatingMatch"
-        (click)="volverACalendario()"
-      >
-        Atrás
-      </button>
-
-      <button
-        *ngIf="currentStep === 3"
-        class="primary-action"
-        type="button"
-        [disabled]="creatingMatch"
-        (click)="createMatch()"
-      >
-        {{ creatingMatch ? "Creando..." : "Crear partido" }}
-      </button>
-
-      <button
-        *ngIf="currentStep === 4"
-        class="secondary-action secondary-action--home"
-        type="button"
-        (click)="goHome()"
-      >
-        Volver al menú principal
-      </button>
-
-      <button
-        *ngIf="currentStep === 4"
-        class="primary-action copy-action"
-        type="button"
-        [class.copy-action--copied]="linkCopied"
-        (click)="copyInvite()"
-      >
-        <span class="copy-action__content">
-          <span class="copy-action__label" [class.is-hidden]="linkCopied">
-            Copiar enlace
-          </span>
-
-          <span
-            class="copy-action__label copy-action__label--success"
-            [class.is-visible]="linkCopied"
-          >
-            ¡Enlace copiado!
-          </span>
-        </span>
-      </button>
     </div>
   </section>
 </ion-content>
