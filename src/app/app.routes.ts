@@ -86,6 +86,14 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'invitar-whatsapp',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./components/invitar-whatsapp/invitar-whatsapp.component').then(
+        (m) => m.InvitarWhatsappComponent,
+      ),
+  },
+  {
     path: '**',
     redirectTo: 'login',
   },

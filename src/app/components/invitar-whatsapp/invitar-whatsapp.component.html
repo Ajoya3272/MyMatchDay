@@ -1,0 +1,58 @@
+<ion-content class="invitar-page">
+  <div class="invitar-page__wrapper">
+    <div class="invitar-page__header">
+      <p class="invitar-page__eyebrow">Invitaciones</p>
+      <h1 class="invitar-page__title">Invitar a tus partidos</h1>
+      <p class="invitar-page__subtitle">
+        Elige un partido pendiente que organizas y comparte el enlace con tus
+        amigos.
+      </p>
+    </div>
+
+    <ng-container
+      *ngIf="partidosPendientes$ | async as partidos; else cargando"
+    >
+      <div class="partidos-list" *ngIf="partidos.length > 0; else vacio">
+        <article
+          class="partido-row"
+          *ngFor="let partido of partidos; trackBy: trackByPartidoId"
+        >
+          <div class="partido-row__info">
+            <h3>{{ getTituloPartido(partido) }}</h3>
+            <p>{{ partido.fecha.toDate() | date: "dd/MM/yyyy HH:mm" }}</p>
+          </div>
+
+          <button
+            class="partido-row__invite-btn"
+            type="button"
+            (click)="invitar(partido)"
+          >
+            Invitar
+          </button>
+        </article>
+      </div>
+
+      <ng-template #vacio>
+        <article class="partidos-empty">
+          <div class="partidos-empty__icon">📲</div>
+          <h3>No tienes ningún partido donde puedas invitar</h3>
+          <p>
+            Solo aparecen aquí los partidos pendientes que organizas. Crea uno
+            nuevo para poder invitar a tus amigos.
+          </p>
+
+          <a class="partidos-empty__cta" routerLink="/crear-partido">
+            Crear partido
+          </a>
+        </article>
+      </ng-template>
+    </ng-container>
+
+    <ng-template #cargando>
+      <div class="invitar-page__loading">
+        <ion-spinner name="crescent"></ion-spinner>
+        <p>Cargando tus partidos...</p>
+      </div>
+    </ng-template>
+  </div>
+</ion-content>

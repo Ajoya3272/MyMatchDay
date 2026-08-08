@@ -13,6 +13,7 @@ import {
   serverTimestamp,
   setDoc,
   updateDoc,
+  where,
 } from '@angular/fire/firestore';
 import { firstValueFrom, Observable } from 'rxjs';
 import { filter, map, take } from 'rxjs/operators';
@@ -85,6 +86,19 @@ export class PartidoService {
   getPartidos(): Observable<Partido[]> {
     const partidosRef = collection(this.firestore, 'partidos');
     const q = query(partidosRef, orderBy('fecha', 'desc'));
+
+    return collectionData(q, { idField: 'partidoId' }).pipe(
+      map((partidos) => partidos as Partido[]),
+    );
+  }
+
+  obtenerPartidosOrganizados(uid: string): Observable<Partido[]> {
+    const partidosRef = collection(this.firestore, 'partidos');
+    const q = query(
+      partidosRef,
+      where('organizadorId', '==', uid),
+      orderBy('fecha', 'desc'),
+    );
 
     return collectionData(q, { idField: 'partidoId' }).pipe(
       map((partidos) => partidos as Partido[]),

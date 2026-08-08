@@ -1,0 +1,142 @@
+ion-content.invitar-page {
+  --background: var(--matchday-bg);
+  color: var(--matchday-text);
+}
+
+.invitar-page__wrapper {
+  padding: 92px 16px 32px;
+}
+
+.invitar-page__header {
+  margin-bottom: 24px;
+}
+
+.invitar-page__eyebrow {
+  margin: 0 0 8px;
+  color: var(--matchday-green);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.invitar-page__title {
+  margin: 0;
+  color: var(--matchday-text);
+  font-size: 1.8rem;
+  font-weight: 800;
+  line-height: 1.08;
+}
+
+.invitar-page__subtitle {
+  margin: 10px 0 0;
+  color: var(--matchday-text-muted);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.invitar-page__loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 0;
+  gap: 12px;
+  color: var(--matchday-text-muted);
+  font-size: 0.9rem;
+}
+
+.partidos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.partido-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 18px;
+  background: var(--matchday-surface);
+  border: 1px solid var(--matchday-border);
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.06);
+}
+
+.partido-row__info {
+  min-width: 0;
+}
+
+.partido-row__info h3 {
+  margin: 0 0 4px;
+  font-size: 0.98rem;
+  font-weight: 800;
+  color: var(--matchday-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.partido-row__info p {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--matchday-text-muted);
+}
+
+.partido-row__invite-btn {
+  flex-shrink: 0;
+  min-height: 40px;
+  padding: 0 18px;
+  border: none;
+  border-radius: 12px;
+  background: var(--matchday-green);
+  color: #ffffff;
+  font-size: 0.88rem;
+  font-weight: 800;
+  box-shadow: 0 6px 16px rgba(34, 197, 94, 0.25);
+}
+
+.partido-row__invite-btn:active {
+  filter: brightness(0.92);
+}
+
+.partidos-empty {
+  text-align: center;
+  padding: 48px 16px;
+  border-radius: 20px;
+  background: var(--matchday-surface);
+  border: 1px solid var(--matchday-border);
+}
+
+.partidos-empty__icon {
+  font-size: 40px;
+  margin-bottom: 12px;
+}
+
+.partidos-empty h3 {
+  margin: 0 0 6px;
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--matchday-text);
+}
+
+.partidos-empty p {
+  margin: 0 0 16px;
+  font-size: 0.88rem;
+  color: var(--matchday-text-muted);
+}
+
+.partidos-empty__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 20px;
+  border-radius: 14px;
+  background: var(--matchday-green);
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 800;
+  text-decoration: none;
+}
