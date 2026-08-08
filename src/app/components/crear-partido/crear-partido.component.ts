@@ -13,6 +13,8 @@ import {
   IonProgressBar,
 } from '@ionic/angular/standalone';
 import { Timestamp } from '@angular/fire/firestore';
+import { take } from 'rxjs';
+
 import { PartidoService } from '../../services/partido.service';
 import { PistaService } from '../../services/pista.service';
 import { UbicacionService } from '../../services/ubicacion.service';
@@ -28,6 +30,10 @@ interface FranjaHoraria {
   hora: string;
   label: string;
   ocupada: boolean;
+}
+
+interface PartidoFechaDoc {
+  fecha?: Timestamp;
 }
 
 const FRANJAS_HORARIAS = ['17', '18', '19', '20', '21'];
@@ -61,9 +67,11 @@ export class CrearPartidoComponent {
   stepAnimationClass = '';
   linkCopied = false;
   creatingMatch = false;
+
   private copyFeedbackTimeout: ReturnType<typeof setTimeout> | null = null;
 
-  // --- Paso 1: selección de pista ---
+  // ---------- Paso 1: selección de pista ----------
+
   pistas: Pista[] = [];
   cargandoPistas = true;
 
@@ -75,11 +83,15 @@ export class CrearPartidoComponent {
   municipioSeleccionadoId = '';
   pistaSeleccionada: Pista | null = null;
 
-  // --- Paso 2: fecha y hora ---
+  // ---------- Paso 2: fecha y hora ----------
+
   cargandoDisponibilidad = false;
   fechaSeleccionada: Date | null = null;
   horaSeleccionada: string | null = null;
+
   private horasOcupadasPorFecha = new Map<string, Set<string>>();
+
+  // ---------- Paso 3: datos del partido ----------
 
   form = this.fb.group({
     nombrePartido: ['', [Validators.required, Validators.maxLength(60)]],
@@ -102,9 +114,17 @@ export class CrearPartidoComponent {
   private cargarPistas(): void {
     this.cargandoPistas = true;
 
-    this.pistaService.obtenerPistas().subscribe((pistas) => {
-      this.pistas = pistas;
-      this.cargandoPistas = false;
+    this.pistaService.obtenerPistas().subscribe({
+      next: (pistas) => {
+        this.pistas = pistas;
+        this.cargandoPistas = false;
+      },
+      error: (error) => {
+        console.error('[CREAR-PARTIDO] Error cargando pistas:', error);
+
+        this.pistas = [];
+        this.cargandoPistas = false;
+      },
     });
   }
 
@@ -118,11 +138,15 @@ export class CrearPartidoComponent {
     this.pistaSeleccionada = null;
     this.municipios = [];
 
-    if (!provinciaId) return;
+    if (!provinciaId) {
+      return;
+    }
 
     this.cargandoMunicipios = true;
+
     this.municipios =
       await this.ubicacionService.obtenerMunicipiosDeProvincia(provinciaId);
+
     this.cargandoMunicipios = false;
   }
 
@@ -134,7 +158,7 @@ export class CrearPartidoComponent {
   get provinciaNombreSeleccionada(): string {
     return (
       this.provincias.find(
-        (p) => p.provincia_id === this.provinciaSeleccionadaId,
+        (provincia) => provincia.provincia_id === this.provinciaSeleccionadaId,
       )?.nombre ?? ''
     );
   }
@@ -142,7 +166,7 @@ export class CrearPartidoComponent {
   get municipioNombreSeleccionado(): string {
     return (
       this.municipios.find(
-        (m) => m.municipio_id === this.municipioSeleccionadoId,
+        (municipio) => municipio.municipio_id === this.municipioSeleccionadoId,
       )?.nombre ?? ''
     );
   }
@@ -152,18 +176,28 @@ export class CrearPartidoComponent {
       return [];
     }
 
-    const provincia = this.normalizar(this.provinciaNombreSeleccionada);
-    const municipio = this.normalizar(this.municipioNombreSeleccionado);
-
-    return this.pistas.filter(
-      (p) =>
-        this.normalizar(p.provincia) === provincia &&
-        this.normalizar(p.localidad) === municipio,
+    const provinciaSeleccionada = this.normalizar(
+      this.provinciaNombreSeleccionada,
     );
+
+    const municipioSeleccionado = this.normalizar(
+      this.municipioNombreSeleccionado,
+    );
+
+    return this.pistas.filter((pista) => {
+      const provinciaPista = this.normalizar(pista.provincia);
+
+      const municipioPista = this.normalizar(pista.localidad);
+
+      return (
+        provinciaPista === provinciaSeleccionada &&
+        municipioPista === municipioSeleccionado
+      );
+    });
   }
 
-  private normalizar(texto: string): string {
-    return texto
+  private normalizar(texto?: string | null): string {
+    return (texto ?? '')
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
       .toLowerCase()
@@ -176,21 +210,29 @@ export class CrearPartidoComponent {
     this.fechaSeleccionada = null;
     this.horaSeleccionada = null;
 
-    this.pistaService.obtenerPartidosDePista(pista.pistaId).subscribe({
-      next: (partidos) => {
-        this.horasOcupadasPorFecha = this.construirMapaOcupacion(partidos);
-        this.cargandoDisponibilidad = false;
-        this.currentStep = 2;
-        this.animateStep('forward');
-      },
-      error: (error) => {
-        console.error('[CREAR-PARTIDO] Error cargando disponibilidad:', error);
-        this.horasOcupadasPorFecha = new Map();
-        this.cargandoDisponibilidad = false;
-        this.currentStep = 2;
-        this.animateStep('forward');
-      },
-    });
+    this.pistaService
+      .obtenerPartidosDePista(pista.pistaId)
+      .pipe(take(1))
+      .subscribe({
+        next: (partidos) => {
+          this.horasOcupadasPorFecha = this.construirMapaOcupacion(partidos);
+
+          this.cargandoDisponibilidad = false;
+          this.currentStep = 2;
+          this.animateStep('forward');
+        },
+        error: (error) => {
+          console.error(
+            '[CREAR-PARTIDO] Error cargando disponibilidad:',
+            error,
+          );
+
+          this.horasOcupadasPorFecha = new Map();
+          this.cargandoDisponibilidad = false;
+          this.currentStep = 2;
+          this.animateStep('forward');
+        },
+      });
   }
 
   volverAPistas(): void {
@@ -204,8 +246,10 @@ export class CrearPartidoComponent {
 
   isDateEnabledFn = (dateIsoString: string): boolean => {
     const fecha = new Date(dateIsoString);
+
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
+
     fecha.setHours(0, 0, 0, 0);
 
     if (fecha.getTime() < hoy.getTime()) {
@@ -213,21 +257,33 @@ export class CrearPartidoComponent {
     }
 
     const ocupadas = this.contarOcupadas(fecha);
+
     return ocupadas < FRANJAS_HORARIAS.length;
   };
 
   highlightedDatesFn = (
     dateIsoString: string,
-  ): { textColor: string; backgroundColor: string } | undefined => {
+  ):
+    | {
+        textColor: string;
+        backgroundColor: string;
+      }
+    | undefined => {
     const fecha = new Date(dateIsoString);
     const ocupadas = this.contarOcupadas(fecha);
 
     if (ocupadas >= FRANJAS_HORARIAS.length) {
-      return { textColor: '#991b1b', backgroundColor: '#fecaca' };
+      return {
+        textColor: '#991b1b',
+        backgroundColor: '#fecaca',
+      };
     }
 
     if (ocupadas > 0) {
-      return { textColor: '#92400e', backgroundColor: '#fef3c7' };
+      return {
+        textColor: '#92400e',
+        backgroundColor: '#fef3c7',
+      };
     }
 
     return undefined;
@@ -243,15 +299,20 @@ export class CrearPartidoComponent {
     }
 
     const iso = Array.isArray(value) ? value[0] : value;
+
     this.fechaSeleccionada = new Date(`${String(iso).slice(0, 10)}T00:00:00`);
+
     this.horaSeleccionada = null;
   }
 
   get franjasDelDia(): FranjaHoraria[] {
-    if (!this.fechaSeleccionada) return [];
+    if (!this.fechaSeleccionada) {
+      return [];
+    }
 
     const clave = this.claveFecha(this.fechaSeleccionada);
-    const ocupadas = this.horasOcupadasPorFecha.get(clave) ?? new Set();
+
+    const ocupadas = this.horasOcupadasPorFecha.get(clave) ?? new Set<string>();
 
     return FRANJAS_HORARIAS.map((hora) => ({
       hora,
@@ -261,12 +322,18 @@ export class CrearPartidoComponent {
   }
 
   seleccionarHora(franja: FranjaHoraria): void {
-    if (franja.ocupada) return;
+    if (franja.ocupada) {
+      return;
+    }
+
     this.horaSeleccionada = franja.hora;
   }
 
   continuarDesdeHorario(): void {
-    if (!this.fechaSeleccionada || !this.horaSeleccionada) return;
+    if (!this.fechaSeleccionada || !this.horaSeleccionada) {
+      return;
+    }
+
     this.currentStep = 3;
     this.animateStep('forward');
   }
@@ -278,23 +345,27 @@ export class CrearPartidoComponent {
 
   private contarOcupadas(fecha: Date): number {
     const clave = this.claveFecha(fecha);
+
     return this.horasOcupadasPorFecha.get(clave)?.size ?? 0;
   }
 
   private construirMapaOcupacion(
-    partidos: { fecha?: Timestamp }[],
+    partidos: PartidoFechaDoc[],
   ): Map<string, Set<string>> {
     const mapa = new Map<string, Set<string>>();
 
     for (const partido of partidos) {
       const fecha = partido.fecha?.toDate?.();
-      if (!fecha) continue;
+
+      if (!fecha) {
+        continue;
+      }
 
       const clave = this.claveFecha(fecha);
       const hora = String(fecha.getHours());
 
       if (!mapa.has(clave)) {
-        mapa.set(clave, new Set());
+        mapa.set(clave, new Set<string>());
       }
 
       mapa.get(clave)!.add(hora);
@@ -307,14 +378,11 @@ export class CrearPartidoComponent {
     const year = fecha.getFullYear();
     const month = String(fecha.getMonth() + 1).padStart(2, '0');
     const day = String(fecha.getDate()).padStart(2, '0');
+
     return `${year}-${month}-${day}`;
   }
 
   // ---------- Paso 3: datos del partido ----------
-
-  prevStep(): void {
-    this.currentStep = 3;
-  }
 
   async createMatch(): Promise<void> {
     if (!this.validateStep3() || this.creatingMatch) {
@@ -334,8 +402,11 @@ export class CrearPartidoComponent {
 
       const nombrePartido =
         this.form.controls.nombrePartido.value?.trim() ?? '';
+
       const equipoA = this.form.controls.equipoA.value?.trim() ?? '';
+
       const equipoB = this.form.controls.equipoB.value?.trim() ?? '';
+
       const ubicacion = `${this.pistaSeleccionada.nombre}, ${this.pistaSeleccionada.localidad}`;
 
       const partidoId = await this.partidoService.crearPartido({
@@ -358,9 +429,10 @@ export class CrearPartidoComponent {
       this.created = true;
       this.currentStep = 4;
       this.linkCopied = false;
+
       this.animateStep('forward');
     } catch (error) {
-      console.error('Error al crear partido:', error);
+      console.error('[CREAR-PARTIDO] Error al crear partido:', error);
     } finally {
       this.creatingMatch = false;
     }
@@ -373,6 +445,7 @@ export class CrearPartidoComponent {
 
     try {
       await navigator.clipboard.writeText(this.inviteLink);
+
       this.linkCopied = true;
 
       if (this.copyFeedbackTimeout) {
@@ -382,7 +455,9 @@ export class CrearPartidoComponent {
       this.copyFeedbackTimeout = setTimeout(() => {
         this.linkCopied = false;
       }, 3000);
-    } catch {
+    } catch (error) {
+      console.error('[CREAR-PARTIDO] Error copiando enlace:', error);
+
       this.linkCopied = false;
     }
   }
@@ -409,10 +484,12 @@ export class CrearPartidoComponent {
     this.stepAnimationClass = '';
     this.linkCopied = false;
     this.creatingMatch = false;
+
     this.provinciaSeleccionadaId = '';
     this.municipioSeleccionadoId = '';
     this.municipios = [];
     this.pistaSeleccionada = null;
+
     this.fechaSeleccionada = null;
     this.horaSeleccionada = null;
     this.horasOcupadasPorFecha = new Map();
@@ -452,28 +529,37 @@ export class CrearPartidoComponent {
       return false;
     }
 
-    if (
-      equipoA.value?.trim().toLowerCase() ===
-      equipoB.value?.trim().toLowerCase()
-    ) {
+    const nombreEquipoA = equipoA.value?.trim().toLowerCase();
+
+    const nombreEquipoB = equipoB.value?.trim().toLowerCase();
+
+    if (nombreEquipoA === nombreEquipoB) {
       equipoB.setErrors({
         ...(equipoB.errors ?? {}),
         sameTeamName: true,
       });
+
       return false;
     }
 
     return true;
   }
 
-  private clearControlError(control: any, errorKey: string): void {
+  private clearControlError(
+    control: {
+      errors: Record<string, unknown> | null;
+      setErrors: (errors: Record<string, unknown> | null) => void;
+    },
+    errorKey: string,
+  ): void {
     if (!control.errors?.[errorKey]) {
       return;
     }
 
     const errors = { ...control.errors };
     delete errors[errorKey];
-    control.setErrors(Object.keys(errors).length ? errors : null);
+
+    control.setErrors(Object.keys(errors).length > 0 ? errors : null);
   }
 
   private buildMatchDateTime(): string {
