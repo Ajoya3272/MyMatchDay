@@ -1,15 +1,37 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { Router } from '@angular/router';
 import {
   IonContent,
   IonDatetime,
   IonProgressBar,
 } from '@ionic/angular/standalone';
+import { Timestamp } from '@angular/fire/firestore';
 import { PartidoService } from '../../services/partido.service';
+import { PistaService } from '../../services/pista.service';
+import { UbicacionService } from '../../services/ubicacion.service';
 import { SpinnerComponent } from '../spinner/spinner.component';
 import { environment } from '../../../enviroments/enviroment';
+import { Pista } from '../../interfaces/Pista.interface';
+import {
+  MunicipioIne,
+  ProvinciaIne,
+} from '../../interfaces/ubicacion.interface';
+
+interface FranjaHoraria {
+  hora: string;
+  label: string;
+  ocupada: boolean;
+}
+
+const FRANJAS_HORARIAS = ['17', '18', '19', '20', '21'];
+const DURACION_MINUTOS_FIJA = 60;
 
 @Component({
   selector: 'app-crear-partido',
@@ -23,92 +45,287 @@ import { environment } from '../../../enviroments/enviroment';
     IonDatetime,
     IonProgressBar,
     SpinnerComponent,
+    FormsModule,
   ],
 })
 export class CrearPartidoComponent {
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private partidoService = inject(PartidoService);
+  private pistaService = inject(PistaService);
+  private ubicacionService = inject(UbicacionService);
 
   currentStep = 1;
   created = false;
   inviteLink = '';
   stepAnimationClass = '';
-  minDateTime = this.getMinDateTime();
   linkCopied = false;
   creatingMatch = false;
   private copyFeedbackTimeout: ReturnType<typeof setTimeout> | null = null;
 
+  // --- Paso 1: selección de pista ---
+  pistas: Pista[] = [];
+  cargandoPistas = true;
+
+  provincias: ProvinciaIne[] = [];
+  municipios: MunicipioIne[] = [];
+  cargandoMunicipios = false;
+
+  provinciaSeleccionadaId = '';
+  municipioSeleccionadoId = '';
+  pistaSeleccionada: Pista | null = null;
+
+  // --- Paso 2: fecha y hora ---
+  cargandoDisponibilidad = false;
+  fechaSeleccionada: Date | null = null;
+  horaSeleccionada: string | null = null;
+  private horasOcupadasPorFecha = new Map<string, Set<string>>();
+
   form = this.fb.group({
-    matchDate: ['', Validators.required],
-    matchTime: ['', Validators.required],
     nombrePartido: ['', [Validators.required, Validators.maxLength(60)]],
     equipoA: ['', [Validators.required, Validators.maxLength(40)]],
     equipoB: ['', [Validators.required, Validators.maxLength(40)]],
-    ubicacion: ['', [Validators.required, Validators.maxLength(100)]],
     playerCount: [10, [Validators.required, Validators.min(2)]],
-    durationMinutes: [90, [Validators.required, Validators.min(1)]],
   });
 
   ionViewWillEnter(): void {
-    this.minDateTime = this.getMinDateTime();
+    this.cargarPistas();
+    this.cargarProvincias();
   }
 
   ionViewWillLeave(): void {
     this.resetCreateMatch();
   }
 
-  onDateSelected(event: CustomEvent): void {
-    const value = event.detail.value;
+  // ---------- Paso 1: pistas ----------
 
-    if (!value) {
-      this.form.controls.matchDate.setValue('');
-      this.form.controls.matchDate.markAsTouched();
-      return;
-    }
+  private cargarPistas(): void {
+    this.cargandoPistas = true;
 
-    const selectedDate = Array.isArray(value) ? value[0] : value;
-    const dateOnly = String(selectedDate).slice(0, 10);
-
-    this.form.controls.matchDate.setValue(dateOnly);
-    this.form.controls.matchDate.markAsTouched();
-    this.clearControlError(this.form.controls.matchDate, 'pastDate');
+    this.pistaService.obtenerPistas().subscribe((pistas) => {
+      this.pistas = pistas;
+      this.cargandoPistas = false;
+    });
   }
 
-  nextStep(): void {
-    this.minDateTime = this.getMinDateTime();
-
-    this.form.controls.matchDate.markAsTouched();
-    this.form.controls.matchTime.markAsTouched();
-
-    if (
-      this.form.controls.matchDate.invalid ||
-      this.form.controls.matchTime.invalid
-    ) {
-      return;
-    }
-
-    this.clearControlError(this.form.controls.matchDate, 'pastDate');
-
-    if (!this.isDateTimeValid()) {
-      this.form.controls.matchDate.setErrors({
-        ...(this.form.controls.matchDate.errors ?? {}),
-        pastDate: true,
-      });
-      return;
-    }
-
-    this.currentStep = 2;
-    this.animateStep('forward');
+  private async cargarProvincias(): Promise<void> {
+    this.provincias = await this.ubicacionService.obtenerProvincias();
   }
 
-  prevStep(): void {
+  async seleccionarProvincia(provinciaId: string): Promise<void> {
+    this.provinciaSeleccionadaId = provinciaId;
+    this.municipioSeleccionadoId = '';
+    this.pistaSeleccionada = null;
+    this.municipios = [];
+
+    if (!provinciaId) return;
+
+    this.cargandoMunicipios = true;
+    this.municipios =
+      await this.ubicacionService.obtenerMunicipiosDeProvincia(provinciaId);
+    this.cargandoMunicipios = false;
+  }
+
+  seleccionarMunicipio(municipioId: string): void {
+    this.municipioSeleccionadoId = municipioId;
+    this.pistaSeleccionada = null;
+  }
+
+  get provinciaNombreSeleccionada(): string {
+    return (
+      this.provincias.find(
+        (p) => p.provincia_id === this.provinciaSeleccionadaId,
+      )?.nombre ?? ''
+    );
+  }
+
+  get municipioNombreSeleccionado(): string {
+    return (
+      this.municipios.find(
+        (m) => m.municipio_id === this.municipioSeleccionadoId,
+      )?.nombre ?? ''
+    );
+  }
+
+  get pistasEncontradas(): Pista[] {
+    if (!this.provinciaSeleccionadaId || !this.municipioSeleccionadoId) {
+      return [];
+    }
+
+    const provincia = this.normalizar(this.provinciaNombreSeleccionada);
+    const municipio = this.normalizar(this.municipioNombreSeleccionado);
+
+    return this.pistas.filter(
+      (p) =>
+        this.normalizar(p.provincia) === provincia &&
+        this.normalizar(p.localidad) === municipio,
+    );
+  }
+
+  private normalizar(texto: string): string {
+    return texto
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .trim();
+  }
+
+  seleccionarPista(pista: Pista): void {
+    this.pistaSeleccionada = pista;
+    this.cargandoDisponibilidad = true;
+    this.fechaSeleccionada = null;
+    this.horaSeleccionada = null;
+
+    this.pistaService.obtenerPartidosDePista(pista.pistaId).subscribe({
+      next: (partidos) => {
+        this.horasOcupadasPorFecha = this.construirMapaOcupacion(partidos);
+        this.cargandoDisponibilidad = false;
+        this.currentStep = 2;
+        this.animateStep('forward');
+      },
+      error: (error) => {
+        console.error('[CREAR-PARTIDO] Error cargando disponibilidad:', error);
+        this.horasOcupadasPorFecha = new Map();
+        this.cargandoDisponibilidad = false;
+        this.currentStep = 2;
+        this.animateStep('forward');
+      },
+    });
+  }
+
+  volverAPistas(): void {
     this.currentStep = 1;
+    this.fechaSeleccionada = null;
+    this.horaSeleccionada = null;
     this.animateStep('backward');
   }
 
+  // ---------- Paso 2: calendario y franjas ----------
+
+  isDateEnabledFn = (dateIsoString: string): boolean => {
+    const fecha = new Date(dateIsoString);
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    fecha.setHours(0, 0, 0, 0);
+
+    if (fecha.getTime() < hoy.getTime()) {
+      return false;
+    }
+
+    const ocupadas = this.contarOcupadas(fecha);
+    return ocupadas < FRANJAS_HORARIAS.length;
+  };
+
+  highlightedDatesFn = (
+    dateIsoString: string,
+  ): { textColor: string; backgroundColor: string } | undefined => {
+    const fecha = new Date(dateIsoString);
+    const ocupadas = this.contarOcupadas(fecha);
+
+    if (ocupadas >= FRANJAS_HORARIAS.length) {
+      return { textColor: '#991b1b', backgroundColor: '#fecaca' };
+    }
+
+    if (ocupadas > 0) {
+      return { textColor: '#92400e', backgroundColor: '#fef3c7' };
+    }
+
+    return undefined;
+  };
+
+  onFechaSeleccionada(event: CustomEvent): void {
+    const value = event.detail.value;
+
+    if (!value) {
+      this.fechaSeleccionada = null;
+      this.horaSeleccionada = null;
+      return;
+    }
+
+    const iso = Array.isArray(value) ? value[0] : value;
+    this.fechaSeleccionada = new Date(`${String(iso).slice(0, 10)}T00:00:00`);
+    this.horaSeleccionada = null;
+  }
+
+  get franjasDelDia(): FranjaHoraria[] {
+    if (!this.fechaSeleccionada) return [];
+
+    const clave = this.claveFecha(this.fechaSeleccionada);
+    const ocupadas = this.horasOcupadasPorFecha.get(clave) ?? new Set();
+
+    return FRANJAS_HORARIAS.map((hora) => ({
+      hora,
+      label: `${hora}:00 - ${Number(hora) + 1}:00`,
+      ocupada: ocupadas.has(hora),
+    }));
+  }
+
+  seleccionarHora(franja: FranjaHoraria): void {
+    if (franja.ocupada) return;
+    this.horaSeleccionada = franja.hora;
+  }
+
+  continuarDesdeHorario(): void {
+    if (!this.fechaSeleccionada || !this.horaSeleccionada) return;
+    this.currentStep = 3;
+    this.animateStep('forward');
+  }
+
+  volverACalendario(): void {
+    this.currentStep = 2;
+    this.animateStep('backward');
+  }
+
+  private contarOcupadas(fecha: Date): number {
+    const clave = this.claveFecha(fecha);
+    return this.horasOcupadasPorFecha.get(clave)?.size ?? 0;
+  }
+
+  private construirMapaOcupacion(
+    partidos: { fecha?: Timestamp }[],
+  ): Map<string, Set<string>> {
+    const mapa = new Map<string, Set<string>>();
+
+    for (const partido of partidos) {
+      const fecha = partido.fecha?.toDate?.();
+      if (!fecha) continue;
+
+      const clave = this.claveFecha(fecha);
+      const hora = String(fecha.getHours());
+
+      if (!mapa.has(clave)) {
+        mapa.set(clave, new Set());
+      }
+
+      mapa.get(clave)!.add(hora);
+    }
+
+    return mapa;
+  }
+
+  private claveFecha(fecha: Date): string {
+    const year = fecha.getFullYear();
+    const month = String(fecha.getMonth() + 1).padStart(2, '0');
+    const day = String(fecha.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  // ---------- Paso 3: datos del partido ----------
+
+  prevStep(): void {
+    this.currentStep = 3;
+  }
+
   async createMatch(): Promise<void> {
-    if (!this.validateStep2() || this.creatingMatch) {
+    if (!this.validateStep3() || this.creatingMatch) {
+      return;
+    }
+
+    if (
+      !this.pistaSeleccionada ||
+      !this.fechaSeleccionada ||
+      !this.horaSeleccionada
+    ) {
       return;
     }
 
@@ -119,7 +336,7 @@ export class CrearPartidoComponent {
         this.form.controls.nombrePartido.value?.trim() ?? '';
       const equipoA = this.form.controls.equipoA.value?.trim() ?? '';
       const equipoB = this.form.controls.equipoB.value?.trim() ?? '';
-      const ubicacion = this.form.controls.ubicacion.value?.trim() ?? '';
+      const ubicacion = `${this.pistaSeleccionada.nombre}, ${this.pistaSeleccionada.localidad}`;
 
       const partidoId = await this.partidoService.crearPartido({
         matchDate: this.buildMatchDateTime(),
@@ -128,7 +345,9 @@ export class CrearPartidoComponent {
         equipoB,
         ubicacion,
         playerCount: Number(this.form.controls.playerCount.value ?? 10),
-        durationMinutes: Number(this.form.controls.durationMinutes.value ?? 90),
+        durationMinutes: DURACION_MINUTOS_FIJA,
+        pistaId: this.pistaSeleccionada.pistaId,
+        pistaNombre: this.pistaSeleccionada.nombre,
       });
 
       const inviteLink = `${this.getAppUrl()}/invitacion/${partidoId}`;
@@ -137,7 +356,7 @@ export class CrearPartidoComponent {
 
       this.inviteLink = inviteLink;
       this.created = true;
-      this.currentStep = 3;
+      this.currentStep = 4;
       this.linkCopied = false;
       this.animateStep('forward');
     } catch (error) {
@@ -188,9 +407,15 @@ export class CrearPartidoComponent {
     this.created = false;
     this.inviteLink = '';
     this.stepAnimationClass = '';
-    this.minDateTime = this.getMinDateTime();
     this.linkCopied = false;
     this.creatingMatch = false;
+    this.provinciaSeleccionadaId = '';
+    this.municipioSeleccionadoId = '';
+    this.municipios = [];
+    this.pistaSeleccionada = null;
+    this.fechaSeleccionada = null;
+    this.horaSeleccionada = null;
+    this.horasOcupadasPorFecha = new Map();
 
     if (this.copyFeedbackTimeout) {
       clearTimeout(this.copyFeedbackTimeout);
@@ -198,36 +423,23 @@ export class CrearPartidoComponent {
     }
 
     this.form.reset({
-      matchDate: '',
-      matchTime: '',
       nombrePartido: '',
       equipoA: '',
       equipoB: '',
-      ubicacion: '',
       playerCount: 10,
-      durationMinutes: 90,
     });
 
     this.form.markAsPristine();
     this.form.markAsUntouched();
   }
 
-  private validateStep2(): boolean {
-    const {
-      nombrePartido,
-      equipoA,
-      equipoB,
-      ubicacion,
-      playerCount,
-      durationMinutes,
-    } = this.form.controls;
+  private validateStep3(): boolean {
+    const { nombrePartido, equipoA, equipoB, playerCount } = this.form.controls;
 
     nombrePartido.markAsTouched();
     equipoA.markAsTouched();
     equipoB.markAsTouched();
-    ubicacion.markAsTouched();
     playerCount.markAsTouched();
-    durationMinutes.markAsTouched();
 
     this.clearControlError(equipoB, 'sameTeamName');
 
@@ -235,9 +447,7 @@ export class CrearPartidoComponent {
       nombrePartido.invalid ||
       equipoA.invalid ||
       equipoB.invalid ||
-      ubicacion.invalid ||
-      playerCount.invalid ||
-      durationMinutes.invalid
+      playerCount.invalid
     ) {
       return false;
     }
@@ -267,37 +477,14 @@ export class CrearPartidoComponent {
   }
 
   private buildMatchDateTime(): string {
-    const date = this.form.controls.matchDate.value ?? '';
-    const time = this.form.controls.matchTime.value ?? '';
-
-    return `${date}T${time}:00`;
-  }
-
-  private isDateTimeValid(): boolean {
-    const date = this.form.controls.matchDate.value;
-    const time = this.form.controls.matchTime.value;
-
-    if (!date || !time) {
-      return false;
+    if (!this.fechaSeleccionada || !this.horaSeleccionada) {
+      return '';
     }
 
-    const selectedDate = new Date(`${date}T${time}:00`);
-    const currentDate = new Date();
+    const clave = this.claveFecha(this.fechaSeleccionada);
+    const hora = this.horaSeleccionada.padStart(2, '0');
 
-    return selectedDate.getTime() >= currentDate.getTime();
-  }
-
-  private getMinDateTime(): string {
-    const now = new Date();
-    now.setSeconds(0, 0);
-
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-
-    return `${year}-${month}-${day}T${hours}:${minutes}:00`;
+    return `${clave}T${hora}:00:00`;
   }
 
   private animateStep(direction: 'forward' | 'backward'): void {
@@ -310,14 +497,6 @@ export class CrearPartidoComponent {
   }
 
   get progressValue(): number {
-    if (this.currentStep === 1) {
-      return 1 / 3;
-    }
-
-    if (this.currentStep === 2) {
-      return 2 / 3;
-    }
-
-    return 1;
+    return this.currentStep / 4;
   }
 }

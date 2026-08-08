@@ -20,6 +20,8 @@ export interface Partido {
   jugadoresEquipoA?: string[];
   jugadoresEquipoB?: string[];
   inicioAnimacionCarruselAt?: Timestamp;
+  pistaId?: string;
+  pistaNombre?: string;
   fechaCreacion?: Timestamp | null;
   fechaActualizacion?: Timestamp | null;
 }
@@ -44,6 +46,8 @@ export interface PartidoWrite {
   jugadoresEquipoA?: string[];
   jugadoresEquipoB?: string[];
   inicioAnimacionCarruselAt?: Timestamp;
+  pistaId?: string;
+  pistaNombre?: string;
   fechaCreacion: unknown;
   fechaActualizacion: unknown;
 }
@@ -56,6 +60,8 @@ export interface CrearPartidoPayload {
   playerCount: number;
   durationMinutes: number;
   ubicacion: string;
+  pistaId?: string;
+  pistaNombre?: string;
 }
 
 export interface PartidoDetalleView {

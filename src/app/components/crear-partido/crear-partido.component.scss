@@ -48,7 +48,7 @@ ion-content.create-match-page {
   justify-content: space-between;
   gap: 8px;
   margin-bottom: 10px;
-  font-size: 0.78rem;
+  font-size: 0.72rem;
 }
 
 .create-match-page__steps span {
@@ -72,7 +72,8 @@ ion-content.create-match-page {
 }
 
 .create-match-page__progress-bar.step-2,
-.create-match-page__progress-bar.step-3 {
+.create-match-page__progress-bar.step-3,
+.create-match-page__progress-bar.step-4 {
   --progress-background: var(--matchday-green);
 }
 
@@ -141,6 +142,155 @@ ion-content.create-match-page {
   margin: 8px 0 18px;
   color: var(--matchday-text-muted);
   font-size: 0.92rem;
+}
+
+/* --- Paso 1: buscador de pistas --- */
+
+.pista-loading {
+  color: var(--matchday-text-muted);
+  font-size: 0.9rem;
+}
+
+.chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 999px;
+  background: var(--matchday-surface);
+  color: var(--matchday-text);
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.chip--active {
+  border-color: var(--matchday-green);
+  background: rgba(34, 197, 94, 0.12);
+  color: #166534;
+}
+
+.pista-results {
+  margin-top: 18px;
+}
+
+.pista-results__heading {
+  margin: 0 0 10px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--matchday-text-muted);
+}
+
+.pista-results__empty {
+  font-size: 0.88rem;
+  color: var(--matchday-text-muted);
+}
+
+.pista-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pista-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--matchday-border);
+  border-radius: 18px;
+  background: var(--matchday-surface-2);
+  text-align: left;
+}
+
+.pista-card__icon {
+  font-size: 1.3rem;
+}
+
+.pista-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pista-card__body strong {
+  color: var(--matchday-text);
+  font-size: 0.95rem;
+}
+
+.pista-card__body span {
+  color: var(--matchday-text-muted);
+  font-size: 0.82rem;
+}
+
+/* --- Paso 2: calendario y franjas --- */
+
+.pista-selected-label {
+  margin: -10px 0 14px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--matchday-text);
+}
+
+.calendar-loading {
+  padding: 24px 0;
+  text-align: center;
+  color: var(--matchday-text-muted);
+  font-size: 0.9rem;
+}
+
+.franjas-list {
+  margin-top: 18px;
+}
+
+.franjas-list__heading {
+  margin: 0 0 10px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--matchday-text);
+}
+
+.franjas-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.franja-chip {
+  min-height: 44px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 14px;
+  background: var(--matchday-surface);
+  color: var(--matchday-text);
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.franja-chip--active {
+  border-color: var(--matchday-green);
+  background: rgba(34, 197, 94, 0.14);
+  color: #166534;
+}
+
+.franja-chip--ocupada {
+  border-color: rgba(239, 68, 68, 0.35);
+  background: rgba(239, 68, 68, 0.08);
+  color: #b91c1c;
+  opacity: 0.7;
+}
+
+.resumen-horario {
+  margin: -10px 0 18px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(34, 197, 94, 0.1);
+  color: #166534;
+  font-size: 0.82rem;
+  font-weight: 700;
 }
 
 .datetime-stack {
@@ -403,6 +553,10 @@ ion-content.create-match-page {
   box-shadow: 0 10px 24px rgba(34, 197, 94, 0.22);
 }
 
+.primary-action:disabled {
+  opacity: 0.5;
+}
+
 .secondary-action {
   background: var(--matchday-surface-2);
   color: var(--matchday-text);
@@ -472,6 +626,10 @@ ion-content.create-match-page {
 
 @media (max-width: 560px) {
   .players-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .franjas-grid {
     grid-template-columns: 1fr;
   }
 

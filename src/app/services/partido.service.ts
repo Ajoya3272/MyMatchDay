@@ -71,6 +71,8 @@ export class PartidoService {
       jugadoresEquipoB: [],
       numeroJugadores: Number(data.playerCount),
       duracionMinutos: Number(data.durationMinutes),
+      ...(data.pistaId ? { pistaId: data.pistaId } : {}),
+      ...(data.pistaNombre ? { pistaNombre: data.pistaNombre } : {}),
       fechaCreacion: serverTimestamp(),
       fechaActualizacion: serverTimestamp(),
     };

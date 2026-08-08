@@ -2,13 +2,13 @@
   --padding-start: 0;
   --padding-end: 0;
   --padding-top: 0;
-  --padding-bottom: 32px;
+  --padding-bottom: 40px;
   --background: #f4f5f7;
 
   &__container {
     max-width: 480px;
     margin: 0 auto;
-    padding: 20px 16px 0;
+    padding: 92px 16px 0;
   }
 
   &__loading,
@@ -181,6 +181,7 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 12px;
+  margin-bottom: 16px;
 }
 
 .estadistica-card {
