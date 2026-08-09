@@ -23,11 +23,38 @@ export class StepFourComponent implements OnDestroy {
 
   private copyFeedbackTimeout: ReturnType<typeof setTimeout> | null = null;
 
-  async copyInvite(): Promise<void> {
+  async compartir(): Promise<void> {
     if (!this.inviteLink) {
       return;
     }
 
+    const shareData = {
+      title: 'Invitación a un partido',
+      text: 'Únete a mi partido en JoinMatch',
+      url: this.inviteLink,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+        return;
+      }
+
+      await this.copiarAlPortapapeles();
+    } catch (error) {
+      const esCancelacionUsuario =
+        error instanceof DOMException && error.name === 'AbortError';
+
+      if (esCancelacionUsuario) {
+        return;
+      }
+
+      console.error('[STEP-FOUR] Error compartiendo el enlace:', error);
+      await this.copiarAlPortapapeles();
+    }
+  }
+
+  private async copiarAlPortapapeles(): Promise<void> {
     try {
       await navigator.clipboard.writeText(this.inviteLink);
 
@@ -42,8 +69,6 @@ export class StepFourComponent implements OnDestroy {
       }, 3000);
     } catch (error) {
       console.error('[STEP-FOUR] Error copiando el enlace:', error);
-
-      this.linkCopied = false;
     }
   }
 

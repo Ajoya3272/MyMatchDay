@@ -18,48 +18,37 @@ ion-content.menu-lateral {
 
 .menu-lateral__brand {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 14px;
 }
 
 .menu-lateral__logo {
-  width: 48px;
-  height: 48px;
+  width: 52px;
+  height: 52px;
   border-radius: 16px;
-  background: var(--matchday-green);
-  color: #0f172a;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
   display: grid;
   place-items: center;
   flex-shrink: 0;
-  font-size: 1.1rem;
-  font-weight: 800;
+  font-size: 24px;
+  color: #ffffff;
 }
 
 .menu-lateral__brand-copy {
   min-width: 0;
 }
 
-.menu-lateral__eyebrow {
-  margin: 0 0 4px;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--matchday-text-muted);
-}
-
 .menu-lateral__title {
   margin: 0;
-  font-size: 1.9rem;
-  line-height: 1;
+  font-size: 1.5rem;
+  line-height: 1.1;
   font-weight: 800;
   color: var(--matchday-text);
 }
 
 .menu-lateral__subtitle {
-  margin: 8px 0 0;
-  font-size: 0.98rem;
-  line-height: 1.45;
+  margin: 4px 0 0;
+  font-size: 0.85rem;
   color: var(--matchday-text-muted);
 }
 
@@ -109,38 +98,4 @@ ion-content.menu-lateral {
   font-size: 0.88rem;
   line-height: 1.35;
   color: var(--matchday-text-muted);
-}
-
-.menu-lateral__bottom {
-  margin-top: 24px;
-}
-
-.menu-lateral__mock-card {
-  padding: 20px;
-  border-radius: 24px;
-  background: var(--matchday-black);
-  color: #ffffff;
-}
-
-.menu-lateral__mock-label {
-  margin: 0 0 8px;
-  font-size: 0.76rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.menu-lateral__mock-title {
-  margin: 0 0 8px;
-  font-size: 1.35rem;
-  line-height: 1.05;
-  font-weight: 800;
-}
-
-.menu-lateral__mock-text {
-  margin: 0;
-  font-size: 0.95rem;
-  line-height: 1.45;
-  color: rgba(255, 255, 255, 0.82);
 }

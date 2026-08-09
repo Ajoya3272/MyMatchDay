@@ -30,11 +30,11 @@
       class="step-four__copy-button"
       [class.step-four__copy-button--copied]="linkCopied"
       [disabled]="!inviteLink"
-      (click)="copyInvite()"
+      (click)="compartir()"
     >
       <span class="step-four__copy-content">
         <span class="step-four__copy-label" [class.is-hidden]="linkCopied">
-          Copiar enlace
+          Compartir invitación
         </span>
 
         <span

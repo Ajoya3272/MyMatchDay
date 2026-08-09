@@ -1,11 +1,13 @@
 <ion-content class="menu-lateral">
   <div class="menu-lateral__top">
     <div class="menu-lateral__brand">
-      <span class="menu-lateral__logo">M</span>
+      <div class="menu-lateral__logo">
+        <ion-icon name="football-outline"></ion-icon>
+      </div>
 
       <div class="menu-lateral__brand-copy">
-        <p class="menu-lateral__eyebrow">Football tracker</p>
-        <h2 class="menu-lateral__title">Matchday</h2>
+        <h2 class="menu-lateral__title">JoinMatch</h2>
+        <p class="menu-lateral__subtitle">Organiza tus partidos</p>
       </div>
     </div>
   </div>
@@ -15,28 +17,13 @@
       <ion-item
         button
         detail="false"
-        routerLink="/stats"
-        class="menu-lateral__item"
-      >
-        <div class="menu-lateral__item-icon" slot="start">📊</div>
-        <ion-label>
-          <h3>Statistics</h3>
-          <p>Your matches, wins and performance.</p>
-        </ion-label>
-      </ion-item>
-    </ion-menu-toggle>
-
-    <ion-menu-toggle auto-hide="true">
-      <ion-item
-        button
-        detail="false"
-        routerLink="/organize-match"
+        routerLink="/crear-partido"
         class="menu-lateral__item"
       >
         <div class="menu-lateral__item-icon" slot="start">⚽</div>
         <ion-label>
-          <h3>Organize match</h3>
-          <p>Create a game and invite your friends.</p>
+          <h3>Crear partido</h3>
+          <p>Monta una pachanga en segundos.</p>
         </ion-label>
       </ion-item>
     </ion-menu-toggle>
@@ -45,25 +32,45 @@
       <ion-item
         button
         detail="false"
-        routerLink="/history"
+        routerLink="/invitar-whatsapp"
         class="menu-lateral__item"
       >
-        <div class="menu-lateral__item-icon" slot="start">🕘</div>
+        <div class="menu-lateral__item-icon" slot="start">📲</div>
         <ion-label>
-          <h3>History</h3>
-          <p>See all your previous matches.</p>
+          <h3>Invitar por WhatsApp</h3>
+          <p>Comparte enlace directo al grupo.</p>
+        </ion-label>
+      </ion-item>
+    </ion-menu-toggle>
+
+    <ion-menu-toggle auto-hide="true">
+      <ion-item
+        button
+        detail="false"
+        routerLink="/registrar-resultado"
+        class="menu-lateral__item"
+      >
+        <div class="menu-lateral__item-icon" slot="start">📝</div>
+        <ion-label>
+          <h3>Registrar resultado</h3>
+          <p>Guarda marcador, goles y asistentes.</p>
+        </ion-label>
+      </ion-item>
+    </ion-menu-toggle>
+
+    <ion-menu-toggle auto-hide="true">
+      <ion-item
+        button
+        detail="false"
+        routerLink="/estadisticas"
+        class="menu-lateral__item"
+      >
+        <div class="menu-lateral__item-icon" slot="start">📊</div>
+        <ion-label>
+          <h3>Mis estadísticas</h3>
+          <p>Consulta tus números al instante.</p>
         </ion-label>
       </ion-item>
     </ion-menu-toggle>
   </ion-list>
-
-  <div class="menu-lateral__bottom">
-    <div class="menu-lateral__mock-card">
-      <p class="menu-lateral__mock-label">Today</p>
-      <h3 class="menu-lateral__mock-title">Who are we playing today?</h3>
-      <p class="menu-lateral__mock-text">
-        Set today’s rival, time and pitch in seconds.
-      </p>
-    </div>
-  </div>
 </ion-content>
