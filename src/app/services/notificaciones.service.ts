@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
+import { Capacitor } from '@capacitor/core';
 import { LocalNotifications } from '@capacitor/local-notifications';
+
 import { Partido } from '../interfaces/Partido.interface';
 
 @Injectable({
@@ -9,6 +11,10 @@ export class NotificacionesService {
   private readonly notificationIdBase = 100000;
 
   async inicializarPermisos(): Promise<boolean> {
+    if (!this.esPlataformaNativa()) {
+      return false;
+    }
+
     const permisos = await LocalNotifications.checkPermissions();
 
     if (permisos.display === 'granted') {
@@ -21,6 +27,11 @@ export class NotificacionesService {
   }
 
   async programarAvisoPartido(partido: Partido): Promise<void> {
+    if (!this.esPlataformaNativa()) {
+      console.info('[NOTIFICACIONES] Recordatorio omitido en navegador');
+      return;
+    }
+
     if (!partido.partidoId || !partido.fecha) {
       return;
     }
@@ -41,7 +52,6 @@ export class NotificacionesService {
 
     const fechaAviso = new Date(inicio.getTime() - 24 * 60 * 60 * 1000);
 
-    // No programar un aviso cuya fecha ya ha pasado.
     if (fechaAviso.getTime() <= Date.now()) {
       return;
     }
@@ -82,6 +92,11 @@ export class NotificacionesService {
   }
 
   async notificarPartidoCreado(nombrePartido: string): Promise<void> {
+    if (!this.esPlataformaNativa()) {
+      console.info('[NOTIFICACIONES] Notificación omitida en navegador');
+      return;
+    }
+
     const tienePermiso = await this.inicializarPermisos();
 
     if (!tienePermiso) {
@@ -104,7 +119,7 @@ export class NotificacionesService {
   }
 
   async cancelarAvisoPartido(partidoId: string): Promise<void> {
-    if (!partidoId) {
+    if (!this.esPlataformaNativa() || !partidoId) {
       return;
     }
 
@@ -121,6 +136,10 @@ export class NotificacionesService {
     } catch (error) {
       console.warn('[NOTIFICACIONES] No se pudo cancelar el aviso:', error);
     }
+  }
+
+  private esPlataformaNativa(): boolean {
+    return Capacitor.isNativePlatform();
   }
 
   private obtenerIdNotificacion(partidoId: string): number {

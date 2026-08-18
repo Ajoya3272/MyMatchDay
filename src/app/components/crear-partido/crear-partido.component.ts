@@ -160,7 +160,10 @@ export class CrearPartidoComponent {
           ? { precio: this.pistaSeleccionada.precio }
           : {}),
         ...(pago
-          ? { paypalOrderId: pago.orderId, paypalPayerId: pago.payerId }
+          ? {
+              paypalOrderId: pago.orderId,
+              paypalPayerId: pago.payerId,
+            }
           : {}),
       });
 
@@ -168,9 +171,16 @@ export class CrearPartidoComponent {
 
       await this.partidoService.guardarEnlaceInvitacion(partidoId, inviteLink);
 
-      await this.notificacionesService.notificarPartidoCreado(
-        datos.nombrePartido,
-      );
+      try {
+        await this.notificacionesService.notificarPartidoCreado(
+          datos.nombrePartido,
+        );
+      } catch (error) {
+        console.warn(
+          '[CREAR-PARTIDO] No se pudo mostrar la notificación:',
+          error,
+        );
+      }
 
       this.inviteLink = inviteLink;
       this.created = true;
