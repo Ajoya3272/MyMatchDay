@@ -22,6 +22,10 @@ export interface Partido {
   inicioAnimacionCarruselAt?: Timestamp;
   pistaId?: string;
   pistaNombre?: string;
+  precio?: number;
+  pagado?: boolean;
+  paypalOrderId?: string;
+  paypalPayerId?: string;
   fechaCreacion?: Timestamp | null;
   fechaActualizacion?: Timestamp | null;
 }
@@ -48,6 +52,10 @@ export interface PartidoWrite {
   inicioAnimacionCarruselAt?: Timestamp;
   pistaId?: string;
   pistaNombre?: string;
+  precio?: number;
+  pagado?: boolean;
+  paypalOrderId?: string;
+  paypalPayerId?: string;
   fechaCreacion: unknown;
   fechaActualizacion: unknown;
 }
@@ -62,6 +70,9 @@ export interface CrearPartidoPayload {
   ubicacion: string;
   pistaId?: string;
   pistaNombre?: string;
+  precio?: number;
+  paypalOrderId?: string;
+  paypalPayerId?: string;
 }
 
 export interface PartidoDetalleView {

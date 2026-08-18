@@ -53,34 +53,50 @@
     <div class="create-match-card">
       <div class="step-shell">
         <div class="step-panel" [class]="stepAnimationClass">
-          <ng-container *ngIf="currentStep === 1">
-            <div class="create-match-card__section">
-              <app-step-one
-                (pistaSeleccionadaChange)="onPistaSeleccionada($event)"
-              ></app-step-one>
-            </div>
-          </ng-container>
+          <div class="create-match-card__section" [hidden]="currentStep !== 1">
+            <app-step-one
+              (pistaSeleccionadaChange)="onPistaSeleccionada($event)"
+            ></app-step-one>
+          </div>
 
-          <ng-container *ngIf="currentStep === 2">
-            <div class="create-match-card__section">
-              <app-step-two
-                [pista]="pistaSeleccionada"
-                (horarioSeleccionado)="onHorarioSeleccionado($event)"
-                (volver)="volverAPistas()"
-              ></app-step-two>
-            </div>
-          </ng-container>
+          <div class="create-match-card__section" [hidden]="currentStep !== 2">
+            <app-step-two
+              [pista]="pistaSeleccionada"
+              (horarioSeleccionado)="onHorarioSeleccionado($event)"
+              (volver)="volverAPistas()"
+            ></app-step-two>
+          </div>
 
           <ng-container *ngIf="currentStep === 3">
             <div class="create-match-card__section">
-              <app-step-three
-                [pista]="pistaSeleccionada"
-                [fecha]="fechaSeleccionada"
-                [hora]="horaSeleccionada"
-                [creatingMatch]="creatingMatch"
-                (datosConfirmados)="onDatosPartidoConfirmados($event)"
-                (volver)="volverACalendario()"
-              ></app-step-three>
+              <div [hidden]="!!datosPartidoPendientes">
+                <app-step-three
+                  [pista]="pistaSeleccionada"
+                  [fecha]="fechaSeleccionada"
+                  [hora]="horaSeleccionada"
+                  [creatingMatch]="creatingMatch"
+                  (datosConfirmados)="onDatosPartidoConfirmados($event)"
+                  (volver)="volverACalendario()"
+                ></app-step-three>
+              </div>
+
+              <ng-container *ngIf="datosPartidoPendientes">
+                <app-paypal-payment
+                  [amount]="precioPista!"
+                  [payeeEmail]="paypalEmailPista"
+                  (pagoCompletado)="onPagoCompletado($event)"
+                  (pagoError)="onPagoError()"
+                ></app-paypal-payment>
+
+                <button
+                  type="button"
+                  class="secondary-action"
+                  [disabled]="creatingMatch"
+                  (click)="cancelarPago()"
+                >
+                  Atrás
+                </button>
+              </ng-container>
             </div>
           </ng-container>
 

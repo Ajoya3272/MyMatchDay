@@ -1,0 +1,28 @@
+<div class="paypal-payment">
+  <div class="paypal-payment__summary">
+    <span class="paypal-payment__label">Total a pagar</span>
+    <span class="paypal-payment__amount">{{ precioFormateado }}</span>
+  </div>
+
+  <div class="paypal-payment__divider"></div>
+
+  <div class="paypal-payment__spinner" *ngIf="cargando">
+    <span class="paypal-payment__spinner-icon"></span>
+    <p>Cargando pasarela de pago...</p>
+  </div>
+
+  <div class="paypal-payment__error" *ngIf="error">
+    <span class="paypal-payment__error-icon">!</span>
+    <p>No se pudo cargar PayPal. Recarga la página e inténtalo de nuevo.</p>
+  </div>
+
+  <div
+    #paypalContainer
+    class="paypal-payment__buttons"
+    [hidden]="cargando || error"
+  ></div>
+
+  <p class="paypal-payment__secure" *ngIf="!cargando && !error">
+    🔒 Pago seguro procesado por PayPal
+  </p>
+</div>

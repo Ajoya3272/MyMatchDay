@@ -15,6 +15,10 @@ import {
   StepThreeComponent,
 } from './step-three/step-three.component';
 import { StepFourComponent } from './step-four/step-four.component';
+import {
+  PaypalPaymentComponent,
+  PagoCompletado,
+} from '../paypal-payment/paypal-payment.component';
 import { environment } from '../../../enviroments/enviroment';
 import { Pista } from '../../interfaces/Pista.interface';
 
@@ -34,6 +38,7 @@ const DURACION_MINUTOS_FIJA = 60;
     StepTwoComponent,
     StepThreeComponent,
     StepFourComponent,
+    PaypalPaymentComponent,
   ],
 })
 export class CrearPartidoComponent {
@@ -49,6 +54,8 @@ export class CrearPartidoComponent {
   pistaSeleccionada: Pista | null = null;
   fechaSeleccionada: Date | null = null;
   horaSeleccionada: string | null = null;
+
+  datosPartidoPendientes: DatosPartido | null = null;
 
   ionViewDidLeave(): void {
     this.resetCreateMatch();
@@ -72,24 +79,51 @@ export class CrearPartidoComponent {
   }
 
   onDatosPartidoConfirmados(datos: DatosPartido): void {
+    if (this.requierePago) {
+      this.datosPartidoPendientes = datos;
+      return;
+    }
+
     void this.createMatch(datos);
+  }
+
+  onPagoCompletado(pago: PagoCompletado): void {
+    if (!this.datosPartidoPendientes) {
+      return;
+    }
+
+    void this.createMatch(this.datosPartidoPendientes, pago);
+    this.datosPartidoPendientes = null;
+  }
+
+  onPagoError(): void {
+    console.error('[CREAR-PARTIDO] Error al procesar el pago');
+  }
+
+  cancelarPago(): void {
+    this.datosPartidoPendientes = null;
   }
 
   volverAPistas(): void {
     this.currentStep = 1;
     this.fechaSeleccionada = null;
     this.horaSeleccionada = null;
+    this.datosPartidoPendientes = null;
 
     this.animateStep('backward');
   }
 
   volverACalendario(): void {
     this.currentStep = 2;
+    this.datosPartidoPendientes = null;
 
     this.animateStep('backward');
   }
 
-  async createMatch(datos?: DatosPartido): Promise<void> {
+  async createMatch(
+    datos?: DatosPartido,
+    pago?: PagoCompletado,
+  ): Promise<void> {
     if (this.creatingMatch) {
       return;
     }
@@ -120,6 +154,12 @@ export class CrearPartidoComponent {
         durationMinutes: DURACION_MINUTOS_FIJA,
         pistaId: this.pistaSeleccionada.pistaId,
         pistaNombre: this.pistaSeleccionada.nombre,
+        ...(typeof this.pistaSeleccionada.precio === 'number'
+          ? { precio: this.pistaSeleccionada.precio }
+          : {}),
+        ...(pago
+          ? { paypalOrderId: pago.orderId, paypalPayerId: pago.payerId }
+          : {}),
       });
 
       const inviteLink = `${this.getAppUrl()}/invitacion/${partidoId}`;
@@ -142,6 +182,22 @@ export class CrearPartidoComponent {
     void this.router.navigate(['/home']);
   }
 
+  get requierePago(): boolean {
+    return typeof this.pistaSeleccionada?.precio === 'number';
+  }
+
+  get precioPista(): number | null {
+    return this.pistaSeleccionada?.precio ?? null;
+  }
+
+  get paypalEmailPista(): string {
+    return (
+      this.pistaSeleccionada?.paypalEmail ??
+      environment.paypalDefaultEmail ??
+      ''
+    );
+  }
+
   private getAppUrl(): string {
     const configuredUrl = environment.appUrl?.trim();
 
@@ -162,6 +218,7 @@ export class CrearPartidoComponent {
     this.pistaSeleccionada = null;
     this.fechaSeleccionada = null;
     this.horaSeleccionada = null;
+    this.datosPartidoPendientes = null;
   }
 
   private buildMatchDateTime(): string {

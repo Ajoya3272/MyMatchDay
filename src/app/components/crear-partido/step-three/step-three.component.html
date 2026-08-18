@@ -9,6 +9,10 @@
     <span class="step-three__summary-location"> 🏟️ {{ pista.nombre }} </span>
 
     <span class="step-three__summary-schedule"> 📅 {{ horarioResumen }} </span>
+
+    <span class="step-three__summary-price" *ngIf="tienePrecio">
+      💳 {{ precioFormateado }}
+    </span>
   </div>
 
   <form
@@ -163,7 +167,13 @@
       </button>
 
       <button type="submit" class="primary-action" [disabled]="creatingMatch">
-        {{ creatingMatch ? "Creando..." : "Crear partido" }}
+        {{
+          creatingMatch
+            ? "Creando..."
+            : tienePrecio
+              ? "Continuar al pago"
+              : "Crear partido"
+        }}
       </button>
     </div>
   </form>

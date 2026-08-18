@@ -152,7 +152,8 @@ ion-content.create-match-page {
 app-step-one,
 app-step-two,
 app-step-three,
-app-step-four {
+app-step-four,
+app-paypal-payment {
   display: block;
   width: 100%;
 }
@@ -170,6 +171,35 @@ app-step-four {
   margin: 20px auto 0;
   padding: 0 16px 30px;
   box-sizing: border-box;
+}
+
+.secondary-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 50px;
+  border: none;
+  border-radius: 16px;
+  background: rgba(148, 163, 184, 0.12);
+  color: var(--matchday-text);
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 160ms ease;
+}
+
+.secondary-action:hover:not(:disabled) {
+  background: rgba(148, 163, 184, 0.2);
+}
+
+.secondary-action:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+app-paypal-payment + .secondary-action {
+  margin-top: 16px;
 }
 
 @media (max-width: 560px) {

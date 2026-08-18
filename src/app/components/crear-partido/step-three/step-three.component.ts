@@ -69,6 +69,21 @@ export class StepThreeComponent {
     return `${fechaFormateada} · ${this.hora}:00 - ${horaFin}:00`;
   }
 
+  get tienePrecio(): boolean {
+    return typeof this.pista?.precio === 'number';
+  }
+
+  get precioFormateado(): string {
+    if (!this.tienePrecio) {
+      return '';
+    }
+
+    return new Intl.NumberFormat('es-ES', {
+      style: 'currency',
+      currency: 'EUR',
+    }).format(this.pista!.precio!);
+  }
+
   volverAlCalendario(): void {
     if (this.creatingMatch) {
       return;

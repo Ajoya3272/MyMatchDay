@@ -74,6 +74,11 @@ export class PartidoService {
       duracionMinutos: Number(data.durationMinutes),
       ...(data.pistaId ? { pistaId: data.pistaId } : {}),
       ...(data.pistaNombre ? { pistaNombre: data.pistaNombre } : {}),
+      ...(typeof data.precio === 'number'
+        ? { precio: data.precio, pagado: true }
+        : {}),
+      ...(data.paypalOrderId ? { paypalOrderId: data.paypalOrderId } : {}),
+      ...(data.paypalPayerId ? { paypalPayerId: data.paypalPayerId } : {}),
       fechaCreacion: serverTimestamp(),
       fechaActualizacion: serverTimestamp(),
     };

@@ -3,4 +3,6 @@ export interface Pista {
   nombre: string;
   provincia: string;
   localidad: string;
+  precio?: number;
+  paypalEmail?: string;
 }

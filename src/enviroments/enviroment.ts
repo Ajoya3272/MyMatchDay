@@ -8,8 +8,10 @@ export const environment = {
   measurementId: 'G-V5MHH501XM',
   appUrl: 'https://joinmatch.es',
   production: true,
+  paypalClientId:
+    'ARyzfQZpE5t0gkJ_V1hGjnDBiiozzU0wH4qxahyLuRXt40nfKUgY5ahpnZEZ4UDMZdnPmqRuHg9H7Epb',
+  paypalDefaultEmail: '',
 };
-
 export const cloudinary = {
   cloudName: 'm4msrltl',
   uploadPreset: 'football_profile_upload',

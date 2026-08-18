@@ -190,6 +190,21 @@ export class StepTwoComponent implements OnInit, OnChanges, OnDestroy {
     }));
   }
 
+  get tienePrecio(): boolean {
+    return typeof this.pista?.precio === 'number';
+  }
+
+  get precioFormateado(): string {
+    if (!this.tienePrecio) {
+      return '';
+    }
+
+    return new Intl.NumberFormat('es-ES', {
+      style: 'currency',
+      currency: 'EUR',
+    }).format(this.pista!.precio!);
+  }
+
   trackByHora(_index: number, franja: FranjaHoraria): string {
     return franja.hora;
   }

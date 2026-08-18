@@ -14,6 +14,10 @@
         Ubicación manual
       </small>
     </p>
+
+    <p class="step-two__price" *ngIf="tienePrecio">
+      Precio de la reserva: {{ precioFormateado }}
+    </p>
   </div>
 
   <div class="step-two__loading" *ngIf="cargandoDisponibilidad">
@@ -45,7 +49,11 @@
           [disabled]="franja.ocupada"
           (pointerdown)="seleccionarHoraDesdePointer($event, franja)"
         >
-          {{ franja.label }}
+          <span class="time-slot__label"> {{ franja.label }} </span>
+
+          <span class="time-slot__price" *ngIf="tienePrecio">
+            {{ precioFormateado }}
+          </span>
         </button>
       </div>
     </div>
