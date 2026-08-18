@@ -3,8 +3,16 @@ import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { IonContent, IonProgressBar } from '@ionic/angular/standalone';
 
+import { environment } from '../../../enviroments/enviroment';
+import { Pista } from '../../interfaces/Pista.interface';
+import { NotificacionesService } from '../../services/notificaciones.service';
 import { PartidoService } from '../../services/partido.service';
+import {
+  PaypalPaymentComponent,
+  PagoCompletado,
+} from '../paypal-payment/paypal-payment.component';
 import { SpinnerComponent } from '../spinner/spinner.component';
+import { StepFourComponent } from './step-four/step-four.component';
 import { StepOneComponent } from './step-one/step-one.component';
 import {
   HorarioSeleccionado,
@@ -14,13 +22,6 @@ import {
   DatosPartido,
   StepThreeComponent,
 } from './step-three/step-three.component';
-import { StepFourComponent } from './step-four/step-four.component';
-import {
-  PaypalPaymentComponent,
-  PagoCompletado,
-} from '../paypal-payment/paypal-payment.component';
-import { environment } from '../../../enviroments/enviroment';
-import { Pista } from '../../interfaces/Pista.interface';
 
 const DURACION_MINUTOS_FIJA = 60;
 
@@ -44,6 +45,7 @@ const DURACION_MINUTOS_FIJA = 60;
 export class CrearPartidoComponent {
   private router = inject(Router);
   private partidoService = inject(PartidoService);
+  private notificacionesService = inject(NotificacionesService);
 
   currentStep = 1;
   created = false;
@@ -165,6 +167,10 @@ export class CrearPartidoComponent {
       const inviteLink = `${this.getAppUrl()}/invitacion/${partidoId}`;
 
       await this.partidoService.guardarEnlaceInvitacion(partidoId, inviteLink);
+
+      await this.notificacionesService.notificarPartidoCreado(
+        datos.nombrePartido,
+      );
 
       this.inviteLink = inviteLink;
       this.created = true;

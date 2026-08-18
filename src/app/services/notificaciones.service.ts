@@ -81,6 +81,28 @@ export class NotificacionesService {
     });
   }
 
+  async notificarPartidoCreado(nombrePartido: string): Promise<void> {
+    const tienePermiso = await this.inicializarPermisos();
+
+    if (!tienePermiso) {
+      console.warn('[NOTIFICACIONES] Permiso no concedido');
+      return;
+    }
+
+    await LocalNotifications.schedule({
+      notifications: [
+        {
+          id: Date.now() % 1000000000,
+          title: '⚽ ¡Partido creado con éxito!',
+          body: `“${nombrePartido}” ya está listo. Invita ahora al resto de jugadores.`,
+          extra: {
+            tipo: 'partido-creado',
+          },
+        },
+      ],
+    });
+  }
+
   async cancelarAvisoPartido(partidoId: string): Promise<void> {
     if (!partidoId) {
       return;
