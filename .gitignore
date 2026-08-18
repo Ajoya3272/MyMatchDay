@@ -41,6 +41,35 @@ testem.log
 .DS_Store
 Thumbs.db
 
+# Environment files with secrets or local configuration
 src/environments/enviroment.ts
 src/environments/environment.ts
 src/environments/environment.local.ts
+
+# Android / Capacitor: local files and generated build output
+/android/.gradle/
+/android/build/
+/android/app/build/
+/android/local.properties
+/android/.idea/
+/android/captures/
+/android/.externalNativeBuild/
+/android/.cxx/
+
+# Android Studio and Gradle local/generated files
+*.iml
+*.hprof
+.gradle/
+/build/
+
+# Generated Android packages: do not commit
+*.apk
+*.aab
+output-metadata.json
+
+# Android signing credentials: never commit
+*.jks
+*.keystore
+*.properties
+!gradle.properties
+!android/gradle.properties

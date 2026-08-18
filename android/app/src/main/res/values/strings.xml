@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">JoinMatch</string>
+    <string name="title_activity_main">JoinMatch</string>
+    <string name="package_name">es.joinmatch.app</string>
+    <string name="custom_url_scheme">es.joinmatch.app</string>
+</resources>
