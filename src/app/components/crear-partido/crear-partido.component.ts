@@ -179,6 +179,17 @@ export class CrearPartidoComponent {
       this.animateStep('forward');
     } catch (error) {
       console.error('[CREAR-PARTIDO] Error al crear partido:', error);
+
+      const mensaje =
+        error instanceof Error ? error.message : 'No se pudo crear el partido';
+
+      if (mensaje.includes('ya está reservada')) {
+        window.alert(
+          '⚠️ Esta hora acaba de ser reservada por otro usuario. Elige otra franja.',
+        );
+      } else {
+        window.alert('No se pudo crear el partido. Inténtalo de nuevo.');
+      }
     } finally {
       this.creatingMatch = false;
     }

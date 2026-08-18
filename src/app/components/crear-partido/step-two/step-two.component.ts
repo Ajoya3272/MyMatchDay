@@ -10,15 +10,16 @@ import {
   SimpleChanges,
   inject,
 } from '@angular/core';
-import { IonDatetime } from '@ionic/angular/standalone';
 import { Timestamp } from '@angular/fire/firestore';
-import { Subject, take, takeUntil } from 'rxjs';
+import { IonDatetime } from '@ionic/angular/standalone';
+import { Subject, takeUntil } from 'rxjs';
 
-import { PistaService } from '../../../services/pista.service';
 import { Pista } from '../../../interfaces/Pista.interface';
+import { PistaService } from '../../../services/pista.service';
 
 interface PartidoFechaDoc {
   fecha?: Timestamp;
+  estado?: string;
 }
 
 interface FranjaHoraria {
@@ -49,7 +50,6 @@ export class StepTwoComponent implements OnInit, OnChanges, OnDestroy {
   @Input() pista: Pista | null = null;
 
   @Output() horarioSeleccionado = new EventEmitter<HorarioSeleccionado>();
-
   @Output() volver = new EventEmitter<void>();
 
   cargandoDisponibilidad = false;
@@ -95,11 +95,12 @@ export class StepTwoComponent implements OnInit, OnChanges, OnDestroy {
 
     this.pistaService
       .obtenerPartidosDePista(pista.pistaId)
-      .pipe(take(1), takeUntil(this.destroy$))
+      .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (partidos) => {
           this.horasOcupadasPorFecha = this.construirMapaOcupacion(partidos);
 
+          this.comprobarHoraSeleccionada();
           this.cargandoDisponibilidad = false;
         },
         error: (error) => {
@@ -180,7 +181,6 @@ export class StepTwoComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     const clave = this.claveFecha(this.fechaSeleccionada);
-
     const ocupadas = this.horasOcupadasPorFecha.get(clave) ?? new Set<string>();
 
     return FRANJAS_HORARIAS.map((hora) => ({
@@ -238,6 +238,19 @@ export class StepTwoComponent implements OnInit, OnChanges, OnDestroy {
     });
   }
 
+  private comprobarHoraSeleccionada(): void {
+    if (!this.fechaSeleccionada || !this.horaSeleccionada) {
+      return;
+    }
+
+    const clave = this.claveFecha(this.fechaSeleccionada);
+    const ocupadas = this.horasOcupadasPorFecha.get(clave);
+
+    if (ocupadas?.has(this.horaSeleccionada)) {
+      this.horaSeleccionada = null;
+    }
+  }
+
   private contarOcupadas(fecha: Date): number {
     const clave = this.claveFecha(fecha);
 
@@ -250,6 +263,10 @@ export class StepTwoComponent implements OnInit, OnChanges, OnDestroy {
     const mapa = new Map<string, Set<string>>();
 
     for (const partido of partidos) {
+      if (partido.estado === 'cancelado' || partido.estado === 'finalizado') {
+        continue;
+      }
+
       const fecha = partido.fecha?.toDate?.();
 
       if (!fecha) {
@@ -271,9 +288,7 @@ export class StepTwoComponent implements OnInit, OnChanges, OnDestroy {
 
   private claveFecha(fecha: Date): string {
     const year = fecha.getFullYear();
-
     const month = String(fecha.getMonth() + 1).padStart(2, '0');
-
     const day = String(fecha.getDate()).padStart(2, '0');
 
     return `${year}-${month}-${day}`;
