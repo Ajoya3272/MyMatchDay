@@ -1,11 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
-
 import { IonApp, IonMenu, IonRouterOutlet } from '@ionic/angular/standalone';
-
 import { HeaderComponent } from './shared/header/header.component';
 import { MenuLateralComponent } from './shared/menu-lateral/menu-lateral.component';
+import { NotificacionesService } from './services/notificaciones.service';
 
 type ThemeMode = 'light' | 'dark';
 
@@ -23,13 +22,15 @@ type ThemeMode = 'light' | 'dark';
   ],
 })
 export class AppComponent {
+  private router = inject(Router);
+  private notificacionesService = inject(NotificacionesService);
+
   hideLayout = false;
 
   private readonly themeStorageKey = 'theme';
 
-  constructor(private router: Router) {
+  constructor() {
     this.initializeTheme();
-
     this.updateLayout(this.router.url);
 
     this.router.events
@@ -41,6 +42,23 @@ export class AppComponent {
       .subscribe((event) => {
         this.updateLayout(event.urlAfterRedirects);
       });
+
+    void this.inicializarNotificaciones();
+  }
+
+  private async inicializarNotificaciones(): Promise<void> {
+    try {
+      const permisoConcedido =
+        await this.notificacionesService.inicializarPermisos();
+
+      if (!permisoConcedido) {
+        console.warn(
+          '[NOTIFICACIONES] El usuario no ha concedido permiso para notificaciones.',
+        );
+      }
+    } catch (error) {
+      console.error('[NOTIFICACIONES] Error inicializando permisos:', error);
+    }
   }
 
   private initializeTheme(): void {
@@ -50,7 +68,6 @@ export class AppComponent {
 
     if (savedTheme === 'dark' || savedTheme === 'light') {
       document.documentElement.setAttribute('data-theme', savedTheme);
-
       return;
     }
 
@@ -61,7 +78,6 @@ export class AppComponent {
       : 'light';
 
     document.documentElement.setAttribute('data-theme', systemTheme);
-
     localStorage.setItem(this.themeStorageKey, systemTheme);
   }
 

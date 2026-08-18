@@ -15,11 +15,13 @@
       <section class="hero-stat">
         <span class="hero-stat__label">Goles totales</span>
         <strong class="hero-stat__value">{{ totalGoles }}</strong>
+
         <div class="hero-stat__row">
-          <span class="hero-stat__pill">⚽ {{ totalPartidos }} partidos</span>
-          <span class="hero-stat__pill"
-            >🏆 {{ porcentajeVictorias }}% victorias</span
-          >
+          <span class="hero-stat__pill"> ⚽ {{ totalPartidos }} partidos </span>
+
+          <span class="hero-stat__pill">
+            🏆 {{ porcentajeVictorias }}% victorias
+          </span>
         </div>
       </section>
 
@@ -40,6 +42,7 @@
             >
               {{ semana.goles }}
             </span>
+
             <div class="estadisticas-chart__bar-track">
               <div
                 class="estadisticas-chart__bar-fill"
@@ -47,9 +50,10 @@
                 [style.height.%]="semana.porcentajeAltura"
               ></div>
             </div>
-            <span class="estadisticas-chart__bar-label">{{
-              semana.label
-            }}</span>
+
+            <span class="estadisticas-chart__bar-label">
+              {{ semana.label }}
+            </span>
           </div>
         </div>
       </section>
@@ -60,11 +64,22 @@
           *ngFor="let card of cards"
           [attr.data-accent]="card.accent"
         >
-          <div class="estadistica-card__icon">{{ card.icon }}</div>
+          <div class="estadistica-card__icon">
+            {{ card.icon }}
+          </div>
+
           <div class="estadistica-card__body">
-            <strong class="estadistica-card__value">{{ card.value }}</strong>
-            <span class="estadistica-card__title">{{ card.title }}</span>
-            <span class="estadistica-card__subtitle">{{ card.subtitle }}</span>
+            <strong class="estadistica-card__value">
+              {{ card.value }}
+            </strong>
+
+            <span class="estadistica-card__title">
+              {{ card.title }}
+            </span>
+
+            <span class="estadistica-card__subtitle">
+              {{ card.subtitle }}
+            </span>
           </div>
         </article>
       </section>

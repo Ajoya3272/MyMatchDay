@@ -231,7 +231,17 @@ export class CarruselComponent implements OnInit, OnDestroy {
   puedeBorrar(match: PartidoCarrusel): boolean {
     const esOrganizador =
       !!this.currentUserUid && match.organizadorId === this.currentUserUid;
-    return esOrganizador && this.isPending(match);
+
+    const inicio = match.fecha?.toDate?.();
+
+    if (!esOrganizador || !inicio || !this.isPending(match)) {
+      return false;
+    }
+
+    const milisegundosHastaInicio = inicio.getTime() - Date.now();
+    const veinticuatroHorasMs = 24 * 60 * 60 * 1000;
+
+    return milisegundosHastaInicio > veinticuatroHorasMs;
   }
 
   openDeleteModal(match: PartidoCarrusel): void {
