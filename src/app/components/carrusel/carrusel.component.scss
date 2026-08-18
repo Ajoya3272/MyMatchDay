@@ -1,6 +1,8 @@
 .matches-carousel-shell {
   position: relative;
   overflow: hidden;
+  background-color: var(--matchday-bg);
+  box-shadow: none;
 }
 
 .matches-carousel {
@@ -8,11 +10,13 @@
   overflow-x: auto;
   padding: 0;
   margin: 0;
+  background-color: var(--matchday-bg);
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   overscroll-behavior-x: contain;
+  box-shadow: none;
 }
 
 .matches-carousel::-webkit-scrollbar {
@@ -23,9 +27,10 @@
   flex: 0 0 100%;
   min-width: 100%;
   max-width: 100%;
-  scroll-snap-align: start;
   padding-right: 12px;
   box-sizing: border-box;
+  background-color: var(--matchday-bg);
+  scroll-snap-align: start;
 }
 
 .match-slide:last-child {
@@ -34,33 +39,39 @@
 
 .match-card {
   position: relative;
-  border-radius: 24px;
   padding: 18px;
+  border-radius: 24px;
   background-color: var(--matchday-black);
   color: #ffffff;
-  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.18);
+  box-shadow: none;
   transition:
     background-color 700ms ease-in-out,
     color 700ms ease-in-out,
-    box-shadow 700ms ease-in-out,
     transform 700ms ease-in-out;
 }
 
 .match-card--pending {
   background-color: var(--matchday-pending);
   color: #ffffff;
+  box-shadow: none;
 }
 
 .match-card--progress {
   background-color: var(--matchday-progress);
   color: #0f172a;
-  box-shadow: 0 16px 40px rgba(96, 165, 250, 0.26);
+  box-shadow: none;
 }
 
 .match-card--finished {
   background-color: var(--matchday-finished);
   color: #ffffff;
-  box-shadow: 0 16px 40px rgba(107, 114, 128, 0.22);
+  box-shadow: none;
+}
+
+.match-card--empty {
+  background-color: var(--matchday-surface);
+  color: var(--matchday-text);
+  box-shadow: none;
 }
 
 .match-card__top {
@@ -123,6 +134,11 @@
 
 .match-card--progress .match-card__teams {
   color: rgba(15, 23, 42, 0.72);
+}
+
+.match-card--empty .match-card__title,
+.match-card--empty .match-card__place {
+  color: var(--matchday-text);
 }
 
 .match-card__meta {
@@ -213,9 +229,9 @@
 }
 
 .match-card--finished .match-card__cta {
+  border: 1px solid rgba(255, 255, 255, 0.14);
   background-color: rgba(255, 255, 255, 0.14);
   color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.14);
 }
 
 .match-card__cta:active {
@@ -250,57 +266,57 @@
 }
 
 .match-card__start {
-  min-height: 240px;
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  min-height: 240px;
   gap: 18px;
-  overflow: hidden;
-  position: relative;
   padding: 22px 18px;
+  overflow: hidden;
 }
 
 .match-card__start-ribbon {
-  width: 100%;
-  overflow: hidden;
   position: relative;
-  height: 54px;
   display: flex;
   align-items: center;
+  width: 100%;
+  height: 54px;
+  overflow: hidden;
 }
 
 .match-card__start-ribbon-text {
   display: inline-block;
   white-space: nowrap;
+  color: #ffffff;
   font-size: 1.6rem;
   font-weight: 900;
   letter-spacing: 0.03em;
   text-transform: uppercase;
-  color: #fff;
   animation: ribbon-move 4.5s linear infinite;
   will-change: transform;
 }
 
 .match-card__start-main {
-  text-align: center;
   display: flex;
   flex-direction: column;
   gap: 10px;
+  text-align: center;
 }
 
 .match-card__start-title {
   margin: 0;
+  color: #ffffff;
   font-size: 1.5rem;
   line-height: 1.05;
   font-weight: 900;
-  color: #ffffff;
 }
 
 .match-card__start-teams {
   margin: 0;
+  color: rgba(255, 255, 255, 0.9);
   font-size: 1rem;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.9);
 }
 
 .match-card__start--fin .match-card__start-ribbon-text {
@@ -340,6 +356,7 @@
   0% {
     transform: translateX(120%);
   }
+
   100% {
     transform: translateX(-120%);
   }
