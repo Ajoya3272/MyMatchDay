@@ -21,9 +21,42 @@
         class="menu-lateral__item"
       >
         <div class="menu-lateral__item-icon" slot="start">⚽</div>
+
         <ion-label>
           <h3>Crear partido</h3>
           <p>Monta una pachanga en segundos.</p>
+        </ion-label>
+      </ion-item>
+    </ion-menu-toggle>
+
+    <ion-menu-toggle auto-hide="true">
+      <ion-item
+        button
+        detail="false"
+        routerLink="/buscar-amigos"
+        class="menu-lateral__item"
+      >
+        <div class="menu-lateral__item-icon" slot="start">🔍</div>
+
+        <ion-label>
+          <h3>Buscar jugadores</h3>
+          <p>Encuentra y sigue a otros usuarios.</p>
+        </ion-label>
+      </ion-item>
+    </ion-menu-toggle>
+
+    <ion-menu-toggle auto-hide="true">
+      <ion-item
+        button
+        detail="false"
+        routerLink="/mis-seguidos"
+        class="menu-lateral__item"
+      >
+        <div class="menu-lateral__item-icon" slot="start">👥</div>
+
+        <ion-label>
+          <h3>Mis seguidos</h3>
+          <p>Jugadores a los que sigues.</p>
         </ion-label>
       </ion-item>
     </ion-menu-toggle>
@@ -36,6 +69,7 @@
         class="menu-lateral__item"
       >
         <div class="menu-lateral__item-icon" slot="start">📲</div>
+
         <ion-label>
           <h3>Invitar por WhatsApp</h3>
           <p>Comparte enlace directo al grupo.</p>
@@ -51,6 +85,7 @@
         class="menu-lateral__item"
       >
         <div class="menu-lateral__item-icon" slot="start">📝</div>
+
         <ion-label>
           <h3>Registrar resultado</h3>
           <p>Guarda marcador, goles y asistentes.</p>
@@ -66,6 +101,7 @@
         class="menu-lateral__item"
       >
         <div class="menu-lateral__item-icon" slot="start">📊</div>
+
         <ion-label>
           <h3>Mis estadísticas</h3>
           <p>Consulta tus números al instante.</p>

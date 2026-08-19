@@ -4,6 +4,9 @@
   --padding-top: 0;
   --padding-bottom: 40px;
   --background: #f4f5f7;
+  --color: #111827;
+
+  color: #111827;
 
   &__container {
     width: 100%;
@@ -13,30 +16,77 @@
     box-sizing: border-box;
   }
 
+  &__header {
+    display: block;
+    margin: 0 0 18px;
+    padding: 0;
+    color: #111827 !important;
+    text-align: left;
+  }
+
+  &__header h1 {
+    display: block;
+    margin: 0 0 7px;
+    padding: 0;
+    color: #111827 !important;
+    font-size: 1.55rem;
+    font-weight: 800;
+    line-height: 1.2;
+    opacity: 1 !important;
+  }
+
+  &__header p {
+    display: block;
+    margin: 0;
+    padding: 0;
+    color: #6b7280 !important;
+    font-size: 0.9rem;
+    font-weight: 400;
+    line-height: 1.4;
+    opacity: 1 !important;
+  }
+
+  &__eyebrow {
+    display: block;
+    margin-bottom: 6px;
+    color: #16a34a !important;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    line-height: 1.2;
+    text-transform: uppercase;
+    opacity: 1 !important;
+  }
+
   &__loading,
   &__empty {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    text-align: center;
     padding: 64px 24px;
-    color: #6b7280;
+    color: #6b7280 !important;
+    text-align: center;
+  }
 
-    h2 {
-      margin: 12px 0 6px;
-      font-size: 17px;
-      color: #111827;
-    }
+  &__loading p,
+  &__empty p {
+    margin: 0;
+    color: #6b7280 !important;
+    font-size: 13px;
+    line-height: 1.4;
+  }
 
-    p {
-      margin: 0;
-      font-size: 13px;
-      line-height: 1.4;
-    }
+  &__empty h2 {
+    margin: 12px 0 6px;
+    color: #111827 !important;
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.25;
   }
 
   &__empty-icon {
+    color: #111827;
     font-size: 40px;
     line-height: 1;
   }
@@ -62,21 +112,23 @@
   margin-bottom: 16px;
   padding: 24px 20px;
   border-radius: 20px;
+  background: linear-gradient(135deg, #16a34a, #15803d);
   color: #ffffff;
   text-align: center;
-  background: linear-gradient(135deg, #16a34a, #15803d);
   box-shadow: 0 8px 20px rgba(21, 128, 61, 0.25);
 
   &__label {
     display: block;
     margin-bottom: 4px;
+    color: #ffffff !important;
     font-size: 13px;
-    opacity: 0.85;
+    opacity: 0.9;
   }
 
   &__value {
     display: block;
     margin-bottom: 14px;
+    color: #ffffff !important;
     font-size: 56px;
     font-weight: 800;
     line-height: 1;
@@ -96,10 +148,11 @@
     min-height: 28px;
     padding: 6px 12px;
     border-radius: 999px;
+    background: rgba(255, 255, 255, 0.18);
+    color: #ffffff !important;
     font-size: 12px;
     font-weight: 600;
     line-height: 1;
-    background: rgba(255, 255, 255, 0.18);
   }
 }
 
@@ -113,19 +166,19 @@
   &__heading {
     margin-bottom: 18px;
     text-align: center;
+  }
 
-    h2 {
-      margin: 0 0 2px;
-      color: #111827;
-      font-size: 15px;
-      font-weight: 700;
-    }
+  &__heading h2 {
+    margin: 0 0 2px;
+    color: #111827 !important;
+    font-size: 15px;
+    font-weight: 700;
+  }
 
-    p {
-      margin: 0;
-      color: #9ca3af;
-      font-size: 11px;
-    }
+  &__heading p {
+    margin: 0;
+    color: #9ca3af !important;
+    font-size: 11px;
   }
 
   &__bars {
@@ -147,12 +200,12 @@
 
   &__bar-value {
     margin-bottom: 6px;
-    color: #d1d5db;
+    color: #d1d5db !important;
     font-size: 11px;
     font-weight: 700;
 
     &--active {
-      color: #16a34a;
+      color: #16a34a !important;
     }
   }
 
@@ -181,7 +234,7 @@
 
   &__bar-label {
     margin-top: 8px;
-    color: #9ca3af;
+    color: #9ca3af !important;
     font-size: 10px;
     font-weight: 600;
     line-height: 1.1;
@@ -250,21 +303,21 @@
   }
 
   &__value {
-    color: #111827;
+    color: #111827 !important;
     font-size: 22px;
     font-weight: 800;
     line-height: 1.1;
   }
 
   &__title {
-    color: #374151;
+    color: #374151 !important;
     font-size: 12px;
     font-weight: 600;
     line-height: 1.15;
   }
 
   &__subtitle {
-    color: #9ca3af;
+    color: #9ca3af !important;
     font-size: 11px;
     line-height: 1.2;
   }

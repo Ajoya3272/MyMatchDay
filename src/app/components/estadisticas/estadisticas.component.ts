@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnInit, inject } from '@angular/core';
-import { IonContent } from '@ionic/angular/standalone';
+import { Component, Input, OnDestroy, OnInit, inject } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { Auth, authState } from '@angular/fire/auth';
 import {
   Firestore,
@@ -11,8 +11,10 @@ import {
   query,
   where,
 } from '@angular/fire/firestore';
-import { Observable, of } from 'rxjs';
-import { catchError, map, switchMap } from 'rxjs/operators';
+import { IonContent } from '@ionic/angular/standalone';
+import { Observable, Subject, of, switchMap, takeUntil } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+
 import { Partido } from '../../interfaces/Partido.interface';
 
 type MetricKey =
@@ -60,9 +62,11 @@ const NUM_SEMANAS_GRAFICA = 6;
   standalone: true,
   imports: [CommonModule, IonContent],
 })
-export class EstadisticasComponent implements OnInit {
+export class EstadisticasComponent implements OnInit, OnDestroy {
   private auth = inject(Auth);
   private firestore = inject(Firestore);
+  private route = inject(ActivatedRoute);
+  private destroy$ = new Subject<void>();
 
   @Input() partidos: Partido[] = [];
 
@@ -74,30 +78,97 @@ export class EstadisticasComponent implements OnInit {
   cargando = true;
   sinDatos = false;
 
+  jugadorId = '';
+  nombreJugador = '';
+  viendoPerfilAjeno = false;
+
   ngOnInit(): void {
-    this.cargarEstadisticas();
+    this.route.queryParamMap
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((params) => {
+        const jugadorIdUrl = params.get('jugadorId')?.trim() ?? '';
+        const nombreUrl = params.get('nombre')?.trim() ?? '';
+
+        this.jugadorId = jugadorIdUrl;
+        this.nombreJugador = nombreUrl;
+        this.viendoPerfilAjeno = !!jugadorIdUrl;
+
+        this.cargarEstadisticas(jugadorIdUrl);
+      });
   }
 
-  private cargarEstadisticas(): void {
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  get tituloHistorial(): string {
+    if (this.viendoPerfilAjeno && this.nombreJugador) {
+      return `Historial de ${this.nombreJugador}`;
+    }
+
+    return 'Tus estadísticas';
+  }
+
+  get textoCargando(): string {
+    if (this.viendoPerfilAjeno && this.nombreJugador) {
+      return `Cargando estadísticas de ${this.nombreJugador}...`;
+    }
+
+    return 'Cargando tus estadísticas...';
+  }
+
+  get tituloSinDatos(): string {
+    if (this.viendoPerfilAjeno && this.nombreJugador) {
+      return `${this.nombreJugador} todavía no tiene estadísticas`;
+    }
+
+    return 'Todavía no tienes estadísticas';
+  }
+
+  get textoSinDatos(): string {
+    if (this.viendoPerfilAjeno && this.nombreJugador) {
+      return 'Cuando registre resultados de partidos, aparecerán aquí.';
+    }
+
+    return 'Registra el resultado de un partido y aparecerán aquí.';
+  }
+
+  get etiquetaGolesTotales(): string {
+    if (this.viendoPerfilAjeno && this.nombreJugador) {
+      return `Goles totales de ${this.nombreJugador}`;
+    }
+
+    return 'Goles totales';
+  }
+
+  private cargarEstadisticas(jugadorIdUrl: string): void {
     this.cargando = true;
     this.sinDatos = false;
+    this.resetearEstadisticas();
 
     authState(this.auth)
       .pipe(
-        switchMap((user) => {
-          if (!user) {
+        takeUntil(this.destroy$),
+        switchMap((usuarioAutenticado) => {
+          const jugadorIdObjetivo =
+            jugadorIdUrl || usuarioAutenticado?.uid || '';
+
+          if (!jugadorIdObjetivo) {
             return of([] as EstadisticaJugadorPartidoDoc[]);
           }
 
-          return this.obtenerEstadisticasJugador(user.uid);
+          if (!this.nombreJugador) {
+            this.nombreJugador = 'tu perfil';
+          }
+
+          return this.obtenerEstadisticasJugador(jugadorIdObjetivo);
         }),
       )
       .subscribe((docs) => {
         this.cargando = false;
 
         if (!docs.length) {
-          this.cards = [];
-          this.semanasGoles = [];
           this.sinDatos = true;
           return;
         }
@@ -128,21 +199,36 @@ export class EstadisticasComponent implements OnInit {
     );
   }
 
+  private resetearEstadisticas(): void {
+    this.cards = [];
+    this.semanasGoles = [];
+    this.totalGoles = 0;
+    this.totalPartidos = 0;
+    this.porcentajeVictorias = 0;
+  }
+
   private construirCards(
     docs: EstadisticaJugadorPartidoDoc[],
   ): EstadisticaCard[] {
     const jugados = docs.length;
-    const goles = docs.reduce((acc, d) => acc + (Number(d.goles) || 0), 0);
-    const asistencias = docs.reduce(
-      (acc, d) => acc + (Number(d.asistencias) || 0),
+
+    const goles = docs.reduce(
+      (acumulado, doc) => acumulado + (Number(doc.goles) || 0),
       0,
     );
-    const victorias = docs.filter((d) => d.victoria).length;
-    const empates = docs.filter((d) => d.empate).length;
-    const derrotas = docs.filter((d) => d.derrota).length;
+
+    const asistencias = docs.reduce(
+      (acumulado, doc) => acumulado + (Number(doc.asistencias) || 0),
+      0,
+    );
+
+    const victorias = docs.filter((doc) => doc.victoria).length;
+    const empates = docs.filter((doc) => doc.empate).length;
+    const derrotas = docs.filter((doc) => doc.derrota).length;
 
     const golesMedia = jugados ? goles / jugados : 0;
     const asistenciasMedia = jugados ? asistencias / jugados : 0;
+
     const porcentajeVictorias = jugados
       ? Math.round((victorias / jugados) * 100)
       : 0;
@@ -151,13 +237,17 @@ export class EstadisticasComponent implements OnInit {
     this.totalPartidos = jugados;
     this.porcentajeVictorias = porcentajeVictorias;
 
+    const sufijoHistorial = this.viendoPerfilAjeno
+      ? `de ${this.nombreJugador}`
+      : 'en tu historial';
+
     return [
       {
         key: 'played',
         icon: '⚽',
         title: 'Partidos jugados',
         value: String(jugados),
-        subtitle: 'Total en tu historial',
+        subtitle: `Total ${sufijoHistorial}`,
         accent: 'blue',
       },
       {
@@ -174,7 +264,7 @@ export class EstadisticasComponent implements OnInit {
         title: 'Empates',
         value: String(empates),
         subtitle: jugados
-          ? `${Math.round((empates / jugados) * 100)}% de tus partidos`
+          ? `${Math.round((empates / jugados) * 100)}% de los partidos`
           : 'Sin datos',
         accent: 'amber',
       },
@@ -184,7 +274,7 @@ export class EstadisticasComponent implements OnInit {
         title: 'Derrotas',
         value: String(derrotas),
         subtitle: jugados
-          ? `${Math.round((derrotas / jugados) * 100)}% de tus partidos`
+          ? `${Math.round((derrotas / jugados) * 100)}% de los partidos`
           : 'Sin datos',
         accent: 'red',
       },
@@ -193,7 +283,9 @@ export class EstadisticasComponent implements OnInit {
         icon: '🥅',
         title: 'Goles totales',
         value: String(goles),
-        subtitle: 'Marcados por ti',
+        subtitle: this.viendoPerfilAjeno
+          ? `Marcados por ${this.nombreJugador}`
+          : 'Marcados por ti',
         accent: 'green',
       },
       {
@@ -227,19 +319,30 @@ export class EstadisticasComponent implements OnInit {
     docs: EstadisticaJugadorPartidoDoc[],
   ): SemanaGoles[] {
     const ahora = Date.now();
+
     const golesPorSemana = new Array(NUM_SEMANAS_GRAFICA).fill(0) as number[];
 
     for (const doc of docs) {
       const fecha = doc.fechaCreacion?.toDate?.();
-      if (!fecha) continue;
+
+      if (!fecha) {
+        continue;
+      }
 
       const diferencia = ahora - fecha.getTime();
-      if (diferencia < 0) continue;
+
+      if (diferencia < 0) {
+        continue;
+      }
 
       const indiceDesdeHoy = Math.floor(diferencia / MS_SEMANA);
-      if (indiceDesdeHoy >= NUM_SEMANAS_GRAFICA) continue;
+
+      if (indiceDesdeHoy >= NUM_SEMANAS_GRAFICA) {
+        continue;
+      }
 
       const indiceCronologico = NUM_SEMANAS_GRAFICA - 1 - indiceDesdeHoy;
+
       golesPorSemana[indiceCronologico] += Number(doc.goles) || 0;
     }
 
@@ -247,6 +350,7 @@ export class EstadisticasComponent implements OnInit {
 
     return golesPorSemana.map((goles, index) => {
       const semanasAtras = NUM_SEMANAS_GRAFICA - 1 - index;
+
       const label =
         semanasAtras === 0 ? 'Esta sem.' : `Hace ${semanasAtras} sem.`;
 

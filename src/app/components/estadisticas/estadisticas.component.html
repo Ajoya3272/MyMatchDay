@@ -1,20 +1,35 @@
 <ion-content class="estadisticas-page">
   <div class="estadisticas-page__container">
+    <header class="estadisticas-page__header">
+      <span class="estadisticas-page__eyebrow"> Perfil de jugador </span>
+
+      <h1>Historial de {{ nombreJugador }}</h1>
+
+      <p>Estadísticas y rendimiento de este jugador.</p>
+    </header>
+
     <div class="estadisticas-page__loading" *ngIf="cargando">
       <div class="spinner"></div>
-      <p>Cargando tus estadísticas...</p>
+      <p>Cargando estadísticas de {{ nombreJugador }}...</p>
     </div>
 
     <div class="estadisticas-page__empty" *ngIf="!cargando && sinDatos">
       <span class="estadisticas-page__empty-icon">⚽</span>
-      <h2>Todavía no tienes estadísticas</h2>
-      <p>Registra el resultado de un partido y aparecerán aquí.</p>
+
+      <h2>{{ nombreJugador }} todavía no tiene estadísticas</h2>
+
+      <p>Cuando registre resultados de partidos, aparecerán aquí.</p>
     </div>
 
     <ng-container *ngIf="!cargando && !sinDatos">
       <section class="hero-stat">
-        <span class="hero-stat__label">Goles totales</span>
-        <strong class="hero-stat__value">{{ totalGoles }}</strong>
+        <span class="hero-stat__label">
+          Goles totales de {{ nombreJugador }}
+        </span>
+
+        <strong class="hero-stat__value">
+          {{ totalGoles }}
+        </strong>
 
         <div class="hero-stat__row">
           <span class="hero-stat__pill"> ⚽ {{ totalPartidos }} partidos </span>

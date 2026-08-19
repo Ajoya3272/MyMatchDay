@@ -94,6 +94,22 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'buscar-amigos',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./components/buscar-amigos/buscar-amigos.component').then(
+        (m) => m.BuscarAmigosComponent,
+      ),
+  },
+  {
+    path: 'mis-seguidos',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./components/mis-seguidos/mis-seguidos.component').then(
+        (m) => m.MisSeguidosComponent,
+      ),
+  },
+  {
     path: '**',
     redirectTo: 'login',
   },

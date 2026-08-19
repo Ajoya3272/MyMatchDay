@@ -1,0 +1,61 @@
+<ion-content class="mis-seguidos">
+  <div class="mis-seguidos__inner">
+    <header class="mis-seguidos__header">
+      <h1>Mis seguidos</h1>
+      <p>Consulta los jugadores a los que sigues.</p>
+    </header>
+
+    <div class="mis-seguidos__loading" *ngIf="cargando">
+      <span class="mis-seguidos__spinner"></span>
+      <p>Cargando jugadores...</p>
+    </div>
+
+    <p class="mis-seguidos__error" *ngIf="error">
+      {{ error }}
+    </p>
+
+    <div
+      class="mis-seguidos__list"
+      *ngIf="!cargando && !error && seguidos.length > 0"
+    >
+      <button
+        type="button"
+        class="mis-seguidos__item"
+        *ngFor="let jugador of seguidos"
+        (click)="verEstadisticas(jugador)"
+      >
+        <img
+          *ngIf="jugador.fotoPerfilUrl; else avatarFallback"
+          class="mis-seguidos__avatar"
+          [src]="jugador.fotoPerfilUrl"
+          alt="Foto de perfil"
+        />
+
+        <ng-template #avatarFallback>
+          <span class="mis-seguidos__avatar mis-seguidos__avatar--fallback">
+            {{ jugador.nombre.charAt(0) }}
+          </span>
+        </ng-template>
+
+        <span class="mis-seguidos__name">
+          {{ jugador.nombre }}
+        </span>
+
+        <span class="mis-seguidos__arrow">›</span>
+      </button>
+    </div>
+
+    <div
+      class="mis-seguidos__empty"
+      *ngIf="!cargando && !error && seguidos.length === 0"
+    >
+      <span>👥</span>
+      <h2>Aún no sigues a nadie</h2>
+      <p>Busca jugadores y sigue sus estadísticas.</p>
+
+      <button type="button" routerLink="/buscar-amigos">
+        Buscar jugadores
+      </button>
+    </div>
+  </div>
+</ion-content>

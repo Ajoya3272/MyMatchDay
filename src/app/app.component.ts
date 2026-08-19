@@ -1,7 +1,12 @@
 import { Component, inject } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
-import { IonApp, IonMenu, IonRouterOutlet } from '@ionic/angular/standalone';
+import {
+  IonApp,
+  IonMenu,
+  IonRouterOutlet,
+  MenuController,
+} from '@ionic/angular/standalone';
 import { HeaderComponent } from './shared/header/header.component';
 import { MenuLateralComponent } from './shared/menu-lateral/menu-lateral.component';
 import { NotificacionesService } from './services/notificaciones.service';
@@ -23,6 +28,7 @@ type ThemeMode = 'light' | 'dark';
 })
 export class AppComponent {
   private router = inject(Router);
+  private menuCtrl = inject(MenuController);
   private notificacionesService = inject(NotificacionesService);
 
   hideLayout = false;
@@ -86,5 +92,11 @@ export class AppComponent {
       url.startsWith('/login') ||
       url.startsWith('/registro-usuario') ||
       url.startsWith('/verificacion-usuario');
+
+    void this.menuCtrl.enable(!this.hideLayout, 'main-menu');
+
+    if (this.hideLayout) {
+      void this.menuCtrl.close('main-menu');
+    }
   }
 }

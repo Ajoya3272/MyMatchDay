@@ -1,0 +1,285 @@
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: #f5f7fb;
+  color: #111827;
+}
+
+ion-content.buscar-amigos {
+  --background: #f5f7fb;
+  --color: #111827;
+
+  display: block;
+  width: 100%;
+  height: 100%;
+  color: #111827;
+}
+
+.buscar-amigos__inner {
+  width: 100%;
+  min-height: 100%;
+  padding: 88px 20px 32px;
+  background: #f5f7fb;
+  color: #111827;
+}
+
+.buscar-amigos__header {
+  display: block;
+  margin: 0 0 22px;
+  padding: 0;
+  background: transparent;
+  color: #111827;
+}
+
+.buscar-amigos__header h1 {
+  display: block;
+  margin: 0 0 8px;
+  padding: 0;
+  color: #111827 !important;
+  font-family: "Inter", "Segoe UI", sans-serif;
+  font-size: 1.55rem;
+  font-weight: 800;
+  line-height: 1.2;
+  opacity: 1 !important;
+}
+
+.buscar-amigos__header p {
+  display: block;
+  margin: 0;
+  padding: 0;
+  color: #6b7280 !important;
+  font-family: "Inter", "Segoe UI", sans-serif;
+  font-size: 0.92rem;
+  font-weight: 400;
+  line-height: 1.45;
+  opacity: 1 !important;
+}
+
+.buscar-amigos__search {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  width: 100%;
+  margin: 0 0 22px;
+}
+
+.buscar-amigos__input {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  height: 48px;
+  margin: 0;
+  padding: 0 15px;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  outline: none;
+  background: #ffffff !important;
+  color: #111827 !important;
+  font-family: "Inter", "Segoe UI", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 400;
+  line-height: 48px;
+  appearance: none;
+  -webkit-appearance: none;
+  box-shadow: none;
+}
+
+.buscar-amigos__input::placeholder {
+  color: #6b7280 !important;
+  opacity: 1;
+}
+
+.buscar-amigos__input:hover {
+  border-color: #86efac;
+}
+
+.buscar-amigos__input:focus {
+  border-color: #16a34a;
+  outline: none;
+  background: #ffffff !important;
+  color: #111827 !important;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.16);
+}
+
+.buscar-amigos__search-btn {
+  flex: 0 0 auto;
+  height: 48px;
+  margin: 0;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 12px;
+  background: #16a34a !important;
+  color: #ffffff !important;
+  font-family: "Inter", "Segoe UI", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 800;
+  line-height: 48px;
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    transform 160ms ease,
+    opacity 160ms ease;
+}
+
+.buscar-amigos__search-btn:hover {
+  background: #15803d !important;
+}
+
+.buscar-amigos__search-btn:active {
+  transform: scale(0.97);
+}
+
+.buscar-amigos__search-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.buscar-amigos__loading,
+.buscar-amigos__empty {
+  display: block;
+  margin: 26px 0 0;
+  color: #6b7280 !important;
+  font-family: "Inter", "Segoe UI", sans-serif;
+  font-size: 0.92rem;
+  font-weight: 400;
+  line-height: 1.4;
+  text-align: center;
+  opacity: 1 !important;
+}
+
+.buscar-amigos__error {
+  display: block;
+  margin: 14px 0 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(185, 28, 28, 0.2);
+  border-radius: 10px;
+  background: #fee2e2;
+  color: #991b1b !important;
+  font-family: "Inter", "Segoe UI", sans-serif;
+  font-size: 0.86rem;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.buscar-amigos__list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.buscar-amigos__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: 66px;
+  padding: 12px 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  background: #ffffff;
+  color: #111827;
+}
+
+.buscar-amigos__item-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.buscar-amigos__avatar {
+  flex: 0 0 40px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.buscar-amigos__avatar--fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #eef5ff;
+  color: #16a34a !important;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.buscar-amigos__name {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  color: #111827 !important;
+  font-family: "Inter", "Segoe UI", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.buscar-amigos__add-btn {
+  flex: 0 0 auto;
+  height: 36px;
+  margin: 0;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: #16a34a !important;
+  color: #ffffff !important;
+  font-family: "Inter", "Segoe UI", sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.buscar-amigos__add-btn:hover {
+  background: #15803d !important;
+}
+
+.buscar-amigos__add-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.buscar-amigos__friend-tag {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  height: 36px;
+  padding: 0 13px;
+  border-radius: 999px;
+  background: #f3f4f6;
+  color: #6b7280 !important;
+  font-family: "Inter", "Segoe UI", sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+@media (max-width: 420px) {
+  .buscar-amigos__inner {
+    padding: 88px 16px 30px;
+  }
+
+  .buscar-amigos__search {
+    gap: 8px;
+  }
+
+  .buscar-amigos__search-btn {
+    padding-inline: 16px;
+  }
+
+  .buscar-amigos__item {
+    padding-inline: 12px;
+  }
+
+  .buscar-amigos__friend-tag {
+    padding-inline: 10px;
+    font-size: 0.74rem;
+  }
+}

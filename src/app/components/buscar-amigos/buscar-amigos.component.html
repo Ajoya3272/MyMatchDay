@@ -1,0 +1,80 @@
+<ion-content class="buscar-amigos">
+  <div class="buscar-amigos__inner">
+    <header class="buscar-amigos__header">
+      <h1>Buscar amigos</h1>
+      <p>Encuentra a otros usuarios y síguelos.</p>
+    </header>
+
+    <form
+      class="buscar-amigos__search"
+      (submit)="$event.preventDefault(); buscar()"
+    >
+      <input
+        class="buscar-amigos__input"
+        type="text"
+        name="busqueda"
+        [(ngModel)]="busqueda"
+        placeholder="Busca por nombre"
+        autocomplete="off"
+      />
+
+      <button type="submit" class="buscar-amigos__search-btn">Buscar</button>
+    </form>
+
+    <p class="buscar-amigos__loading" *ngIf="buscando">Buscando...</p>
+
+    <p class="buscar-amigos__error" *ngIf="error">
+      {{ error }}
+    </p>
+
+    <div class="buscar-amigos__list" *ngIf="!buscando && resultados.length > 0">
+      <button
+        class="buscar-amigos__item"
+        type="button"
+        *ngFor="let resultado of resultados"
+        [disabled]="!resultado.esAmigo"
+        (click)="abrirEstadisticas(resultado)"
+      >
+        <span class="buscar-amigos__item-info">
+          <img
+            *ngIf="resultado.fotoPerfilUrl; else avatarFallback"
+            class="buscar-amigos__avatar"
+            [src]="resultado.fotoPerfilUrl"
+            alt="Foto de perfil"
+          />
+
+          <ng-template #avatarFallback>
+            <span class="buscar-amigos__avatar buscar-amigos__avatar--fallback">
+              {{ resultado.nombre.charAt(0) }}
+            </span>
+          </ng-template>
+
+          <span class="buscar-amigos__name">
+            {{ resultado.nombre }}
+          </span>
+        </span>
+
+        <span
+          *ngIf="!resultado.esAmigo"
+          class="buscar-amigos__add-btn"
+          role="button"
+          tabindex="0"
+          (click)="$event.stopPropagation(); agregarAmigo(resultado)"
+        >
+          {{ resultado.agregando ? "Siguiendo..." : "+ Seguir" }}
+        </span>
+
+        <span *ngIf="resultado.esAmigo" class="buscar-amigos__friend-tag">
+          Siguiendo
+        </span>
+      </button>
+    </div>
+
+    <p
+      class="buscar-amigos__empty"
+      *ngIf="!buscando && yaBusco && resultados.length === 0 && !error"
+    >
+      No se encontraron usuarios con ese nombre.
+    </p>
+  </div>
+</ion-content>
