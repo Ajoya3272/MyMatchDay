@@ -12,6 +12,7 @@ import {
 import { HeaderComponent } from './shared/header/header.component';
 import { MenuLateralComponent } from './shared/menu-lateral/menu-lateral.component';
 import { NotificacionesService } from './services/notificaciones.service';
+import { AvisosOrganizadorService } from './services/aviso-organizador.service';
 
 type ThemeMode = 'light' | 'dark';
 
@@ -33,6 +34,7 @@ export class AppComponent {
   private menuCtrl = inject(MenuController);
   private location = inject(Location);
   private notificacionesService = inject(NotificacionesService);
+  private avisosOrganizadorService = inject(AvisosOrganizadorService);
 
   hideLayout = false;
 
@@ -54,6 +56,7 @@ export class AppComponent {
 
     void this.inicializarNotificaciones();
     this.inicializarBotonAtras();
+    this.avisosOrganizadorService.escuchar();
   }
 
   private inicializarBotonAtras(): void {

@@ -118,6 +118,36 @@ export class NotificacionesService {
     });
   }
 
+  async notificarAbandonoEquipo(
+    nombreJugador: string,
+    nombrePartido: string,
+  ): Promise<void> {
+    if (!this.esPlataformaNativa()) {
+      console.info('[NOTIFICACIONES] Aviso de abandono omitido en navegador');
+      return;
+    }
+
+    const tienePermiso = await this.inicializarPermisos();
+
+    if (!tienePermiso) {
+      console.warn('[NOTIFICACIONES] Permiso no concedido');
+      return;
+    }
+
+    await LocalNotifications.schedule({
+      notifications: [
+        {
+          id: Date.now() % 1000000000,
+          title: '⚠️ Un jugador ha abandonado el equipo',
+          body: `${nombreJugador} ha dejado "${nombrePartido}". Ya tienes hueco libre.`,
+          extra: {
+            tipo: 'abandono-partido',
+          },
+        },
+      ],
+    });
+  }
+
   async cancelarAvisoPartido(partidoId: string): Promise<void> {
     if (!this.esPlataformaNativa() || !partidoId) {
       return;

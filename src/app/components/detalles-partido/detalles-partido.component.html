@@ -185,6 +185,15 @@
           >
             Invitar jugadores
           </button>
+
+          <button
+            *ngIf="vm.estaEnPartido"
+            class="partido-leave-btn"
+            type="button"
+            (click)="abandonarEquipo(partido, vm)"
+          >
+            Abandonar equipo
+          </button>
         </section>
       </section>
     </ng-container>

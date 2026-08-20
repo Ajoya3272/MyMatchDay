@@ -7,9 +7,11 @@ import {
   Firestore,
   arrayRemove,
   arrayUnion,
+  collection,
   doc,
   docData,
   serverTimestamp,
+  setDoc,
   updateDoc,
 } from '@angular/fire/firestore';
 import { Observable, combineLatest, of } from 'rxjs';
@@ -281,6 +283,58 @@ export class DetallesPartidoComponent {
     } catch (error) {
       console.error('Error al unirse al equipo:', error);
     }
+  }
+
+  async abandonarEquipo(
+    partido: Partido,
+    vm: DetallesPartidoVm,
+  ): Promise<void> {
+    if (!vm.estaAntesDeEmpezar || !vm.estaEnPartido) {
+      return;
+    }
+
+    if (!vm.nombreUsuarioActual || !vm.uidUsuarioActual) {
+      return;
+    }
+
+    const partidoRef = doc(this.firestore, `partidos/${partido.partidoId}`);
+    const uid = vm.uidUsuarioActual;
+    const nombre = vm.nombreUsuarioActual;
+
+    try {
+      await updateDoc(partidoRef, {
+        jugadoresId: arrayRemove(uid),
+        participantes: arrayRemove(nombre),
+        jugadoresEquipoA: arrayRemove(uid),
+        jugadoresEquipoB: arrayRemove(uid),
+        fechaActualizacion: serverTimestamp(),
+      });
+
+      await this.crearAvisoAbandono(partido, nombre);
+    } catch (error) {
+      console.error('Error al abandonar el equipo:', error);
+    }
+  }
+
+  private async crearAvisoAbandono(
+    partido: Partido,
+    nombreJugador: string,
+  ): Promise<void> {
+    const avisosRef = collection(
+      this.firestore,
+      `partidos/${partido.partidoId}/avisos`,
+    );
+    const avisoRef = doc(avisosRef);
+
+    await setDoc(avisoRef, {
+      tipo: 'abandono',
+      partidoId: partido.partidoId,
+      partidoNombre: partido.nombre,
+      organizadorId: partido.organizadorId,
+      jugadorNombre: nombreJugador,
+      leido: false,
+      fechaCreacion: serverTimestamp(),
+    });
   }
 
   private estaAntesDeEmpezar(partido: Partido): boolean {
