@@ -1,6 +1,8 @@
+import { Location } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import { App } from '@capacitor/app';
 import {
   IonApp,
   IonMenu,
@@ -29,6 +31,7 @@ type ThemeMode = 'light' | 'dark';
 export class AppComponent {
   private router = inject(Router);
   private menuCtrl = inject(MenuController);
+  private location = inject(Location);
   private notificacionesService = inject(NotificacionesService);
 
   hideLayout = false;
@@ -50,6 +53,25 @@ export class AppComponent {
       });
 
     void this.inicializarNotificaciones();
+    this.inicializarBotonAtras();
+  }
+
+  private inicializarBotonAtras(): void {
+    App.addListener('backButton', async ({ canGoBack }) => {
+      const menuAbierto = await this.menuCtrl.isOpen('main-menu');
+
+      if (menuAbierto) {
+        await this.menuCtrl.close('main-menu');
+        return;
+      }
+
+      if (canGoBack) {
+        this.location.back();
+        return;
+      }
+
+      await App.exitApp();
+    });
   }
 
   private async inicializarNotificaciones(): Promise<void> {
