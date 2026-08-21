@@ -20,39 +20,63 @@
       ✕
     </button>
 
-    <span class="delete-match-modal__badge"> Cancelar partido </span>
+    <span class="delete-match-modal__badge">Cancelar partido</span>
 
     <h3 id="delete-match-title" class="delete-match-modal__title">
       ¿Quieres cancelar este partido?
     </h3>
 
-    <p id="delete-match-description" class="delete-match-modal__text">
-      Esta acción eliminará el partido de forma permanente y no se puede
-      deshacer.
-    </p>
+    <ng-container *ngIf="partido as match">
+      <p id="delete-match-description" class="delete-match-modal__text">
+        Se realizará un reembolso de
+        <strong>{{ getImporteReembolso(match) }}</strong>
+        a la cuenta que realizó el pago.
+      </p>
 
-    <div class="delete-match-modal__card" *ngIf="partido as match">
-      <span class="delete-match-modal__label">Partido</span>
-      <strong class="delete-match-modal__match-name">
-        {{ match.nombre }}
-      </strong>
+      <div class="delete-match-modal__refund">
+        <span class="delete-match-modal__refund-icon">↩</span>
 
-      <div class="delete-match-modal__meta">
-        <div class="delete-match-modal__meta-item">
-          <span class="delete-match-modal__meta-label">Fecha</span>
-          <strong class="delete-match-modal__meta-value">
-            {{ match.fecha.toDate() | date: "dd/MM/yyyy" }}
+        <div class="delete-match-modal__refund-content">
+          <span class="delete-match-modal__refund-label">
+            Reembolso a realizar
+          </span>
+
+          <strong class="delete-match-modal__refund-amount">
+            {{ getImporteReembolso(match) }}
           </strong>
-        </div>
 
-        <div class="delete-match-modal__meta-item">
-          <span class="delete-match-modal__meta-label">Hora</span>
-          <strong class="delete-match-modal__meta-value">
-            {{ match.fecha.toDate() | date: "HH:mm" }}
-          </strong>
+          <span class="delete-match-modal__refund-email">
+            {{ getEmailPago(match) }}
+          </span>
         </div>
       </div>
-    </div>
+
+      <div class="delete-match-modal__card">
+        <span class="delete-match-modal__label">Partido</span>
+
+        <strong class="delete-match-modal__match-name">
+          {{ match.nombre }}
+        </strong>
+
+        <div class="delete-match-modal__meta">
+          <div class="delete-match-modal__meta-item">
+            <span class="delete-match-modal__meta-label">Fecha</span>
+
+            <strong class="delete-match-modal__meta-value">
+              {{ match.fecha.toDate() | date: "dd/MM/yyyy" }}
+            </strong>
+          </div>
+
+          <div class="delete-match-modal__meta-item">
+            <span class="delete-match-modal__meta-label">Hora</span>
+
+            <strong class="delete-match-modal__meta-value">
+              {{ match.fecha.toDate() | date: "HH:mm" }}
+            </strong>
+          </div>
+        </div>
+      </div>
+    </ng-container>
 
     <div class="delete-match-modal__actions">
       <button
@@ -61,7 +85,7 @@
         (click)="onCancel()"
         [disabled]="loading"
       >
-        Volver
+        Cancelar reembolso
       </button>
 
       <button
@@ -70,7 +94,7 @@
         (click)="onConfirm()"
         [disabled]="loading"
       >
-        {{ loading ? "Cancelando..." : "Sí, cancelar partido" }}
+        {{ loading ? "Reembolsando..." : "Aceptar y reembolsar" }}
       </button>
     </div>
   </div>

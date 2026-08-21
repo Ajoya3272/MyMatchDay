@@ -9,6 +9,7 @@ import { Partido } from '../interfaces/Partido.interface';
 })
 export class NotificacionesService {
   private readonly notificationIdBase = 100000;
+  private readonly cancellationNotificationIdBase = 900000000;
 
   async inicializarPermisos(): Promise<boolean> {
     if (!this.esPlataformaNativa()) {
@@ -107,7 +108,7 @@ export class NotificacionesService {
     await LocalNotifications.schedule({
       notifications: [
         {
-          id: Date.now() % 1000000000,
+          id: this.obtenerIdAleatorio(),
           title: '⚽ ¡Partido creado con éxito!',
           body: `“${nombrePartido}” ya está listo. Invita ahora al resto de jugadores.`,
           extra: {
@@ -137,11 +138,50 @@ export class NotificacionesService {
     await LocalNotifications.schedule({
       notifications: [
         {
-          id: Date.now() % 1000000000,
+          id: this.obtenerIdAleatorio(),
           title: '⚠️ Un jugador ha abandonado el equipo',
           body: `${nombreJugador} ha dejado "${nombrePartido}". Ya tienes hueco libre.`,
           extra: {
             tipo: 'abandono-partido',
+          },
+        },
+      ],
+    });
+  }
+
+  async notificarPartidoCanceladoOrganizador(partido: Partido): Promise<void> {
+    if (!this.esPlataformaNativa()) {
+      console.info(
+        '[NOTIFICACIONES] Aviso de cancelación omitido en navegador',
+      );
+      return;
+    }
+
+    if (!partido.partidoId) {
+      return;
+    }
+
+    const tienePermiso = await this.inicializarPermisos();
+
+    if (!tienePermiso) {
+      console.warn('[NOTIFICACIONES] Permiso no concedido');
+      return;
+    }
+
+    await this.cancelarAvisoPartido(partido.partidoId);
+
+    const fechaTexto = this.obtenerFechaPartido(partido);
+    const pista = this.obtenerPista(partido);
+
+    await LocalNotifications.schedule({
+      notifications: [
+        {
+          id: this.obtenerIdCancelacion(partido.partidoId),
+          title: '⚽ Partido cancelado',
+          body: `Has cancelado "${partido.nombre}". ${pista} · ${fechaTexto}`,
+          extra: {
+            tipo: 'partido-cancelado-organizador',
+            partidoId: partido.partidoId,
           },
         },
       ],
@@ -168,6 +208,34 @@ export class NotificacionesService {
     }
   }
 
+  private obtenerFechaPartido(partido: Partido): string {
+    const fecha = partido.fecha?.toDate?.();
+
+    if (!fecha) {
+      return 'Fecha por confirmar';
+    }
+
+    return fecha.toLocaleDateString('es-ES', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  }
+
+  private obtenerPista(partido: Partido): string {
+    const partidoConPista = partido as Partido & {
+      pistaNombre?: string;
+    };
+
+    return (
+      partidoConPista.pistaNombre?.trim() ||
+      partido.ubicacion?.trim() ||
+      'Pista por confirmar'
+    );
+  }
+
   private esPlataformaNativa(): boolean {
     return Capacitor.isNativePlatform();
   }
@@ -181,5 +249,20 @@ export class NotificacionesService {
     }
 
     return this.notificationIdBase + Math.abs(hash % 800000);
+  }
+
+  private obtenerIdCancelacion(partidoId: string): number {
+    let hash = 0;
+
+    for (let i = 0; i < partidoId.length; i++) {
+      hash = (hash << 5) - hash + partidoId.charCodeAt(i);
+      hash |= 0;
+    }
+
+    return this.cancellationNotificationIdBase + Math.abs(hash % 90000000);
+  }
+
+  private obtenerIdAleatorio(): number {
+    return Math.floor(Date.now() % 800000000);
   }
 }

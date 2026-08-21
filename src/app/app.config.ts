@@ -9,6 +9,8 @@ import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { provideAuth, getAuth } from '@angular/fire/auth';
 import { provideFirestore, getFirestore } from '@angular/fire/firestore';
 import { provideStorage, getStorage } from '@angular/fire/storage';
+import { provideFunctions, getFunctions } from '@angular/fire/functions';
+
 import { routes } from './app.routes';
 import { environment } from '../enviroments/enviroment';
 
@@ -18,8 +20,9 @@ export const appConfig: ApplicationConfig = {
     provideFirebaseApp(() => initializeApp(environment)),
     provideAuth(() => getAuth()),
     provideFirestore(() => getFirestore()),
+    provideStorage(() => getStorage()),
+    provideFunctions(() => getFunctions(undefined, 'europe-west1')),
     provideRouter(routes, withEnabledBlockingInitialNavigation()),
     provideAnimationsAsync(),
-    provideStorage(() => getStorage()),
   ],
 };

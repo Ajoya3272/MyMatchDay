@@ -8,21 +8,18 @@ import {
   Timestamp,
   collection,
   collectionData,
-  collectionGroup,
   doc,
   docData,
-  limit,
-  orderBy,
   query,
   where,
 } from '@angular/fire/firestore';
 import { Observable, of, combineLatest } from 'rxjs';
 import { catchError, map, shareReplay, switchMap } from 'rxjs/operators';
+
 import { CarruselComponent } from '../carrusel/carrusel.component';
 import { Partido } from '../../interfaces/Partido.interface';
 import {
   ActividadItemView,
-  EstadisticaConFechaDoc,
   EstadisticaJugadorPartidoDoc,
   EstadisticasUsuarioView,
   EstadoPartido,
@@ -30,7 +27,6 @@ import {
 } from '../../interfaces/EstadisticasJugador.interface';
 
 const VENTANA_ACTIVIDAD_MS = 3 * 24 * 60 * 60 * 1000;
-const VENTANA_SEMANA_MS = 7 * 24 * 60 * 60 * 1000;
 
 @Component({
   selector: 'app-home',
@@ -40,8 +36,8 @@ const VENTANA_SEMANA_MS = 7 * 24 * 60 * 60 * 1000;
   imports: [CommonModule, RouterLink, IonContent, CarruselComponent],
 })
 export class HomeComponent {
-  private auth = inject(Auth);
-  private firestore = inject(Firestore);
+  private readonly auth = inject(Auth);
+  private readonly firestore = inject(Firestore);
 
   uidUsuarioActual: string | null = null;
 
@@ -72,13 +68,22 @@ export class HomeComponent {
         map(([creados, unidos]) => {
           const todos = [...(creados as Partido[]), ...(unidos as Partido[])];
 
-          return todos.filter(
+          const sinDuplicados = todos.filter(
             (partido, index, array) =>
-              array.findIndex((p) => p.partidoId === partido.partidoId) ===
-              index,
+              array.findIndex(
+                (otroPartido) => otroPartido.partidoId === partido.partidoId,
+              ) === index,
+          );
+
+          return sinDuplicados.filter(
+            (partido) => !this.estaCancelado(partido),
           );
         }),
       );
+    }),
+    catchError((error) => {
+      console.error('[HOME] Error cargando partidos:', error);
+      return of([] as Partido[]);
     }),
     shareReplay({ bufferSize: 1, refCount: true }),
   );
@@ -86,6 +91,7 @@ export class HomeComponent {
   pendingMatches$: Observable<PartidoHomeView[]> = this.userMatches$.pipe(
     map((partidos) =>
       partidos
+        .filter((partido) => !this.estaCancelado(partido))
         .map((partido) => this.mapearPartidoHome(partido))
         .filter((partido) => this.debeMostrarEnCarrusel(partido))
         .sort((a, b) => this.ordenarPartidosCarrusel(a, b)),
@@ -109,7 +115,10 @@ export class HomeComponent {
 
       return docData(resumenRef).pipe(
         map((data) => this.normalizarEstadisticas(data)),
-        catchError(() => of(this.estadisticasVacias())),
+        catchError((error) => {
+          console.error('[HOME] Error cargando resumen:', error);
+          return of(this.estadisticasVacias());
+        }),
       );
     }),
     shareReplay({ bufferSize: 1, refCount: true }),
@@ -123,7 +132,13 @@ export class HomeComponent {
         }
 
         const finalizados = partidos
-          .filter((partido) => partido.estado === 'finalizado')
+          .filter(
+            (partido) =>
+              !this.estaCancelado(partido) &&
+              String(partido.estado ?? '')
+                .trim()
+                .toLowerCase() === 'finalizado',
+          )
           .sort(
             (a, b) => b.fecha.toDate().getTime() - a.fecha.toDate().getTime(),
           );
@@ -152,6 +167,13 @@ export class HomeComponent {
               stat as EstadisticaJugadorPartidoDoc,
             ),
           ),
+          catchError((error) => {
+            console.error(
+              '[HOME] Error cargando estadísticas del último resultado:',
+              error,
+            );
+            return of(null);
+          }),
         );
       }),
       catchError((error) => {
@@ -165,7 +187,11 @@ export class HomeComponent {
     this.userMatches$.pipe(
       map((partidos) => {
         const activos = partidos
-          .filter((partido) => this.calcularEstado(partido) !== 'finalizado')
+          .filter(
+            (partido) =>
+              !this.estaCancelado(partido) &&
+              this.calcularEstado(partido) !== 'finalizado',
+          )
           .sort(
             (a, b) => a.fecha.toDate().getTime() - b.fecha.toDate().getTime(),
           );
@@ -188,31 +214,22 @@ export class HomeComponent {
       shareReplay({ bufferSize: 1, refCount: true }),
     );
 
-  private golesSemana$: Observable<ActividadItemView | null> = authState(
-    this.auth,
-  ).pipe(
-    switchMap((user) => {
-      if (!user) {
-        return of(null);
+  private golesSemana$: Observable<ActividadItemView | null> = this.stats$.pipe(
+    map((estadisticas) => {
+      const goles = Number(estadisticas.goles) || 0;
+
+      if (goles <= 0) {
+        return null;
       }
 
-      const estadisticasRef = collectionGroup(this.firestore, 'estadisticas');
-
-      const estadisticasQuery = query(
-        estadisticasRef,
-        where('jugadorId', '==', user.uid),
-        orderBy('fechaCreacion', 'desc'),
-        limit(20),
-      );
-
-      return collectionData(estadisticasQuery).pipe(
-        map((docs) =>
-          this.construirActividadGolesSemana(docs as EstadisticaConFechaDoc[]),
-        ),
-      );
+      return {
+        id: 'goles-totales',
+        titulo: `Has marcado ${goles} gol${goles === 1 ? '' : 'es'} en total`,
+        texto: '¡Sigue así!',
+      };
     }),
     catchError((error) => {
-      console.error('[HOME] Error cargando goles de la semana:', error);
+      console.error('[HOME] Error cargando goles:', error);
       return of(null);
     }),
     shareReplay({ bufferSize: 1, refCount: true }),
@@ -223,34 +240,48 @@ export class HomeComponent {
     this.golesSemana$,
     this.confirmacionReciente$,
   ]).pipe(
-    map(([resultado, golesSemana, confirmacion]) =>
-      [resultado, golesSemana, confirmacion].filter(
+    map(([resultado, goles, confirmacion]) =>
+      [resultado, goles, confirmacion].filter(
         (item): item is ActividadItemView => item !== null,
       ),
     ),
     shareReplay({ bufferSize: 1, refCount: true }),
   );
 
+  private estaCancelado(partido: Partido): boolean {
+    const estado = String(partido.estado ?? '')
+      .trim()
+      .toLowerCase();
+
+    return estado === 'cancelado' || estado === 'cancelada';
+  }
+
   private mapearPartidoHome(partido: Partido): PartidoHomeView {
     const estadoCalculado = this.calcularEstado(partido);
 
     return {
       ...partido,
+
       estadoCalculado,
       estadoTexto: this.obtenerTextoEstado(estadoCalculado),
       estadoClase: this.obtenerClaseEstado(estadoCalculado),
-      estado: estadoCalculado,
     };
   }
 
   private calcularEstado(partido: Partido): EstadoPartido {
+    if (this.estaCancelado(partido)) {
+      return 'finalizado';
+    }
+
     const inicio = partido.fecha?.toDate?.();
 
     if (!inicio) {
       return 'pendiente';
     }
 
-    const fin = new Date(inicio.getTime() + partido.duracionMinutos * 60_000);
+    const duracionMinutos = Number(partido.duracionMinutos) || 0;
+    const fin = new Date(inicio.getTime() + duracionMinutos * 60_000);
+
     const ahora = new Date();
 
     if (ahora < inicio) {
@@ -265,13 +296,19 @@ export class HomeComponent {
   }
 
   private debeMostrarEnCarrusel(partido: PartidoHomeView): boolean {
+    if (this.estaCancelado(partido)) {
+      return false;
+    }
+
     const inicio = partido.fecha?.toDate?.();
 
     if (!inicio) {
       return false;
     }
 
-    const fin = new Date(inicio.getTime() + partido.duracionMinutos * 60_000);
+    const duracionMinutos = Number(partido.duracionMinutos) || 0;
+    const fin = new Date(inicio.getTime() + duracionMinutos * 60_000);
+
     const ahora = Date.now();
     const ventana24h = 24 * 60 * 60 * 1000;
 
@@ -354,6 +391,7 @@ export class HomeComponent {
 
   private getTituloPartido(partido: Partido): string {
     const nombre = (partido.nombre ?? '').trim();
+
     return nombre.length > 0
       ? nombre
       : `${partido.equipoA} vs ${partido.equipoB}`;
@@ -362,7 +400,9 @@ export class HomeComponent {
   private estaDentroDeVentana(partido: Partido, ventanaMs: number): boolean {
     const referencia =
       (
-        partido as unknown as { fechaActualizacion?: Timestamp }
+        partido as unknown as {
+          fechaActualizacion?: Timestamp;
+        }
       ).fechaActualizacion?.toDate?.() ?? partido.fecha?.toDate?.();
 
     if (!referencia) {
@@ -381,10 +421,12 @@ export class HomeComponent {
     }
 
     const rival = stat.equipo === 'A' ? partido.equipoB : partido.equipoA;
+
     const golesFavor =
       Number(
         stat.equipo === 'A' ? partido.golesEquipoA : partido.golesEquipoB,
       ) || 0;
+
     const golesContra =
       Number(
         stat.equipo === 'A' ? partido.golesEquipoB : partido.golesEquipoA,
@@ -403,7 +445,9 @@ export class HomeComponent {
     const goles = Number(stat.goles) || 0;
     const asistencias = Number(stat.asistencias) || 0;
 
-    const texto = `Marcaste ${goles} gol${goles === 1 ? '' : 'es'} y diste ${asistencias} asistencia${asistencias === 1 ? '' : 's'}.`;
+    const texto =
+      `Marcaste ${goles} gol${goles === 1 ? '' : 'es'} ` +
+      `y diste ${asistencias} asistencia${asistencias === 1 ? '' : 's'}.`;
 
     return {
       id: partido.partidoId,
@@ -426,45 +470,12 @@ export class HomeComponent {
 
     return {
       id: partido.partidoId,
-      titulo: `Ya sois ${confirmados} jugador${confirmados === 1 ? '' : 'es'} para el partido`,
-      texto: `${titulo} tiene ${confirmados} jugador${confirmados === 1 ? '' : 'es'} confirmado${confirmados === 1 ? '' : 's'}.`,
-    };
-  }
-
-  private construirActividadGolesSemana(
-    docs: EstadisticaConFechaDoc[],
-  ): ActividadItemView | null {
-    if (!docs.length) {
-      return null;
-    }
-
-    const fechaMasReciente = docs[0].fechaCreacion?.toDate?.();
-
-    if (!fechaMasReciente) {
-      return null;
-    }
-
-    const ahora = Date.now();
-
-    if (ahora - fechaMasReciente.getTime() > VENTANA_ACTIVIDAD_MS) {
-      return null;
-    }
-
-    const golesSemana = docs
-      .filter((d) => {
-        const fecha = d.fechaCreacion?.toDate?.();
-        return fecha ? ahora - fecha.getTime() <= VENTANA_SEMANA_MS : false;
-      })
-      .reduce((acc, d) => acc + (Number(d.goles) || 0), 0);
-
-    if (golesSemana <= 0) {
-      return null;
-    }
-
-    return {
-      id: 'goles-semana',
-      titulo: `Has marcado ${golesSemana} gol${golesSemana === 1 ? '' : 'es'} esta semana`,
-      texto: '¡Sigue así!',
+      titulo: `Ya sois ${confirmados} jugador${
+        confirmados === 1 ? '' : 'es'
+      } para el partido`,
+      texto: `${titulo} tiene ${confirmados} jugador${
+        confirmados === 1 ? '' : 'es'
+      } confirmado${confirmados === 1 ? '' : 's'}.`,
     };
   }
 }

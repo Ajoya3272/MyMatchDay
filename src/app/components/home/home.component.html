@@ -17,7 +17,9 @@
     <ng-template #emptyNextMatch>
       <article class="match-card match-card--empty">
         <div class="match-card__empty-icon">⚽</div>
+
         <h3 class="match-card__title">No tienes ningún partido pendiente</h3>
+
         <p class="match-card__place">Organiza uno e invita a tus amigos.</p>
 
         <button
@@ -41,13 +43,15 @@
       <button class="quick-card" type="button" routerLink="/crear-partido">
         <span class="quick-card__icon">⚽</span>
         <span class="quick-card__title">Crear partido</span>
-        <span class="quick-card__text">Monta una pachanga en segundos.</span>
+        <span class="quick-card__text"> Monta una pachanga en segundos. </span>
       </button>
 
       <button class="quick-card" type="button" routerLink="/invitar-whatsapp">
         <span class="quick-card__icon">📲</span>
         <span class="quick-card__title">Invitar por WhatsApp</span>
-        <span class="quick-card__text">Comparte enlace directo al grupo.</span>
+        <span class="quick-card__text">
+          Comparte enlace directo al grupo.
+        </span>
       </button>
 
       <button
@@ -65,7 +69,9 @@
       <button class="quick-card" type="button" routerLink="/estadisticas">
         <span class="quick-card__icon">📊</span>
         <span class="quick-card__title">Mis estadísticas</span>
-        <span class="quick-card__text">Consulta tus números al instante.</span>
+        <span class="quick-card__text">
+          Consulta tus números al instante.
+        </span>
       </button>
     </div>
   </section>
@@ -79,22 +85,30 @@
     <div class="stats-grid" *ngIf="stats$ | async as stats">
       <article class="stat-card">
         <span class="stat-card__label">Partidos</span>
-        <strong class="stat-card__value">{{ stats.partidosJugados }}</strong>
+        <strong class="stat-card__value">
+          {{ stats.partidosJugados }}
+        </strong>
       </article>
 
       <article class="stat-card">
         <span class="stat-card__label">Victorias</span>
-        <strong class="stat-card__value">{{ stats.victorias }}</strong>
+        <strong class="stat-card__value">
+          {{ stats.victorias }}
+        </strong>
       </article>
 
       <article class="stat-card">
         <span class="stat-card__label">Goles</span>
-        <strong class="stat-card__value">{{ stats.goles }}</strong>
+        <strong class="stat-card__value">
+          {{ stats.goles }}
+        </strong>
       </article>
 
       <article class="stat-card">
         <span class="stat-card__label">Asistencias</span>
-        <strong class="stat-card__value">{{ stats.asistencias }}</strong>
+        <strong class="stat-card__value">
+          {{ stats.asistencias }}
+        </strong>
       </article>
     </div>
   </section>
@@ -112,6 +126,7 @@
       >
         <article class="activity-item" *ngFor="let item of activityItems">
           <span class="activity-item__dot"></span>
+
           <div>
             <h3>{{ item.titulo }}</h3>
             <p>{{ item.texto }}</p>
@@ -122,6 +137,7 @@
       <ng-template #emptyActivity>
         <article class="activity-item activity-item--empty">
           <span class="activity-item__dot"></span>
+
           <div>
             <h3>No hay ninguna novedad</h3>
             <p>Anímate a organizar un partido y aparecerá aquí.</p>

@@ -10,20 +10,19 @@ import {
   doc,
   orderBy,
   query,
-  runTransaction,
   serverTimestamp,
+  setDoc,
   updateDoc,
   where,
 } from '@angular/fire/firestore';
 import { firstValueFrom, Observable } from 'rxjs';
 import { filter, map, take } from 'rxjs/operators';
-
+import { LoginService } from './login.service';
 import {
   CrearPartidoPayload,
   Partido,
   PartidoWrite,
 } from '../interfaces/Partido.interface';
-import { LoginService } from './login.service';
 
 @Injectable({
   providedIn: 'root',
@@ -40,16 +39,6 @@ export class PartidoService {
       throw new Error('No hay usuario autenticado');
     }
 
-    if (!data.pistaId) {
-      throw new Error('Debes seleccionar una pista para crear el partido');
-    }
-
-    const fechaPartido = new Date(data.matchDate);
-
-    if (Number.isNaN(fechaPartido.getTime())) {
-      throw new Error('La fecha y hora del partido no son válidas');
-    }
-
     const usuario = await firstValueFrom(
       this.loginService.user$.pipe(
         filter((user): user is NonNullable<typeof user> => !!user),
@@ -57,21 +46,24 @@ export class PartidoService {
       ),
     );
 
-    const partidoDocRef = doc(collection(this.firestore, 'partidos'));
+    const partidosCollectionRef = collection(this.firestore, 'partidos');
+    const partidoDocRef = doc(partidosCollectionRef);
 
-    const reservaId = this.crearIdReserva(data.pistaId, fechaPartido);
-    const reservaDocRef = doc(this.firestore, `reservas/${reservaId}`);
+    const equipoA = data.equipoA.trim();
+    const equipoB = data.equipoB.trim();
+    const ubicacion = data.ubicacion.trim();
+    const nombrePartido = data.nombrePartido.trim();
 
     const partidoData: PartidoWrite = {
       partidoId: partidoDocRef.id,
-      nombre: data.nombrePartido.trim(),
+      nombre: nombrePartido,
       organizador: usuario.nombre,
       organizadorId: authUser.uid,
-      fecha: Timestamp.fromDate(fechaPartido),
+      fecha: Timestamp.fromDate(new Date(data.matchDate)),
       estado: 'pendiente',
-      equipoA: data.equipoA.trim(),
-      equipoB: data.equipoB.trim(),
-      ubicacion: data.ubicacion.trim(),
+      equipoA,
+      equipoB,
+      ubicacion,
       golesEquipoA: 0,
       golesEquipoB: 0,
       jugadoresId: [],
@@ -80,59 +72,43 @@ export class PartidoService {
       jugadoresEquipoB: [],
       numeroJugadores: Number(data.playerCount),
       duracionMinutos: Number(data.durationMinutes),
-      pistaId: data.pistaId,
+      ...(data.pistaId ? { pistaId: data.pistaId } : {}),
       ...(data.pistaNombre ? { pistaNombre: data.pistaNombre } : {}),
       ...(typeof data.precio === 'number'
         ? { precio: data.precio, pagado: true }
         : {}),
       ...(data.paypalOrderId ? { paypalOrderId: data.paypalOrderId } : {}),
       ...(data.paypalPayerId ? { paypalPayerId: data.paypalPayerId } : {}),
+      ...(data.paypalCaptureId
+        ? { paypalCaptureId: data.paypalCaptureId }
+        : {}),
       fechaCreacion: serverTimestamp(),
       fechaActualizacion: serverTimestamp(),
     };
 
-    await runTransaction(this.firestore, async (transaction) => {
-      const reservaSnapshot = await transaction.get(reservaDocRef);
-
-      if (reservaSnapshot.exists()) {
-        throw new Error(
-          'Esta pista ya está reservada para la fecha y hora seleccionadas',
-        );
-      }
-
-      transaction.set(reservaDocRef, {
-        pistaId: data.pistaId,
-        partidoId: partidoDocRef.id,
-        fecha: Timestamp.fromDate(fechaPartido),
-        estado: 'reservada',
-        fechaCreacion: serverTimestamp(),
-      });
-
-      transaction.set(partidoDocRef, partidoData);
-    });
+    await setDoc(partidoDocRef, partidoData);
 
     return partidoDocRef.id;
   }
 
   getPartidos(): Observable<Partido[]> {
     const partidosRef = collection(this.firestore, 'partidos');
-    const partidosQuery = query(partidosRef, orderBy('fecha', 'desc'));
+    const q = query(partidosRef, orderBy('fecha', 'desc'));
 
-    return collectionData(partidosQuery, { idField: 'partidoId' }).pipe(
+    return collectionData(q, { idField: 'partidoId' }).pipe(
       map((partidos) => partidos as Partido[]),
     );
   }
 
   obtenerPartidosOrganizados(uid: string): Observable<Partido[]> {
     const partidosRef = collection(this.firestore, 'partidos');
-
-    const partidosQuery = query(
+    const q = query(
       partidosRef,
       where('organizadorId', '==', uid),
       orderBy('fecha', 'desc'),
     );
 
-    return collectionData(partidosQuery, { idField: 'partidoId' }).pipe(
+    return collectionData(q, { idField: 'partidoId' }).pipe(
       map((partidos) => partidos as Partido[]),
     );
   }
@@ -198,15 +174,5 @@ export class PartidoService {
       estado: 'finalizado',
       fechaActualizacion: serverTimestamp(),
     });
-  }
-
-  private crearIdReserva(pistaId: string, fecha: Date): string {
-    const year = fecha.getFullYear();
-    const month = String(fecha.getMonth() + 1).padStart(2, '0');
-    const day = String(fecha.getDate()).padStart(2, '0');
-    const hour = String(fecha.getHours()).padStart(2, '0');
-    const minute = String(fecha.getMinutes()).padStart(2, '0');
-
-    return `${pistaId}_${year}${month}${day}_${hour}${minute}`;
   }
 }

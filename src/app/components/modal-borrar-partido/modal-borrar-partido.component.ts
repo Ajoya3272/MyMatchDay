@@ -1,6 +1,18 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+
 import { Partido } from '../../interfaces/Partido.interface';
+
+interface PartidoConPago extends Partido {
+  precio?: number;
+  importePagado?: number;
+  totalPagado?: number;
+  paypalPayerEmail?: string;
+  payerEmail?: string;
+  emailPagador?: string;
+  emailPago?: string;
+  email?: string;
+}
 
 @Component({
   selector: 'app-modal-borrar-partido',
@@ -33,5 +45,33 @@ export class ModalBorrarPartidoComponent {
     if (!this.loading) {
       this.confirm.emit();
     }
+  }
+
+  getImporteReembolso(partido: Partido): string {
+    const match = partido as PartidoConPago;
+
+    const importe =
+      Number(match.precio) ||
+      Number(match.importePagado) ||
+      Number(match.totalPagado) ||
+      0;
+
+    return new Intl.NumberFormat('es-ES', {
+      style: 'currency',
+      currency: 'EUR',
+    }).format(importe);
+  }
+
+  getEmailPago(partido: Partido): string {
+    const match = partido as PartidoConPago;
+
+    return (
+      match.paypalPayerEmail ||
+      match.payerEmail ||
+      match.emailPagador ||
+      match.emailPago ||
+      match.email ||
+      'Cuenta de PayPal utilizada para el pago'
+    );
   }
 }

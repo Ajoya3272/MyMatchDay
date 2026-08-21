@@ -3,16 +3,8 @@ import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { IonContent, IonProgressBar } from '@ionic/angular/standalone';
 
-import { environment } from '../../../enviroments/enviroment';
-import { Pista } from '../../interfaces/Pista.interface';
-import { NotificacionesService } from '../../services/notificaciones.service';
 import { PartidoService } from '../../services/partido.service';
-import {
-  PaypalPaymentComponent,
-  PagoCompletado,
-} from '../paypal-payment/paypal-payment.component';
 import { SpinnerComponent } from '../spinner/spinner.component';
-import { StepFourComponent } from './step-four/step-four.component';
 import { StepOneComponent } from './step-one/step-one.component';
 import {
   HorarioSeleccionado,
@@ -22,6 +14,14 @@ import {
   DatosPartido,
   StepThreeComponent,
 } from './step-three/step-three.component';
+import { StepFourComponent } from './step-four/step-four.component';
+import {
+  PaypalPaymentComponent,
+  PagoCompletado,
+  limpiarOverlaysPaypalHuerfanos,
+} from '../paypal-payment/paypal-payment.component';
+import { environment } from '../../../enviroments/enviroment';
+import { Pista } from '../../interfaces/Pista.interface';
 
 const DURACION_MINUTOS_FIJA = 60;
 
@@ -45,7 +45,6 @@ const DURACION_MINUTOS_FIJA = 60;
 export class CrearPartidoComponent {
   private router = inject(Router);
   private partidoService = inject(PartidoService);
-  private notificacionesService = inject(NotificacionesService);
 
   currentStep = 1;
   created = false;
@@ -61,6 +60,7 @@ export class CrearPartidoComponent {
 
   ionViewDidLeave(): void {
     this.resetCreateMatch();
+    limpiarOverlaysPaypalHuerfanos();
   }
 
   onPistaSeleccionada(pista: Pista): void {
@@ -163,6 +163,7 @@ export class CrearPartidoComponent {
           ? {
               paypalOrderId: pago.orderId,
               paypalPayerId: pago.payerId,
+              paypalCaptureId: pago.captureId,
             }
           : {}),
       });
@@ -171,17 +172,6 @@ export class CrearPartidoComponent {
 
       await this.partidoService.guardarEnlaceInvitacion(partidoId, inviteLink);
 
-      try {
-        await this.notificacionesService.notificarPartidoCreado(
-          datos.nombrePartido,
-        );
-      } catch (error) {
-        console.warn(
-          '[CREAR-PARTIDO] No se pudo mostrar la notificación:',
-          error,
-        );
-      }
-
       this.inviteLink = inviteLink;
       this.created = true;
       this.currentStep = 4;
@@ -189,17 +179,6 @@ export class CrearPartidoComponent {
       this.animateStep('forward');
     } catch (error) {
       console.error('[CREAR-PARTIDO] Error al crear partido:', error);
-
-      const mensaje =
-        error instanceof Error ? error.message : 'No se pudo crear el partido';
-
-      if (mensaje.includes('ya está reservada')) {
-        window.alert(
-          '⚠️ Esta hora acaba de ser reservada por otro usuario. Elige otra franja.',
-        );
-      } else {
-        window.alert('No se pudo crear el partido. Inténtalo de nuevo.');
-      }
     } finally {
       this.creatingMatch = false;
     }

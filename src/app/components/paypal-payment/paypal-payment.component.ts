@@ -16,6 +16,7 @@ declare const paypal: any;
 export interface PagoCompletado {
   orderId: string;
   payerId: string;
+  captureId: string;
 }
 
 let paypalSdkPromise: Promise<void> | null = null;
@@ -40,6 +41,21 @@ function cargarSdkPaypal(): Promise<void> {
   });
 
   return paypalSdkPromise;
+}
+
+export function limpiarOverlaysPaypalHuerfanos(): void {
+  const selectores = [
+    'iframe[name^="__zoid__"]',
+    '[id^="zoid-"]',
+    '[class*="zoid-"]',
+    '[data-zoid-container]',
+  ];
+
+  selectores.forEach((selector) => {
+    document.querySelectorAll(selector).forEach((el) => {
+      el.parentElement?.removeChild(el);
+    });
+  });
 }
 
 @Component({
@@ -80,6 +96,8 @@ export class PaypalPaymentComponent implements AfterViewInit, OnDestroy {
     if (this.botones?.close) {
       this.botones.close();
     }
+
+    limpiarOverlaysPaypalHuerfanos();
   }
 
   get precioFormateado(): string {
@@ -115,14 +133,27 @@ export class PaypalPaymentComponent implements AfterViewInit, OnDestroy {
       },
       onApprove: async (_data: unknown, actions: any) => {
         const order = await actions.order.capture();
+        const captureId =
+          order?.purchase_units?.[0]?.payments?.captures?.[0]?.id ?? '';
+
+        if (!captureId) {
+          console.error('[PAYPAL-PAYMENT] No se recibió captureId:', order);
+          this.pagoError.emit();
+          return;
+        }
 
         this.pagoCompletado.emit({
           orderId: order.id,
           payerId: order.payer?.payer_id ?? '',
+          captureId,
         });
+      },
+      onCancel: () => {
+        limpiarOverlaysPaypalHuerfanos();
       },
       onError: (error: unknown) => {
         console.error('[PAYPAL-PAYMENT] Error en el pago:', error);
+        limpiarOverlaysPaypalHuerfanos();
         this.pagoError.emit();
       },
     });

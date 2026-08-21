@@ -9,17 +9,29 @@ import {
   inject,
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { Firestore, deleteDoc, doc } from '@angular/fire/firestore';
+import { httpsCallable, Functions } from '@angular/fire/functions';
+
 import { Partido } from '../../interfaces/Partido.interface';
+import { NotificacionesService } from '../../services/notificaciones.service';
 import { ModalBorrarPartidoComponent } from '../modal-borrar-partido/modal-borrar-partido.component';
 
 type EstadoPartidoVista = 'pending' | 'progress' | 'finished';
-
 type BannerTipo = 'inicio' | 'fin';
 
 interface BannerActivo {
   tipo: BannerTipo;
   until: number;
+}
+
+interface CancelarPartidoResponse {
+  success: boolean;
+  refundStatus?: string;
+}
+
+interface FirebaseCallableError {
+  code?: string;
+  message?: string;
+  details?: unknown;
 }
 
 export interface PartidoCarrusel extends Partido {
@@ -35,7 +47,9 @@ export interface PartidoCarrusel extends Partido {
   imports: [CommonModule, RouterLink, ModalBorrarPartidoComponent],
 })
 export class CarruselComponent implements OnInit, OnDestroy {
-  private firestore = inject(Firestore);
+  private readonly functions = inject(Functions);
+  private readonly notificaciones = inject(NotificacionesService);
+
   private _matches: PartidoCarrusel[] = [];
   private refreshTimer?: ReturnType<typeof setInterval>;
   private timers = new Map<string, ReturnType<typeof setTimeout>>();
@@ -53,14 +67,18 @@ export class CarruselComponent implements OnInit, OnDestroy {
 
   @Input({ required: true })
   set matches(value: PartidoCarrusel[] | null | undefined) {
-    this._matches = value ?? [];
-    this.recalcularBanners();
+    this._matches = (value ?? []).filter((match) => !this.estaCancelado(match));
 
+    this.recalcularBanners();
     this.activeMatchIndex = 0;
 
-    const el = this.matchesCarousel?.nativeElement;
-    if (el) {
-      el.scrollTo({ left: 0, behavior: 'auto' });
+    const carousel = this.matchesCarousel?.nativeElement;
+
+    if (carousel) {
+      carousel.scrollTo({
+        left: 0,
+        behavior: 'auto',
+      });
     }
   }
 
@@ -69,7 +87,9 @@ export class CarruselComponent implements OnInit, OnDestroy {
   }
 
   get matchesVisibles(): PartidoCarrusel[] {
-    return this._matches.filter((match) => !this.isFinished(match));
+    return this._matches.filter(
+      (match) => !this.estaCancelado(match) && !this.isFinished(match),
+    );
   }
 
   ngOnInit(): void {
@@ -91,11 +111,53 @@ export class CarruselComponent implements OnInit, OnDestroy {
     this.banners.clear();
   }
 
+  private estaCancelado(match: PartidoCarrusel): boolean {
+    const estado = String(match.estado ?? '')
+      .trim()
+      .toLowerCase();
+
+    return estado === 'cancelado' || estado === 'cancelada';
+  }
+
+  private eliminarDelCarrusel(partidoId: string): void {
+    this._matches = this._matches.filter(
+      (match) => match.partidoId !== partidoId,
+    );
+
+    this.banners.delete(partidoId);
+
+    const timer = this.timers.get(partidoId);
+
+    if (timer) {
+      clearTimeout(timer);
+      this.timers.delete(partidoId);
+    }
+
+    this.activeMatchIndex = Math.min(
+      this.activeMatchIndex,
+      Math.max(this.matchesVisibles.length - 1, 0),
+    );
+  }
+
   private recalcularBanners(): void {
     const now = Date.now();
 
     for (const match of this._matches) {
+      if (this.estaCancelado(match)) {
+        this.banners.delete(match.partidoId);
+
+        const timer = this.timers.get(match.partidoId);
+
+        if (timer) {
+          clearTimeout(timer);
+          this.timers.delete(match.partidoId);
+        }
+
+        continue;
+      }
+
       const inicio = match.fecha?.toDate?.();
+
       if (!inicio) {
         continue;
       }
@@ -136,15 +198,18 @@ export class CarruselComponent implements OnInit, OnDestroy {
     });
 
     const timerPrevio = this.timers.get(partidoId);
+
     if (timerPrevio) {
       clearTimeout(timerPrevio);
     }
 
     const timer = setTimeout(() => {
-      const current = this.banners.get(partidoId);
-      if (current?.tipo === tipo) {
+      const bannerActual = this.banners.get(partidoId);
+
+      if (bannerActual?.tipo === tipo) {
         this.banners.delete(partidoId);
       }
+
       this.timers.delete(partidoId);
     }, duracionMs);
 
@@ -152,24 +217,34 @@ export class CarruselComponent implements OnInit, OnDestroy {
   }
 
   esBannerInicio(match: PartidoCarrusel): boolean {
+    if (this.estaCancelado(match)) {
+      return false;
+    }
+
     const banner = this.banners.get(match.partidoId);
+
     return banner?.tipo === 'inicio' && Date.now() < banner.until;
   }
 
   esBannerFin(match: PartidoCarrusel): boolean {
+    if (this.estaCancelado(match)) {
+      return false;
+    }
+
     const banner = this.banners.get(match.partidoId);
+
     return banner?.tipo === 'fin' && Date.now() < banner.until;
   }
 
   onCarouselScroll(): void {
-    const el = this.matchesCarousel?.nativeElement;
+    const carousel = this.matchesCarousel?.nativeElement;
 
-    if (!el || el.clientWidth === 0) {
+    if (!carousel || carousel.clientWidth === 0) {
       return;
     }
 
-    const slideWidth = el.clientWidth;
-    const nextIndex = Math.round(el.scrollLeft / slideWidth);
+    const slideWidth = carousel.clientWidth;
+    const nextIndex = Math.round(carousel.scrollLeft / slideWidth);
 
     this.activeMatchIndex = Math.min(
       Math.max(nextIndex, 0),
@@ -189,6 +264,7 @@ export class CarruselComponent implements OnInit, OnDestroy {
     }
 
     const ahora = new Date();
+
     const fin = new Date(
       inicio.getTime() + (match.duracionMinutos ?? 0) * 60_000,
     );
@@ -205,6 +281,10 @@ export class CarruselComponent implements OnInit, OnDestroy {
   }
 
   getEstadoTexto(match: PartidoCarrusel): string {
+    if (this.estaCancelado(match)) {
+      return 'Cancelado';
+    }
+
     const estado = this.getEstadoClase(match);
 
     if (estado === 'progress') {
@@ -219,12 +299,16 @@ export class CarruselComponent implements OnInit, OnDestroy {
   }
 
   isPending(match: PartidoCarrusel): boolean {
-    return this.getEstadoClase(match) === 'pending';
+    return (
+      !this.estaCancelado(match) && this.getEstadoClase(match) === 'pending'
+    );
   }
 
   isFinished(match: PartidoCarrusel): boolean {
     return (
-      this.getEstadoClase(match) === 'finished' && !this.esBannerFin(match)
+      !this.estaCancelado(match) &&
+      this.getEstadoClase(match) === 'finished' &&
+      !this.esBannerFin(match)
     );
   }
 
@@ -234,7 +318,12 @@ export class CarruselComponent implements OnInit, OnDestroy {
 
     const inicio = match.fecha?.toDate?.();
 
-    if (!esOrganizador || !inicio || !this.isPending(match)) {
+    if (
+      this.estaCancelado(match) ||
+      !esOrganizador ||
+      !inicio ||
+      !this.isPending(match)
+    ) {
       return false;
     }
 
@@ -245,7 +334,12 @@ export class CarruselComponent implements OnInit, OnDestroy {
   }
 
   openDeleteModal(match: PartidoCarrusel): void {
-    if (!match.partidoId || this.deletingMatchId || !this.puedeBorrar(match)) {
+    if (
+      !match.partidoId ||
+      this.deletingMatchId ||
+      this.estaCancelado(match) ||
+      !this.puedeBorrar(match)
+    ) {
       return;
     }
 
@@ -265,20 +359,58 @@ export class CarruselComponent implements OnInit, OnDestroy {
   async confirmDeleteMatch(): Promise<void> {
     const match = this.selectedMatchToDelete;
 
-    if (!match?.partidoId || this.deletingMatchId || !this.puedeBorrar(match)) {
+    if (
+      !match?.partidoId ||
+      this.deletingMatchId ||
+      this.estaCancelado(match) ||
+      !this.puedeBorrar(match)
+    ) {
       return;
     }
 
     try {
       this.deletingMatchId = match.partidoId;
 
-      const partidoRef = doc(this.firestore, `partidos/${match.partidoId}`);
-      await deleteDoc(partidoRef);
+      const cancelarPartido = httpsCallable<
+        { partidoId: string },
+        CancelarPartidoResponse
+      >(this.functions, 'cancelarPartido');
 
+      const resultado = await cancelarPartido({
+        partidoId: match.partidoId,
+      });
+
+      if (!resultado.data.success) {
+        throw new Error('No se pudo cancelar el partido.');
+      }
+
+      await this.notificaciones.notificarPartidoCanceladoOrganizador(match);
+
+      this.eliminarDelCarrusel(match.partidoId);
       this.isDeleteModalOpen = false;
       this.selectedMatchToDelete = null;
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('[CARRUSEL] Error al cancelar el partido:', error);
+
+      const firebaseError = error as FirebaseCallableError;
+      const mensaje = firebaseError.message ?? 'Error desconocido.';
+      const mensajeNormalizado = mensaje.toLowerCase();
+
+      const yaEstaCancelado =
+        firebaseError.code === 'already-exists' ||
+        mensajeNormalizado.includes('ya está cancelado') ||
+        mensajeNormalizado.includes('ya esta cancelado');
+
+      if (yaEstaCancelado) {
+        await this.notificaciones.notificarPartidoCanceladoOrganizador(match);
+
+        this.eliminarDelCarrusel(match.partidoId);
+        this.isDeleteModalOpen = false;
+        this.selectedMatchToDelete = null;
+        return;
+      }
+
+      window.alert(`No se pudo cancelar el partido.\n\n${mensaje}`);
     } finally {
       this.deletingMatchId = null;
     }

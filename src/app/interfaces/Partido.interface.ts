@@ -26,6 +26,8 @@ export interface Partido {
   pagado?: boolean;
   paypalOrderId?: string;
   paypalPayerId?: string;
+  paypalCaptureId?: string;
+  reembolsado?: boolean;
   fechaCreacion?: Timestamp | null;
   fechaActualizacion?: Timestamp | null;
 }
@@ -56,6 +58,7 @@ export interface PartidoWrite {
   pagado?: boolean;
   paypalOrderId?: string;
   paypalPayerId?: string;
+  paypalCaptureId?: string;
   fechaCreacion: unknown;
   fechaActualizacion: unknown;
 }
@@ -73,6 +76,7 @@ export interface CrearPartidoPayload {
   precio?: number;
   paypalOrderId?: string;
   paypalPayerId?: string;
+  paypalCaptureId?: string;
 }
 
 export interface PartidoDetalleView {

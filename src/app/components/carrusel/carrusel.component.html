@@ -24,7 +24,10 @@
               </div>
 
               <div class="match-card__start-main">
-                <h3 class="match-card__start-title">{{ match.nombre }}</h3>
+                <h3 class="match-card__start-title">
+                  {{ match.nombre }}
+                </h3>
+
                 <p class="match-card__start-teams">
                   {{ match.equipoA }} vs {{ match.equipoB }}
                 </p>
@@ -42,7 +45,10 @@
                 </div>
 
                 <div class="match-card__start-main">
-                  <h3 class="match-card__start-title">{{ match.nombre }}</h3>
+                  <h3 class="match-card__start-title">
+                    {{ match.nombre }}
+                  </h3>
+
                   <p class="match-card__start-teams">
                     {{ match.equipoA }} vs {{ match.equipoB }}
                   </p>
@@ -69,6 +75,7 @@
             <div class="match-card__meta">
               <div class="match-card__meta-item">
                 <span class="match-card__meta-label">Cuándo</span>
+
                 <strong class="match-card__meta-value">
                   {{ match.fecha.toDate() | date: "dd/MM/yyyy" }} ·
                   {{ match.fecha.toDate() | date: "HH:mm" }}
@@ -77,6 +84,7 @@
 
               <div class="match-card__meta-item">
                 <span class="match-card__meta-label">Ubicación</span>
+
                 <strong class="match-card__meta-value">
                   {{ match.ubicacion || "Por confirmar" }}
                 </strong>
@@ -101,7 +109,11 @@
                 [disabled]="deletingMatchId === match.partidoId"
                 (click)="openDeleteModal(match)"
               >
-                Cancelar partido
+                {{
+                  deletingMatchId === match.partidoId
+                    ? "Cancelando..."
+                    : "Cancelar partido"
+                }}
               </button>
             </div>
 
@@ -121,6 +133,7 @@
   <ng-template #emptyNextMatch>
     <article class="match-card match-card--empty">
       <h3 class="match-card__title">No tienes ningún partido pendiente</h3>
+
       <p class="match-card__place">Organiza uno e invita a tus amigos.</p>
 
       <button class="match-card__cta" type="button" routerLink="/crear-partido">
