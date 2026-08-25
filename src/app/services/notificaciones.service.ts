@@ -1,6 +1,20 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import { LocalNotifications } from '@capacitor/local-notifications';
+import {
+  ActionPerformed,
+  PushNotificationSchema,
+  PushNotifications,
+  Token,
+} from '@capacitor/push-notifications';
+import { Auth } from '@angular/fire/auth';
+import {
+  arrayRemove,
+  arrayUnion,
+  doc,
+  Firestore,
+  updateDoc,
+} from '@angular/fire/firestore';
 
 import { Partido } from '../interfaces/Partido.interface';
 
@@ -10,6 +24,10 @@ import { Partido } from '../interfaces/Partido.interface';
 export class NotificacionesService {
   private readonly notificationIdBase = 100000;
   private readonly cancellationNotificationIdBase = 900000000;
+  private readonly auth = inject(Auth);
+  private readonly firestore = inject(Firestore);
+  private tokenPushActual: string | null = null;
+  private listenersPushInicializados = false;
 
   async inicializarPermisos(): Promise<boolean> {
     if (!this.esPlataformaNativa()) {
@@ -25,6 +43,129 @@ export class NotificacionesService {
     const solicitados = await LocalNotifications.requestPermissions();
 
     return solicitados.display === 'granted';
+  }
+
+  async inicializarPush(): Promise<void> {
+    if (!this.esPlataformaNativa()) {
+      console.info('[NOTIFICACIONES] Push omitido en navegador');
+      return;
+    }
+
+    this.registrarListenersPush();
+
+    const permisos = await PushNotifications.checkPermissions();
+    let estado = permisos.receive;
+
+    if (estado === 'prompt' || estado === 'prompt-with-rationale') {
+      const solicitados = await PushNotifications.requestPermissions();
+      estado = solicitados.receive;
+    }
+
+    if (estado !== 'granted') {
+      console.warn('[NOTIFICACIONES] Permiso de push no concedido');
+      return;
+    }
+
+    await PushNotifications.register();
+  }
+
+  private registrarListenersPush(): void {
+    if (this.listenersPushInicializados) {
+      return;
+    }
+
+    this.listenersPushInicializados = true;
+
+    PushNotifications.addListener('registration', (token: Token) => {
+      this.tokenPushActual = token.value;
+      void this.guardarTokenPush(token.value);
+    });
+
+    PushNotifications.addListener('registrationError', (error) => {
+      console.error('[NOTIFICACIONES] Error registrando push:', error);
+    });
+
+    PushNotifications.addListener(
+      'pushNotificationReceived',
+      (notification: PushNotificationSchema) => {
+        void this.mostrarNotificacionLocalDesdePush(notification);
+      },
+    );
+
+    PushNotifications.addListener(
+      'pushNotificationActionPerformed',
+      (accion: ActionPerformed) => {
+        console.log('[NOTIFICACIONES] Push abierto por el usuario:', accion);
+      },
+    );
+  }
+
+  private async mostrarNotificacionLocalDesdePush(
+    notification: PushNotificationSchema,
+  ): Promise<void> {
+    const tienePermiso = await this.inicializarPermisos();
+
+    if (!tienePermiso) {
+      return;
+    }
+
+    await LocalNotifications.schedule({
+      notifications: [
+        {
+          id: this.obtenerIdAleatorio(),
+          title: notification.title ?? 'JoinMatch',
+          body: notification.body ?? '',
+          extra: notification.data,
+        },
+      ],
+    });
+  }
+
+  private async guardarTokenPush(token: string): Promise<void> {
+    const uid = this.auth.currentUser?.uid;
+
+    if (!uid) {
+      console.warn(
+        '[NOTIFICACIONES] No hay usuario logueado para guardar el token',
+      );
+      return;
+    }
+
+    try {
+      const usuarioRef = doc(this.firestore, 'usuarios', uid);
+
+      await updateDoc(usuarioRef, {
+        fcmTokens: arrayUnion(token),
+      });
+
+      console.log('[NOTIFICACIONES] Token push guardado');
+    } catch (error) {
+      console.error(
+        '[NOTIFICACIONES] No se pudo guardar el token push:',
+        error,
+      );
+    }
+  }
+
+  async eliminarTokenPushActual(): Promise<void> {
+    const uid = this.auth.currentUser?.uid;
+
+    if (!uid || !this.tokenPushActual) {
+      return;
+    }
+
+    try {
+      const usuarioRef = doc(this.firestore, 'usuarios', uid);
+
+      await updateDoc(usuarioRef, {
+        fcmTokens: arrayRemove(this.tokenPushActual),
+      });
+    } catch (error) {
+      console.error(
+        '[NOTIFICACIONES] No se pudo eliminar el token push:',
+        error,
+      );
+    }
   }
 
   async programarAvisoPartido(partido: Partido): Promise<void> {

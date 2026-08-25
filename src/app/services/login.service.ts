@@ -7,8 +7,16 @@ import {
   signOut,
 } from '@angular/fire/auth';
 import { Firestore, doc, docData, updateDoc } from '@angular/fire/firestore';
-import { map, Observable, of, shareReplay, switchMap } from 'rxjs';
+import {
+  firstValueFrom,
+  map,
+  Observable,
+  of,
+  shareReplay,
+  switchMap,
+} from 'rxjs';
 import { UsuarioFirestore } from '../interfaces/RegistroUsuario.interface';
+import { NotificacionesService } from './notificaciones.service';
 
 export interface LoginPayload {
   email: string;
@@ -21,6 +29,7 @@ export interface LoginPayload {
 export class LoginService {
   private auth = inject(Auth);
   private firestore = inject(Firestore);
+  private notificacionesService = inject(NotificacionesService);
 
   authUser$ = authState(this.auth).pipe(
     shareReplay({ bufferSize: 1, refCount: true }),
@@ -70,11 +79,24 @@ export class LoginService {
       credential.user.emailVerified,
     );
 
+    await this.notificacionesService.inicializarPush();
+
     return credential;
   }
 
   async cerrarSesion(): Promise<void> {
+    await this.notificacionesService.eliminarTokenPushActual();
     await signOut(this.auth);
+  }
+
+  async inicializarPushSiHaySesion(): Promise<void> {
+    const user = await firstValueFrom(this.authUser$);
+
+    if (!user || !user.emailVerified) {
+      return;
+    }
+
+    await this.notificacionesService.inicializarPush();
   }
 
   obtenerInicialUsuario(user: UsuarioFirestore | null): string {

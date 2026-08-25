@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "856738938096",
+    "project_id": "football-app-18c93",
+    "storage_bucket": "football-app-18c93.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:856738938096:android:7e68008eda27c48261d635",
+        "android_client_info": {
+          "package_name": "es.joinmatch.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "856738938096-vuog4v4j140g5b4ivou5aoa0hmdslnmb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCGJ7N00pAdcyzTrCwXTTMz2XFF8BEN8rU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "856738938096-vuog4v4j140g5b4ivou5aoa0hmdslnmb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -13,6 +13,7 @@ import { HeaderComponent } from './shared/header/header.component';
 import { MenuLateralComponent } from './shared/menu-lateral/menu-lateral.component';
 import { NotificacionesService } from './services/notificaciones.service';
 import { AvisosOrganizadorService } from './services/aviso-organizador.service';
+import { LoginService } from './services/login.service';
 
 type ThemeMode = 'light' | 'dark';
 
@@ -35,6 +36,7 @@ export class AppComponent {
   private location = inject(Location);
   private notificacionesService = inject(NotificacionesService);
   private avisosOrganizadorService = inject(AvisosOrganizadorService);
+  private loginService = inject(LoginService);
 
   hideLayout = false;
 
@@ -89,6 +91,12 @@ export class AppComponent {
       }
     } catch (error) {
       console.error('[NOTIFICACIONES] Error inicializando permisos:', error);
+    }
+
+    try {
+      await this.loginService.inicializarPushSiHaySesion();
+    } catch (error) {
+      console.error('[NOTIFICACIONES] Error inicializando push:', error);
     }
   }
 

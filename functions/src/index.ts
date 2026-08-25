@@ -2,6 +2,7 @@ import {HttpsError, onCall} from "firebase-functions/v2/https";
 import {defineSecret} from "firebase-functions/params";
 import {initializeApp} from "firebase-admin/app";
 import {FieldValue, getFirestore, Timestamp} from "firebase-admin/firestore";
+import {getMessaging, MulticastMessage} from "firebase-admin/messaging";
 
 initializeApp();
 
@@ -33,6 +34,11 @@ interface PartidoFirestore {
   ubicacion?: string;
   jugadoresId?: unknown[];
   paypalCaptureId?: string;
+}
+
+interface TokenJugador {
+  uid: string;
+  token: string;
 }
 
 function paypalBaseUrl(): string {
@@ -212,6 +218,108 @@ async function crearAvisosCancelacion(
   });
 }
 
+async function obtenerTokensJugadores(
+  jugadoresUid: string[],
+): Promise<TokenJugador[]> {
+  if (jugadoresUid.length === 0) {
+    return [];
+  }
+
+  const refs = jugadoresUid.map((uid) => db.collection("usuarios").doc(uid));
+  const snapshots = await db.getAll(...refs);
+
+  const tokens: TokenJugador[] = [];
+
+  for (const snap of snapshots) {
+    const data = snap.data();
+    const tokensUsuario = data?.fcmTokens;
+
+    if (Array.isArray(tokensUsuario)) {
+      for (const token of tokensUsuario) {
+        if (typeof token === "string" && token.trim().length > 0) {
+          tokens.push({uid: snap.id, token});
+        }
+      }
+    }
+  }
+
+  return tokens;
+}
+
+async function enviarPushCancelacion(
+  tokensJugadores: TokenJugador[],
+  partidoId: string,
+  partido: PartidoFirestore,
+  fecha: Date,
+): Promise<void> {
+  if (tokensJugadores.length === 0) {
+    return;
+  }
+
+  const nombreOrganizador = obtenerNombreOrganizador(partido);
+  const nombrePartido = obtenerNombrePartido(partido);
+  const nombrePista = obtenerNombrePista(partido);
+  const fechaTexto = obtenerFechaTexto(fecha);
+
+  const tokens = tokensJugadores.map((tj) => tj.token);
+
+  const mensaje: MulticastMessage = {
+    tokens,
+    notification: {
+      title: "⚽ Partido cancelado",
+      body:
+        `${nombreOrganizador} ha cancelado "${nombrePartido}". ` +
+        `${nombrePista} · ${fechaTexto}`,
+    },
+    data: {
+      tipo: "partido-cancelado",
+      partidoId,
+    },
+    android: {
+      priority: "high",
+    },
+  };
+
+  const respuesta = await getMessaging().sendEachForMulticast(mensaje);
+
+  console.log("[CANCELAR PARTIDO] Push enviados:", {
+    partidoId,
+    exitosos: respuesta.successCount,
+    fallidos: respuesta.failureCount,
+  });
+
+  const lote = db.batch();
+  let tokensInvalidos = 0;
+
+  respuesta.responses.forEach((resultado, indice) => {
+    if (resultado.success) {
+      return;
+    }
+
+    const codigo = resultado.error?.code ?? "";
+    const esTokenInvalido =
+      codigo === "messaging/registration-token-not-registered" ||
+      codigo === "messaging/invalid-registration-token";
+
+    if (!esTokenInvalido) {
+      return;
+    }
+
+    const tokenJugador = tokensJugadores[indice];
+    const usuarioRef = db.collection("usuarios").doc(tokenJugador.uid);
+
+    lote.update(usuarioRef, {
+      fcmTokens: FieldValue.arrayRemove(tokenJugador.token),
+    });
+
+    tokensInvalidos++;
+  });
+
+  if (tokensInvalidos > 0) {
+    await lote.commit();
+  }
+}
+
 export const cancelarPartido = onCall(
   {
     region: "europe-west1",
@@ -308,8 +416,19 @@ export const cancelarPartido = onCall(
 
     try {
       await crearAvisosCancelacion(partidoId, partido, request.auth.uid, fecha);
+
+      const jugadores = obtenerJugadoresAVisar(
+        partido.jugadoresId,
+        request.auth.uid,
+      );
+      const tokensJugadores = await obtenerTokensJugadores(jugadores);
+
+      await enviarPushCancelacion(tokensJugadores, partidoId, partido, fecha);
     } catch (error) {
-      console.error("[CANCELAR PARTIDO] No se pudieron crear avisos:", error);
+      console.error(
+        "[CANCELAR PARTIDO] No se pudieron enviar los avisos:",
+        error,
+      );
     }
 
     return {
