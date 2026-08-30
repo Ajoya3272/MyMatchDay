@@ -29,6 +29,7 @@
     "@capacitor/core": "latest",
     "@capacitor/local-notifications": "^8.3.0",
     "@capacitor/push-notifications": "^8.1.2",
+    "@capacitor/share": "^8.0.1",
     "@ionic/angular": "^8.8.16",
     "firebase": "10.14.1",
     "rxjs": "~7.8.0",

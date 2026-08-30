@@ -21,7 +21,7 @@
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--matchday-text-muted);
+  color: var(--matchday-green);
 }
 
 .ajustes__title {
@@ -96,7 +96,13 @@
 
 .theme-toggle__option--active {
   border-color: var(--matchday-green);
-  box-shadow: 0 10px 20px rgba(34, 197, 94, 0.14);
+  background: rgba(34, 197, 94, 0.08);
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.12);
+}
+
+.theme-toggle__option--active .theme-toggle__icon,
+.theme-toggle__option--active .theme-toggle__label {
+  color: var(--matchday-green);
 }
 
 .theme-toggle__icon {

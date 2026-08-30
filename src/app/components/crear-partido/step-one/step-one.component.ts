@@ -1,9 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, OnInit, Output, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { firstValueFrom } from 'rxjs';
 
 import { PistaService } from '../../../services/pista.service';
 import { UbicacionService } from '../../../services/ubicacion.service';
+import { MiPerfilService } from '../../../services/mi-perfil.service';
 import { Pista } from '../../../interfaces/Pista.interface';
 import {
   MunicipioIne,
@@ -20,6 +22,7 @@ import {
 export class StepOneComponent implements OnInit {
   private pistaService = inject(PistaService);
   private ubicacionService = inject(UbicacionService);
+  private miPerfilService = inject(MiPerfilService);
 
   @Output() pistaSeleccionadaChange = new EventEmitter<Pista>();
 
@@ -39,7 +42,7 @@ export class StepOneComponent implements OnInit {
 
   ngOnInit(): void {
     this.cargarPistas();
-    this.cargarProvincias();
+    void this.inicializarProvincias();
   }
 
   private cargarPistas(): void {
@@ -59,8 +62,55 @@ export class StepOneComponent implements OnInit {
     });
   }
 
-  private async cargarProvincias(): Promise<void> {
+  private async inicializarProvincias(): Promise<void> {
     this.provincias = await this.ubicacionService.obtenerProvincias();
+
+    await this.precargarUbicacionUsuario();
+  }
+
+  private async precargarUbicacionUsuario(): Promise<void> {
+    try {
+      const usuario = await firstValueFrom(this.miPerfilService.usuario$);
+
+      const provinciaUsuario = usuario?.provincia?.trim();
+
+      if (!provinciaUsuario) {
+        return;
+      }
+
+      const provinciaEncontrada = this.provincias.find(
+        (provincia) =>
+          this.normalizar(provincia.nombre) ===
+          this.normalizar(provinciaUsuario),
+      );
+
+      if (!provinciaEncontrada) {
+        return;
+      }
+
+      await this.seleccionarProvincia(provinciaEncontrada.provincia_id);
+
+      const localidadUsuario = usuario?.localidad?.trim();
+
+      if (!localidadUsuario) {
+        return;
+      }
+
+      const municipioEncontrado = this.municipios.find(
+        (municipio) =>
+          this.normalizar(municipio.nombre) ===
+          this.normalizar(localidadUsuario),
+      );
+
+      if (municipioEncontrado) {
+        this.seleccionarMunicipio(municipioEncontrado.municipio_id);
+      }
+    } catch (error) {
+      console.error(
+        '[STEP-ONE] Error precargando ubicación del usuario:',
+        error,
+      );
+    }
   }
 
   async seleccionarProvincia(provinciaId: string): Promise<void> {

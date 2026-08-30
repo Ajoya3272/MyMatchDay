@@ -34,6 +34,10 @@ interface FirebaseCallableError {
   details?: unknown;
 }
 
+interface CancelarPartidoRequest {
+  partidoId: string;
+}
+
 export interface PartidoCarrusel extends Partido {
   estadoClase?: EstadoPartidoVista;
   estadoTexto?: string;
@@ -356,6 +360,13 @@ export class CarruselComponent implements OnInit, OnDestroy {
     this.selectedMatchToDelete = null;
   }
 
+  private obtenerCallableCancelarPartido() {
+    return httpsCallable<CancelarPartidoRequest, CancelarPartidoResponse>(
+      this.functions,
+      'cancelarPartido',
+    );
+  }
+
   async confirmDeleteMatch(): Promise<void> {
     const match = this.selectedMatchToDelete;
 
@@ -371,12 +382,9 @@ export class CarruselComponent implements OnInit, OnDestroy {
     try {
       this.deletingMatchId = match.partidoId;
 
-      const cancelarPartido = httpsCallable<
-        { partidoId: string },
-        CancelarPartidoResponse
-      >(this.functions, 'cancelarPartido');
+      const cancelarPartidoFn = this.obtenerCallableCancelarPartido();
 
-      const resultado = await cancelarPartido({
+      const resultado = await cancelarPartidoFn({
         partidoId: match.partidoId,
       });
 
@@ -384,7 +392,7 @@ export class CarruselComponent implements OnInit, OnDestroy {
         throw new Error('No se pudo cancelar el partido.');
       }
 
-      await this.notificaciones.notificarPartidoCanceladoOrganizador(match);
+      await this.notificaciones.cancelarAvisoPartido(match.partidoId);
 
       this.eliminarDelCarrusel(match.partidoId);
       this.isDeleteModalOpen = false;
@@ -402,7 +410,7 @@ export class CarruselComponent implements OnInit, OnDestroy {
         mensajeNormalizado.includes('ya esta cancelado');
 
       if (yaEstaCancelado) {
-        await this.notificaciones.notificarPartidoCanceladoOrganizador(match);
+        await this.notificaciones.cancelarAvisoPartido(match.partidoId);
 
         this.eliminarDelCarrusel(match.partidoId);
         this.isDeleteModalOpen = false;

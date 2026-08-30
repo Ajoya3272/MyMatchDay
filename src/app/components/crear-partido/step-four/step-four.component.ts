@@ -6,6 +6,8 @@ import {
   OnDestroy,
   Output,
 } from '@angular/core';
+import { Share } from '@capacitor/share';
+import { Capacitor } from '@capacitor/core';
 
 @Component({
   selector: 'app-step-four',
@@ -28,22 +30,31 @@ export class StepFourComponent implements OnDestroy {
       return;
     }
 
-    const shareData = {
-      title: 'Invitación a un partido',
-      text: 'Únete a mi partido en JoinMatch',
-      url: this.inviteLink,
-    };
-
     try {
+      if (Capacitor.isNativePlatform()) {
+        await Share.share({
+          title: 'Invitación a un partido',
+          text: 'Únete a mi partido en JoinMatch',
+          url: this.inviteLink,
+          dialogTitle: 'Invitar al partido',
+        });
+        return;
+      }
+
       if (navigator.share) {
-        await navigator.share(shareData);
+        await navigator.share({
+          title: 'Invitación a un partido',
+          text: 'Únete a mi partido en JoinMatch',
+          url: this.inviteLink,
+        });
         return;
       }
 
       await this.copiarAlPortapapeles();
     } catch (error) {
       const esCancelacionUsuario =
-        error instanceof DOMException && error.name === 'AbortError';
+        (error instanceof DOMException && error.name === 'AbortError') ||
+        (error instanceof Error && error.message === 'Share canceled');
 
       if (esCancelacionUsuario) {
         return;

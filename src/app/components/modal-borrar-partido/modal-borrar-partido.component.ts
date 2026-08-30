@@ -47,14 +47,12 @@ export class ModalBorrarPartidoComponent {
     }
   }
 
-  getImporteReembolso(partido: Partido): string {
-    const match = partido as PartidoConPago;
+  tieneReembolso(partido: Partido): boolean {
+    return this.obtenerImporte(partido) > 0;
+  }
 
-    const importe =
-      Number(match.precio) ||
-      Number(match.importePagado) ||
-      Number(match.totalPagado) ||
-      0;
+  getImporteReembolso(partido: Partido): string {
+    const importe = this.obtenerImporte(partido);
 
     return new Intl.NumberFormat('es-ES', {
       style: 'currency',
@@ -72,6 +70,17 @@ export class ModalBorrarPartidoComponent {
       match.emailPago ||
       match.email ||
       'Cuenta de PayPal utilizada para el pago'
+    );
+  }
+
+  private obtenerImporte(partido: Partido): number {
+    const match = partido as PartidoConPago;
+
+    return (
+      Number(match.precio) ||
+      Number(match.importePagado) ||
+      Number(match.totalPagado) ||
+      0
     );
   }
 }

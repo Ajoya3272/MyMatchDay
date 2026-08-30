@@ -218,14 +218,12 @@ async function crearAvisosCancelacion(
   });
 }
 
-async function obtenerTokensJugadores(
-  jugadoresUid: string[],
-): Promise<TokenJugador[]> {
-  if (jugadoresUid.length === 0) {
+async function obtenerTokensJugadores(uids: string[]): Promise<TokenJugador[]> {
+  if (uids.length === 0) {
     return [];
   }
 
-  const refs = jugadoresUid.map((uid) => db.collection("usuarios").doc(uid));
+  const refs = uids.map((uid) => db.collection("usuarios").doc(uid));
   const snapshots = await db.getAll(...refs);
 
   const tokens: TokenJugador[] = [];
@@ -246,35 +244,25 @@ async function obtenerTokensJugadores(
   return tokens;
 }
 
-async function enviarPushCancelacion(
-  tokensJugadores: TokenJugador[],
-  partidoId: string,
-  partido: PartidoFirestore,
-  fecha: Date,
+async function enviarPushGenerico(
+  tokensDestino: TokenJugador[],
+  titulo: string,
+  cuerpo: string,
+  datosExtra: Record<string, string>,
 ): Promise<void> {
-  if (tokensJugadores.length === 0) {
+  if (tokensDestino.length === 0) {
     return;
   }
 
-  const nombreOrganizador = obtenerNombreOrganizador(partido);
-  const nombrePartido = obtenerNombrePartido(partido);
-  const nombrePista = obtenerNombrePista(partido);
-  const fechaTexto = obtenerFechaTexto(fecha);
-
-  const tokens = tokensJugadores.map((tj) => tj.token);
+  const tokens = tokensDestino.map((tj) => tj.token);
 
   const mensaje: MulticastMessage = {
     tokens,
     notification: {
-      title: "⚽ Partido cancelado",
-      body:
-        `${nombreOrganizador} ha cancelado "${nombrePartido}". ` +
-        `${nombrePista} · ${fechaTexto}`,
+      title: titulo,
+      body: cuerpo,
     },
-    data: {
-      tipo: "partido-cancelado",
-      partidoId,
-    },
+    data: datosExtra,
     android: {
       priority: "high",
     },
@@ -283,7 +271,7 @@ async function enviarPushCancelacion(
   const respuesta = await getMessaging().sendEachForMulticast(mensaje);
 
   console.log("[CANCELAR PARTIDO] Push enviados:", {
-    partidoId,
+    titulo,
     exitosos: respuesta.successCount,
     fallidos: respuesta.failureCount,
   });
@@ -305,7 +293,7 @@ async function enviarPushCancelacion(
       return;
     }
 
-    const tokenJugador = tokensJugadores[indice];
+    const tokenJugador = tokensDestino[indice];
     const usuarioRef = db.collection("usuarios").doc(tokenJugador.uid);
 
     lote.update(usuarioRef, {
@@ -318,6 +306,51 @@ async function enviarPushCancelacion(
   if (tokensInvalidos > 0) {
     await lote.commit();
   }
+}
+
+async function enviarPushCancelacion(
+  tokensJugadores: TokenJugador[],
+  partidoId: string,
+  partido: PartidoFirestore,
+  fecha: Date,
+): Promise<void> {
+  const nombreOrganizador = obtenerNombreOrganizador(partido);
+  const nombrePartido = obtenerNombrePartido(partido);
+  const nombrePista = obtenerNombrePista(partido);
+  const fechaTexto = obtenerFechaTexto(fecha);
+
+  await enviarPushGenerico(
+    tokensJugadores,
+    "⚽ Partido cancelado",
+    `${nombreOrganizador} ha cancelado "${nombrePartido}". ` +
+      `${nombrePista} · ${fechaTexto}`,
+    {
+      tipo: "partido-cancelado",
+      partidoId,
+    },
+  );
+}
+
+async function enviarPushConfirmacionOrganizador(
+  tokensOrganizador: TokenJugador[],
+  partidoId: string,
+  partido: PartidoFirestore,
+  fecha: Date,
+): Promise<void> {
+  const nombrePartido = obtenerNombrePartido(partido);
+  const nombrePista = obtenerNombrePista(partido);
+  const fechaTexto = obtenerFechaTexto(fecha);
+
+  await enviarPushGenerico(
+    tokensOrganizador,
+    "⚽ Partido cancelado",
+    `Has cancelado "${nombrePartido}" correctamente. ` +
+      `${nombrePista} · ${fechaTexto}`,
+    {
+      tipo: "partido-cancelado-organizador",
+      partidoId,
+    },
+  );
 }
 
 export const cancelarPartido = onCall(
@@ -421,9 +454,19 @@ export const cancelarPartido = onCall(
         partido.jugadoresId,
         request.auth.uid,
       );
-      const tokensJugadores = await obtenerTokensJugadores(jugadores);
+
+      const [tokensJugadores, tokensOrganizador] = await Promise.all([
+        obtenerTokensJugadores(jugadores),
+        obtenerTokensJugadores([request.auth.uid]),
+      ]);
 
       await enviarPushCancelacion(tokensJugadores, partidoId, partido, fecha);
+      await enviarPushConfirmacionOrganizador(
+        tokensOrganizador,
+        partidoId,
+        partido,
+        fecha,
+      );
     } catch (error) {
       console.error(
         "[CANCELAR PARTIDO] No se pudieron enviar los avisos:",

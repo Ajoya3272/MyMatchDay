@@ -128,6 +128,11 @@
   margin-top: 16px;
 }
 
+.match-card__actions:last-child {
+  margin: auto 0;
+  padding-top: 16px;
+}
+
 .match-card__actions:has(.match-card__cta:only-child) {
   grid-template-columns: 1fr;
 }

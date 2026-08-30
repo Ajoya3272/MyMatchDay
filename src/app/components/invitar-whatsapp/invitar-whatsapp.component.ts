@@ -3,6 +3,8 @@ import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { IonContent, IonSpinner } from '@ionic/angular/standalone';
 import { Auth, authState } from '@angular/fire/auth';
+import { Share } from '@capacitor/share';
+import { Capacitor } from '@capacitor/core';
 import { Observable, of } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { Partido } from '../../interfaces/Partido.interface';
@@ -42,21 +44,36 @@ export class InvitarWhatsappComponent {
     const enlace = this.obtenerEnlaceInvitacion(partido);
     const titulo = this.getTituloPartido(partido);
 
-    const shareData = {
-      title: titulo,
-      text: `Únete a mi partido "${titulo}" en JoinMatch`,
-      url: enlace,
-    };
-
     try {
+      if (Capacitor.isNativePlatform()) {
+        await Share.share({
+          title: titulo,
+          text: `Únete a mi partido "${titulo}" en JoinMatch`,
+          url: enlace,
+          dialogTitle: 'Invitar al partido',
+        });
+        return;
+      }
+
       if (navigator.share) {
-        await navigator.share(shareData);
+        await navigator.share({
+          title: titulo,
+          text: `Únete a mi partido "${titulo}" en JoinMatch`,
+          url: enlace,
+        });
         return;
       }
 
       await navigator.clipboard.writeText(enlace);
       alert('Enlace de invitación copiado al portapapeles');
     } catch (error) {
+      const esCancelacionUsuario =
+        error instanceof Error && error.message === 'Share canceled';
+
+      if (esCancelacionUsuario) {
+        return;
+      }
+
       console.error('Error al compartir la invitación:', error);
     }
   }

@@ -8,6 +8,7 @@ import {
   IonMenu,
   IonRouterOutlet,
   MenuController,
+  Platform,
 } from '@ionic/angular/standalone';
 import { HeaderComponent } from './shared/header/header.component';
 import { MenuLateralComponent } from './shared/menu-lateral/menu-lateral.component';
@@ -34,6 +35,7 @@ export class AppComponent {
   private router = inject(Router);
   private menuCtrl = inject(MenuController);
   private location = inject(Location);
+  private platform = inject(Platform);
   private notificacionesService = inject(NotificacionesService);
   private avisosOrganizadorService = inject(AvisosOrganizadorService);
   private loginService = inject(LoginService);
@@ -62,7 +64,7 @@ export class AppComponent {
   }
 
   private inicializarBotonAtras(): void {
-    App.addListener('backButton', async ({ canGoBack }) => {
+    this.platform.backButton.subscribeWithPriority(-1, async () => {
       const menuAbierto = await this.menuCtrl.isOpen('main-menu');
 
       if (menuAbierto) {
@@ -70,12 +72,12 @@ export class AppComponent {
         return;
       }
 
-      if (canGoBack) {
-        this.location.back();
+      if (this.router.url === '/home' || this.router.url === '/login') {
+        await App.exitApp();
         return;
       }
 
-      await App.exitApp();
+      this.location.back();
     });
   }
 

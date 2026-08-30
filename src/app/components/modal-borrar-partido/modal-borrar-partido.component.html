@@ -27,13 +27,24 @@
     </h3>
 
     <ng-container *ngIf="partido as match">
-      <p id="delete-match-description" class="delete-match-modal__text">
+      <p
+        id="delete-match-description"
+        class="delete-match-modal__text"
+        *ngIf="tieneReembolso(match); else sinReembolsoTexto"
+      >
         Se realizará un reembolso de
         <strong>{{ getImporteReembolso(match) }}</strong>
         a la cuenta que realizó el pago.
       </p>
 
-      <div class="delete-match-modal__refund">
+      <ng-template #sinReembolsoTexto>
+        <p id="delete-match-description" class="delete-match-modal__text">
+          Este partido no tiene ningún pago asociado, así que no hay ningún
+          reembolso que realizar.
+        </p>
+      </ng-template>
+
+      <div class="delete-match-modal__refund" *ngIf="tieneReembolso(match)">
         <span class="delete-match-modal__refund-icon">↩</span>
 
         <div class="delete-match-modal__refund-content">
@@ -85,7 +96,7 @@
         (click)="onCancel()"
         [disabled]="loading"
       >
-        Cancelar reembolso
+        Volver
       </button>
 
       <button
@@ -94,7 +105,15 @@
         (click)="onConfirm()"
         [disabled]="loading"
       >
-        {{ loading ? "Reembolsando..." : "Aceptar y reembolsar" }}
+        {{
+          loading
+            ? partido && tieneReembolso(partido)
+              ? "Reembolsando..."
+              : "Cancelando..."
+            : partido && tieneReembolso(partido)
+              ? "Aceptar y reembolsar"
+              : "Cancelar partido"
+        }}
       </button>
     </div>
   </div>
