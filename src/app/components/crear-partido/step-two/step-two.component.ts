@@ -11,8 +11,8 @@ import {
   inject,
 } from '@angular/core';
 import { Timestamp } from '@angular/fire/firestore';
-import { IonDatetime } from '@ionic/angular/standalone';
-import { Subject, takeUntil } from 'rxjs';
+import { IonDatetime, Platform } from '@ionic/angular/standalone';
+import { Subject, takeUntil, Subscription } from 'rxjs';
 
 import { Pista } from '../../../interfaces/Pista.interface';
 import { PistaService } from '../../../services/pista.service';
@@ -45,6 +45,7 @@ const PREFIJO_UBICACION_MANUAL = 'manual-';
 })
 export class StepTwoComponent implements OnInit, OnChanges, OnDestroy {
   private pistaService = inject(PistaService);
+  private platform = inject(Platform);
   private destroy$ = new Subject<void>();
 
   @Input() pista: Pista | null = null;
@@ -58,7 +59,15 @@ export class StepTwoComponent implements OnInit, OnChanges, OnDestroy {
 
   private horasOcupadasPorFecha = new Map<string, Set<string>>();
 
+  private backButtonSubscription: Subscription | null = null;
+
   ngOnInit(): void {
+    this.backButtonSubscription =
+      this.platform.backButton.subscribeWithPriority(20, () => {
+        // Vuelve al paso 1 y evita que Ionic navegue hacia atrás.
+        this.volver.emit();
+      });
+
     if (this.pista) {
       this.cargarDisponibilidad(this.pista);
     }
@@ -77,6 +86,7 @@ export class StepTwoComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.backButtonSubscription?.unsubscribe();
     this.destroy$.next();
     this.destroy$.complete();
   }

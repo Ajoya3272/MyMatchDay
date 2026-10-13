@@ -30,23 +30,28 @@ export class StepFourComponent implements OnDestroy {
       return;
     }
 
+    const titulo = 'Invitación a un partido';
+    const texto = 'Únete a mi partido en JoinMatch';
+
     try {
       if (Capacitor.isNativePlatform()) {
         await Share.share({
-          title: 'Invitación a un partido',
-          text: 'Únete a mi partido en JoinMatch',
+          title: titulo,
+          text: texto,
           url: this.inviteLink,
           dialogTitle: 'Invitar al partido',
         });
+
         return;
       }
 
       if (navigator.share) {
         await navigator.share({
-          title: 'Invitación a un partido',
-          text: 'Únete a mi partido en JoinMatch',
+          title: titulo,
+          text: texto,
           url: this.inviteLink,
         });
+
         return;
       }
 

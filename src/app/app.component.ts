@@ -42,13 +42,14 @@ export class AppComponent {
 
   hideLayout = false;
 
+  private currentUrl = this.router.url;
   private previousUrl: string | null = null;
 
   private readonly themeStorageKey = 'theme';
 
   constructor() {
     this.initializeTheme();
-    this.updateLayout(this.router.url);
+    this.updateLayout(this.currentUrl);
 
     this.router.events
       .pipe(
@@ -57,8 +58,10 @@ export class AppComponent {
         ),
       )
       .subscribe((event) => {
-        this.previousUrl = this.router.url;
-        this.updateLayout(event.urlAfterRedirects);
+        this.previousUrl = this.currentUrl;
+        this.currentUrl = event.urlAfterRedirects;
+
+        this.updateLayout(this.currentUrl);
       });
 
     void this.inicializarNotificaciones();
@@ -75,7 +78,7 @@ export class AppComponent {
         return;
       }
 
-      const urlActual = this.router.url.split('?')[0];
+      const urlActual = this.currentUrl.split('?')[0];
 
       const esPantallaPrincipal =
         urlActual === '/home' ||
@@ -83,19 +86,19 @@ export class AppComponent {
         urlActual === '/registro-usuario' ||
         urlActual === '/verificacion-usuario';
 
-      // Si Angular conoce una pantalla anterior, vuelve atrás.
-      if (this.previousUrl && this.previousUrl !== this.router.url) {
-        this.location.back();
-        return;
-      }
-
-      // Si estamos en Home u otra pantalla principal, cerrar la app.
+      // 1. En una pantalla principal, salir de la app.
       if (esPantallaPrincipal) {
         await App.exitApp();
         return;
       }
 
-      // Si no hay historial conocido, volver a Home.
+      // 2. Si Angular conoce una pantalla anterior, volver a ella.
+      if (this.previousUrl) {
+        this.location.back();
+        return;
+      }
+
+      // 3. Sin historial conocido, ir a Home.
       void this.router.navigate(['/home']);
     });
   }

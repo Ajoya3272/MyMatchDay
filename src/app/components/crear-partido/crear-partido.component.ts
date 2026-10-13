@@ -1,7 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, OnDestroy, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { IonContent, IonProgressBar } from '@ionic/angular/standalone';
+import {
+  IonContent,
+  IonProgressBar,
+  Platform,
+} from '@ionic/angular/standalone';
+import { Subscription } from 'rxjs';
 
 import { PartidoService } from '../../services/partido.service';
 import { SpinnerComponent } from '../spinner/spinner.component';
@@ -42,9 +47,10 @@ const DURACION_MINUTOS_FIJA = 60;
     PaypalPaymentComponent,
   ],
 })
-export class CrearPartidoComponent {
+export class CrearPartidoComponent implements OnDestroy {
   private router = inject(Router);
   private partidoService = inject(PartidoService);
+  private platform = inject(Platform);
 
   currentStep = 1;
   created = false;
@@ -58,9 +64,65 @@ export class CrearPartidoComponent {
 
   datosPartidoPendientes: DatosPartido | null = null;
 
+  private backButtonSubscription: Subscription | null = null;
+
+  ionViewWillEnter(): void {
+    this.registrarBotonAtras();
+  }
+
+  ionViewWillLeave(): void {
+    this.quitarBotonAtras();
+  }
+
   ionViewDidLeave(): void {
     this.resetCreateMatch();
     limpiarOverlaysPaypalHuerfanos();
+  }
+
+  ngOnDestroy(): void {
+    this.quitarBotonAtras();
+  }
+
+  private registrarBotonAtras(): void {
+    this.quitarBotonAtras();
+
+    this.backButtonSubscription =
+      this.platform.backButton.subscribeWithPriority(20, () => {
+        this.gestionarBotonAtras();
+      });
+  }
+
+  private quitarBotonAtras(): void {
+    this.backButtonSubscription?.unsubscribe();
+    this.backButtonSubscription = null;
+  }
+
+  private gestionarBotonAtras(): void {
+    if (this.creatingMatch) {
+      return;
+    }
+
+    switch (this.currentStep) {
+      case 1:
+        this.goHome();
+        return;
+
+      case 2:
+        this.volverAPistas();
+        return;
+
+      case 3:
+        if (this.datosPartidoPendientes) {
+          this.cancelarPago();
+          return;
+        }
+
+        this.volverACalendario();
+        return;
+
+      default:
+        this.goHome();
+    }
   }
 
   onPistaSeleccionada(pista: Pista): void {

@@ -1,6 +1,17 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+  inject,
+} from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Platform } from '@ionic/angular/standalone';
+import { Subscription } from 'rxjs';
+
 import { Pista } from '../../../interfaces/Pista.interface';
 
 export interface DatosPartido {
@@ -17,8 +28,9 @@ export interface DatosPartido {
   templateUrl: './step-three.component.html',
   styleUrls: ['./step-three.component.scss'],
 })
-export class StepThreeComponent {
+export class StepThreeComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
+  private platform = inject(Platform);
 
   @Input() pista: Pista | null = null;
   @Input() fecha: Date | null = null;
@@ -35,6 +47,20 @@ export class StepThreeComponent {
     equipoB: ['', [Validators.required, Validators.maxLength(40)]],
     playerCount: [10, [Validators.required, Validators.min(2)]],
   });
+
+  private backButtonSubscription: Subscription | null = null;
+
+  ngOnInit(): void {
+    this.backButtonSubscription =
+      this.platform.backButton.subscribeWithPriority(20, () => {
+        // Vuelve al paso 2 y evita que Ionic navegue hacia atrás.
+        this.volver.emit();
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.backButtonSubscription?.unsubscribe();
+  }
 
   get nombrePartidoControl() {
     return this.form.controls.nombrePartido;

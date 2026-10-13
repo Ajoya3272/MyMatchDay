@@ -14,6 +14,8 @@ import {
   setDoc,
   updateDoc,
 } from '@angular/fire/firestore';
+import { Share } from '@capacitor/share';
+import { Capacitor } from '@capacitor/core';
 import { Observable, combineLatest, of } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import {
@@ -225,22 +227,50 @@ export class DetallesPartidoComponent {
 
     const enlace = this.obtenerEnlaceInvitacion(partido);
 
-    const shareData = {
-      title: partido.nombre,
-      text: `Únete a mi partido "${partido.nombre}" en JoinMatch`,
-      url: enlace,
-    };
+    const titulo = partido.nombre;
+    const texto = `Únete a mi partido "${partido.nombre}" en JoinMatch`;
 
     try {
+      if (Capacitor.isNativePlatform()) {
+        await Share.share({
+          title: titulo,
+          text: texto,
+          url: enlace,
+          dialogTitle: 'Invitar al partido',
+        });
+
+        return;
+      }
+
       if (navigator.share) {
-        await navigator.share(shareData);
+        await navigator.share({
+          title: titulo,
+          text: texto,
+          url: enlace,
+        });
+
         return;
       }
 
       await navigator.clipboard.writeText(enlace);
       alert('Enlace de invitación copiado al portapapeles');
     } catch (error) {
+      const esCancelacionUsuario =
+        (error instanceof DOMException && error.name === 'AbortError') ||
+        (error instanceof Error && error.message === 'Share canceled');
+
+      if (esCancelacionUsuario) {
+        return;
+      }
+
       console.error('Error al compartir la invitación:', error);
+
+      try {
+        await navigator.clipboard.writeText(enlace);
+        alert('Enlace de invitación copiado al portapapeles');
+      } catch (copyError) {
+        console.error('Error al copiar el enlace de invitación:', copyError);
+      }
     }
   }
 
