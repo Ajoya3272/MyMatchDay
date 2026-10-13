@@ -42,6 +42,8 @@ export class AppComponent {
 
   hideLayout = false;
 
+  private previousUrl: string | null = null;
+
   private readonly themeStorageKey = 'theme';
 
   constructor() {
@@ -55,6 +57,7 @@ export class AppComponent {
         ),
       )
       .subscribe((event) => {
+        this.previousUrl = this.router.url;
         this.updateLayout(event.urlAfterRedirects);
       });
 
@@ -80,18 +83,19 @@ export class AppComponent {
         urlActual === '/registro-usuario' ||
         urlActual === '/verificacion-usuario';
 
+      // Si Angular conoce una pantalla anterior, vuelve atrás.
+      if (this.previousUrl && this.previousUrl !== this.router.url) {
+        this.location.back();
+        return;
+      }
+
+      // Si estamos en Home u otra pantalla principal, cerrar la app.
       if (esPantallaPrincipal) {
         await App.exitApp();
         return;
       }
 
-      // Si hay historial, vuelve a la pantalla anterior.
-      if (window.history.length > 1) {
-        this.location.back();
-        return;
-      }
-
-      // Si no hay historial, vuelve al home en lugar de cerrar la app.
+      // Si no hay historial conocido, volver a Home.
       void this.router.navigate(['/home']);
     });
   }
