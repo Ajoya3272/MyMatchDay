@@ -1,12 +1,15 @@
+ion-content.estadisticas-page {
+  --background: var(--matchday-bg);
+  color: var(--matchday-text);
+}
+
 .estadisticas-page {
   --padding-start: 0;
   --padding-end: 0;
   --padding-top: 0;
   --padding-bottom: 40px;
-  --background: #f4f5f7;
-  --color: #111827;
 
-  color: #111827;
+  color: var(--matchday-text);
 
   &__container {
     width: 100%;
@@ -20,7 +23,7 @@
     display: block;
     margin: 0 0 18px;
     padding: 0;
-    color: #111827 !important;
+    color: var(--matchday-text) !important;
     text-align: left;
   }
 
@@ -28,7 +31,7 @@
     display: block;
     margin: 0 0 7px;
     padding: 0;
-    color: #111827 !important;
+    color: var(--matchday-text) !important;
     font-size: 1.55rem;
     font-weight: 800;
     line-height: 1.2;
@@ -39,7 +42,7 @@
     display: block;
     margin: 0;
     padding: 0;
-    color: #6b7280 !important;
+    color: var(--matchday-text-muted) !important;
     font-size: 0.9rem;
     font-weight: 400;
     line-height: 1.4;
@@ -65,28 +68,28 @@
     align-items: center;
     justify-content: center;
     padding: 64px 24px;
-    color: #6b7280 !important;
+    color: var(--matchday-text-muted) !important;
     text-align: center;
   }
 
   &__loading p,
   &__empty p {
     margin: 0;
-    color: #6b7280 !important;
+    color: var(--matchday-text-muted) !important;
     font-size: 13px;
     line-height: 1.4;
   }
 
   &__empty h2 {
     margin: 12px 0 6px;
-    color: #111827 !important;
+    color: var(--matchday-text) !important;
     font-size: 17px;
     font-weight: 700;
     line-height: 1.25;
   }
 
   &__empty-icon {
-    color: #111827;
+    color: var(--matchday-text);
     font-size: 40px;
     line-height: 1;
   }
@@ -96,8 +99,8 @@
   width: 32px;
   height: 32px;
   margin-bottom: 12px;
-  border: 3px solid #e5e7eb;
-  border-top-color: #22c55e;
+  border: 3px solid var(--matchday-border);
+  border-top-color: var(--matchday-green);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -160,7 +163,8 @@
   margin-bottom: 16px;
   padding: 18px 16px;
   border-radius: 18px;
-  background: #ffffff;
+  background: var(--matchday-surface);
+  border: 1px solid var(--matchday-border);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
 
   &__heading {
@@ -170,14 +174,14 @@
 
   &__heading h2 {
     margin: 0 0 2px;
-    color: #111827 !important;
+    color: var(--matchday-text) !important;
     font-size: 15px;
     font-weight: 700;
   }
 
   &__heading p {
     margin: 0;
-    color: #9ca3af !important;
+    color: var(--matchday-text-muted) !important;
     font-size: 11px;
   }
 
@@ -200,7 +204,7 @@
 
   &__bar-value {
     margin-bottom: 6px;
-    color: #d1d5db !important;
+    color: var(--matchday-text-muted) !important;
     font-size: 11px;
     font-weight: 700;
 
@@ -217,14 +221,14 @@
     height: 100%;
     overflow: hidden;
     border-radius: 10px;
-    background: #f3f4f6;
+    background: var(--matchday-surface-2);
   }
 
   &__bar-fill {
     width: 100%;
     min-height: 0;
     border-radius: 10px 10px 0 0;
-    background: #e5e7eb;
+    background: var(--matchday-border);
     transition: height 0.4s ease;
 
     &--filled {
@@ -234,7 +238,7 @@
 
   &__bar-label {
     margin-top: 8px;
-    color: #9ca3af !important;
+    color: var(--matchday-text-muted) !important;
     font-size: 10px;
     font-weight: 600;
     line-height: 1.1;
@@ -257,7 +261,8 @@
   padding: 14px 10px 16px;
   border-left: 4px solid transparent;
   border-radius: 16px;
-  background: #ffffff;
+  background: var(--matchday-surface);
+  border: 1px solid var(--matchday-border);
   text-align: center;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
   box-sizing: border-box;
@@ -303,21 +308,21 @@
   }
 
   &__value {
-    color: #111827 !important;
+    color: var(--matchday-text) !important;
     font-size: 22px;
     font-weight: 800;
     line-height: 1.1;
   }
 
   &__title {
-    color: #374151 !important;
+    color: var(--matchday-text) !important;
     font-size: 12px;
     font-weight: 600;
     line-height: 1.15;
   }
 
   &__subtitle {
-    color: #9ca3af !important;
+    color: var(--matchday-text-muted) !important;
     font-size: 11px;
     line-height: 1.2;
   }

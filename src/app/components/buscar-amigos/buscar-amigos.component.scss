@@ -2,26 +2,26 @@
   display: block;
   width: 100%;
   height: 100%;
-  background: #f5f7fb;
-  color: #111827;
+  background: var(--matchday-bg);
+  color: var(--matchday-text);
 }
 
 ion-content.buscar-amigos {
-  --background: #f5f7fb;
-  --color: #111827;
+  --background: var(--matchday-bg);
+  --color: var(--matchday-text);
 
   display: block;
   width: 100%;
   height: 100%;
-  color: #111827;
+  color: var(--matchday-text);
 }
 
 .buscar-amigos__inner {
   width: 100%;
   min-height: 100%;
   padding: 88px 20px 32px;
-  background: #f5f7fb;
-  color: #111827;
+  background: var(--matchday-bg);
+  color: var(--matchday-text);
 }
 
 .buscar-amigos__header {
@@ -29,14 +29,14 @@ ion-content.buscar-amigos {
   margin: 0 0 22px;
   padding: 0;
   background: transparent;
-  color: #111827;
+  color: var(--matchday-text);
 }
 
 .buscar-amigos__header h1 {
   display: block;
   margin: 0 0 8px;
   padding: 0;
-  color: #111827 !important;
+  color: var(--matchday-text) !important;
   font-family: "Inter", "Segoe UI", sans-serif;
   font-size: 1.55rem;
   font-weight: 800;
@@ -48,7 +48,7 @@ ion-content.buscar-amigos {
   display: block;
   margin: 0;
   padding: 0;
-  color: #6b7280 !important;
+  color: var(--matchday-text-muted) !important;
   font-family: "Inter", "Segoe UI", sans-serif;
   font-size: 0.92rem;
   font-weight: 400;
@@ -71,11 +71,11 @@ ion-content.buscar-amigos {
   height: 48px;
   margin: 0;
   padding: 0 15px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--matchday-border);
   border-radius: 12px;
   outline: none;
-  background: #ffffff !important;
-  color: #111827 !important;
+  background: var(--matchday-surface) !important;
+  color: var(--matchday-text) !important;
   font-family: "Inter", "Segoe UI", sans-serif;
   font-size: 0.95rem;
   font-weight: 400;
@@ -86,19 +86,19 @@ ion-content.buscar-amigos {
 }
 
 .buscar-amigos__input::placeholder {
-  color: #6b7280 !important;
+  color: var(--matchday-text-muted) !important;
   opacity: 1;
 }
 
 .buscar-amigos__input:hover {
-  border-color: #86efac;
+  border-color: rgba(34, 197, 94, 0.5);
 }
 
 .buscar-amigos__input:focus {
-  border-color: #16a34a;
+  border-color: var(--matchday-green);
   outline: none;
-  background: #ffffff !important;
-  color: #111827 !important;
+  background: var(--matchday-surface) !important;
+  color: var(--matchday-text) !important;
   box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.16);
 }
 
@@ -109,8 +109,8 @@ ion-content.buscar-amigos {
   padding: 0 18px;
   border: 0;
   border-radius: 12px;
-  background: #16a34a !important;
-  color: #ffffff !important;
+  background: var(--matchday-green) !important;
+  color: #0b1220 !important;
   font-family: "Inter", "Segoe UI", sans-serif;
   font-size: 0.9rem;
   font-weight: 800;
@@ -123,7 +123,7 @@ ion-content.buscar-amigos {
 }
 
 .buscar-amigos__search-btn:hover {
-  background: #15803d !important;
+  background: #16a34a !important;
 }
 
 .buscar-amigos__search-btn:active {
@@ -139,7 +139,7 @@ ion-content.buscar-amigos {
 .buscar-amigos__empty {
   display: block;
   margin: 26px 0 0;
-  color: #6b7280 !important;
+  color: var(--matchday-text-muted) !important;
   font-family: "Inter", "Segoe UI", sans-serif;
   font-size: 0.92rem;
   font-weight: 400;
@@ -152,10 +152,10 @@ ion-content.buscar-amigos {
   display: block;
   margin: 14px 0 0;
   padding: 10px 12px;
-  border: 1px solid rgba(185, 28, 28, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.25);
   border-radius: 10px;
-  background: #fee2e2;
-  color: #991b1b !important;
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444 !important;
   font-family: "Inter", "Segoe UI", sans-serif;
   font-size: 0.86rem;
   font-weight: 600;
@@ -178,10 +178,10 @@ ion-content.buscar-amigos {
   width: 100%;
   min-height: 66px;
   padding: 12px 14px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--matchday-border);
   border-radius: 14px;
-  background: #ffffff;
-  color: #111827;
+  background: var(--matchday-surface);
+  color: var(--matchday-text);
 }
 
 .buscar-amigos__item-info {
@@ -203,8 +203,8 @@ ion-content.buscar-amigos {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #eef5ff;
-  color: #16a34a !important;
+  background: rgba(34, 197, 94, 0.12);
+  color: var(--matchday-green) !important;
   font-size: 1rem;
   font-weight: 800;
 }
@@ -213,7 +213,7 @@ ion-content.buscar-amigos {
   display: block;
   min-width: 0;
   overflow: hidden;
-  color: #111827 !important;
+  color: var(--matchday-text) !important;
   font-family: "Inter", "Segoe UI", sans-serif;
   font-size: 0.95rem;
   font-weight: 700;
@@ -229,8 +229,8 @@ ion-content.buscar-amigos {
   padding: 0 14px;
   border: 0;
   border-radius: 999px;
-  background: #16a34a !important;
-  color: #ffffff !important;
+  background: var(--matchday-green) !important;
+  color: #0b1220 !important;
   font-family: "Inter", "Segoe UI", sans-serif;
   font-size: 0.82rem;
   font-weight: 700;
@@ -238,7 +238,7 @@ ion-content.buscar-amigos {
 }
 
 .buscar-amigos__add-btn:hover {
-  background: #15803d !important;
+  background: #16a34a !important;
 }
 
 .buscar-amigos__add-btn:disabled {
@@ -253,8 +253,9 @@ ion-content.buscar-amigos {
   height: 36px;
   padding: 0 13px;
   border-radius: 999px;
-  background: #f3f4f6;
-  color: #6b7280 !important;
+  background: var(--matchday-surface-2);
+  border: 1px solid var(--matchday-border);
+  color: var(--matchday-text-muted) !important;
   font-family: "Inter", "Segoe UI", sans-serif;
   font-size: 0.8rem;
   font-weight: 700;

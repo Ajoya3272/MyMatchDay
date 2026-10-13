@@ -1,7 +1,7 @@
 <ion-content class="estadisticas-page">
   <div class="estadisticas-page__container">
     <header class="estadisticas-page__header">
-      <span class="estadisticas-page__eyebrow"> Perfil de jugador </span>
+      <span class="estadisticas-page__eyebrow">Perfil de jugador</span>
 
       <h1>Historial de {{ nombreJugador }}</h1>
 
@@ -10,6 +10,7 @@
 
     <div class="estadisticas-page__loading" *ngIf="cargando">
       <div class="spinner"></div>
+
       <p>Cargando estadísticas de {{ nombreJugador }}...</p>
     </div>
 
@@ -43,6 +44,7 @@
       <section class="estadisticas-chart">
         <div class="estadisticas-chart__heading">
           <h2>Goles por semana</h2>
+
           <p>Últimas {{ semanasGoles.length }} semanas</p>
         </div>
 
