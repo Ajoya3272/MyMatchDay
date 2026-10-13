@@ -64,7 +64,7 @@ export class AppComponent {
   }
 
   private inicializarBotonAtras(): void {
-    this.platform.backButton.subscribeWithPriority(-1, async () => {
+    this.platform.backButton.subscribeWithPriority(10, async () => {
       const menuAbierto = await this.menuCtrl.isOpen('main-menu');
 
       if (menuAbierto) {
@@ -72,12 +72,27 @@ export class AppComponent {
         return;
       }
 
-      if (this.router.url === '/home' || this.router.url === '/login') {
+      const urlActual = this.router.url.split('?')[0];
+
+      const esPantallaPrincipal =
+        urlActual === '/home' ||
+        urlActual === '/login' ||
+        urlActual === '/registro-usuario' ||
+        urlActual === '/verificacion-usuario';
+
+      if (esPantallaPrincipal) {
         await App.exitApp();
         return;
       }
 
-      this.location.back();
+      // Si hay historial, vuelve a la pantalla anterior.
+      if (window.history.length > 1) {
+        this.location.back();
+        return;
+      }
+
+      // Si no hay historial, vuelve al home en lugar de cerrar la app.
+      void this.router.navigate(['/home']);
     });
   }
 
